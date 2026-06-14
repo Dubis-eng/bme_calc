@@ -1,0 +1,56 @@
+{
+  "$schema": "antigravity_sdd_v2",
+  "project_status": {
+    "current_phase": "4_SURGICAL_EXECUTION",
+    "execution_locked": false
+  },
+  "phase_gates": {
+    "discovery_completed": true,
+    "socratic_questions_answered": 3,
+    "human_review_token": "APPROVED",
+    "architecture_approved": true
+  },
+  "enforcement_metrics": {
+    "max_file_lines": 300,
+    "max_nesting_level": 3,
+    "strict_typing_enforced": true
+  },
+  "atomic_tasks": [
+    {
+      "id": "TASK-501",
+      "description": "Alteração no resolvedor do backend (engine.py) para aceitar IDs alfanuméricos arbitrários em fórmulas via análise da AST",
+      "scope": "backend/engine.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-502",
+      "description": "Criação do modal VariableModal.tsx no frontend para cadastro e edição de propriedades e equações de variáveis",
+      "scope": "frontend/src/components/VariableModal.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-503",
+      "description": "Criação do componente SectorModules.tsx para exibição das variáveis agrupadas por Definição em painéis/módulos visuais",
+      "scope": "frontend/src/components/SectorModules.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-504",
+      "description": "Integração dos componentes no App.tsx e refatoração geral do componente principal para respeitar o limite de 300 linhas físicas",
+      "scope": "frontend/src/App.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-505",
+      "description": "Homologação com testes automatizados e checklist de acessibilidade WCAG/design Maestro UI",
+      "scope": "tests/checklists",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-701",
+      "description": "Criação do arquivo .gitignore na raiz do projeto com as regras para ignorar a pasta .agent/, bancos locais SQLite (*.db), backups SQL (*.sql), ambientes virtuais Python (.venv, __pycache__), diretórios do Node.js (node_modules, dist, build) e arquivos sensíveis (.env*)",
+      "scope": ".gitignore",
+      "status": "DONE"
+    }
+  ]
+}

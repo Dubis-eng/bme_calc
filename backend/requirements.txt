@@ -2,3 +2,9 @@ fastapi
 uvicorn
 pydantic
 networkx
+iapws
+sqlmodel
+scipy
+reportlab
+openpyxl
+psycopg2-binary

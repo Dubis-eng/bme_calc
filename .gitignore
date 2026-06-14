@@ -1,0 +1,58 @@
+# ==============================================================================
+# BME Calc - .gitignore
+# ==============================================================================
+
+# IDEs, Editores e Arquivos de Sistema
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Toolkit de Automação do Antigravity
+.agent/
+
+# Python - Compilação, Caches e Ambientes Virtuais
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.eggs/
+*.egg-info/
+pip-log.txt
+.venv/
+venv/
+env/
+ENV/
+backend/.venv/
+
+# Node.js - Dependências e Artefatos de Build
+node_modules/
+jspm_packages/
+web_modules/
+dist/
+build/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Banco de Dados e Dumps Locais (SQLite, SQL Dumps)
+*.db
+*.sqlite
+*.sql
+backend/test.db
+test.db
+backup_cenarios.sql
+
+# Segurança (Variáveis de Ambiente)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
