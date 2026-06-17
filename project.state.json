@@ -17,39 +17,33 @@
   },
   "atomic_tasks": [
     {
-      "id": "TASK-501",
-      "description": "Alteração no resolvedor do backend (engine.py) para aceitar IDs alfanuméricos arbitrários em fórmulas via análise da AST",
-      "scope": "backend/engine.py",
+      "id": "TASK-901",
+      "description": "Nova Tabela de Setores e Migração no Backend (database.py)",
+      "scope": "backend/database.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-502",
-      "description": "Criação do modal VariableModal.tsx no frontend para cadastro e edição de propriedades e equações de variáveis",
-      "scope": "frontend/src/components/VariableModal.tsx",
+      "id": "TASK-902",
+      "description": "Roteamento CRUD de Setores (main.py, services.py, schemas.py)",
+      "scope": "backend/main.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-503",
-      "description": "Criação do componente SectorModules.tsx para exibição das variáveis agrupadas por Definição em painéis/módulos visuais",
-      "scope": "frontend/src/components/SectorModules.tsx",
+      "id": "TASK-903",
+      "description": "Árvore Hierárquica na Sidebar (Sidebar.tsx)",
+      "scope": "frontend/src/components/Sidebar.tsx",
       "status": "DONE"
     },
     {
-      "id": "TASK-504",
-      "description": "Integração dos componentes no App.tsx e refatoração geral do componente principal para respeitar o limite de 300 linhas físicas",
-      "scope": "frontend/src/App.tsx",
+      "id": "TASK-904",
+      "description": "Painel de Configurações de Setor (SectorConfig.tsx, App.tsx)",
+      "scope": "frontend/src/components/SectorConfig.tsx",
       "status": "DONE"
     },
     {
-      "id": "TASK-505",
-      "description": "Homologação com testes automatizados e checklist de acessibilidade WCAG/design Maestro UI",
-      "scope": "tests/checklists",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-701",
-      "description": "Criação do arquivo .gitignore na raiz do projeto com as regras para ignorar a pasta .agent/, bancos locais SQLite (*.db), backups SQL (*.sql), ambientes virtuais Python (.venv, __pycache__), diretórios do Node.js (node_modules, dist, build) e arquivos sensíveis (.env*)",
-      "scope": ".gitignore",
+      "id": "TASK-905",
+      "description": "Validação Local e Auditoria de Checklists",
+      "scope": "project",
       "status": "DONE"
     }
   ]
