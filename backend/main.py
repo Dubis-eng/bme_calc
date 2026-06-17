@@ -4,12 +4,24 @@ from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
 
 import engine
 import goalseek
 import exports
 from database import create_db_and_tables, get_session, Scenario, ScenarioStatus
+import services
+from schemas import (
+    CalculateRequest,
+    CalculateResponse,
+    ScenarioCreate,
+    StatusUpdate,
+    ScenarioDetail,
+    GoalSeekRequest,
+    ScenarioExportWrapper,
+    SectorCreate,
+    SectorUpdate,
+    SectorDetail
+)
 
 app = FastAPI()
 
@@ -25,32 +37,6 @@ app.add_middleware(
 def on_startup():
     create_db_and_tables()
 
-# Request/Response DTOs
-class CalculateRequest(BaseModel):
-    variables: List[Dict[str, Any]]
-
-class CalculateResponse(BaseModel):
-    results: Dict[str, Any]
-    convergence_error: bool
-    iterations: int
-
-class ScenarioCreate(BaseModel):
-    year_harvest: str
-    reference_month: str
-    variables: List[Dict[str, Any]]
-    status: Optional[ScenarioStatus] = ScenarioStatus.EM_EDICAO
-
-class StatusUpdate(BaseModel):
-    status: ScenarioStatus
-
-class GoalSeekRequest(BaseModel):
-    variables: List[Dict[str, Any]]
-    input_id: str
-    target_id: str
-    target_value: float
-    min_val: Optional[float] = None
-    max_val: Optional[float] = None
-
 # Calculation Endpoint
 @app.post("/api/calculate", response_model=CalculateResponse)
 def calculate(req: CalculateRequest):
@@ -65,29 +51,10 @@ def calculate(req: CalculateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Scenario Persistence Endpoints
-@app.post("/api/scenarios", response_model=Scenario)
+@app.post("/api/scenarios", response_model=ScenarioDetail)
 def create_scenario(req: ScenarioCreate, db=Depends(get_session)):
     try:
-        from sqlmodel import select
-        # Query versions for the same period to assign the next version sequence
-        stmt = select(Scenario.version).where(
-            Scenario.year_harvest == req.year_harvest,
-            Scenario.reference_month == req.reference_month
-        ).order_by(Scenario.version.desc())
-        versions = db.exec(stmt).all()
-        next_version = (versions[0] + 1) if versions else 1
-
-        db_scenario = Scenario(
-            year_harvest=req.year_harvest,
-            reference_month=req.reference_month,
-            version=next_version,
-            status=req.status or ScenarioStatus.EM_EDICAO,
-            variables=req.variables
-        )
-        db.add(db_scenario)
-        db.commit()
-        db.refresh(db_scenario)
-        return db_scenario
+        return services.create_new_scenario(req, db)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -95,7 +62,6 @@ def create_scenario(req: ScenarioCreate, db=Depends(get_session)):
 def list_scenarios(db=Depends(get_session)):
     try:
         from sqlmodel import select
-        # Return scenario metadata to keep response body lightweight
         stmt = select(
             Scenario.id, Scenario.year_harvest, Scenario.reference_month, 
             Scenario.version, Scenario.status, Scenario.created_at, Scenario.updated_at
@@ -119,12 +85,24 @@ def list_scenarios(db=Depends(get_session)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/scenarios/{id}", response_model=Scenario)
+@app.get("/api/scenarios/{id}", response_model=ScenarioDetail)
 def get_scenario(id: uuid.UUID, db=Depends(get_session)):
     db_scenario = db.get(Scenario, id)
     if not db_scenario:
         raise HTTPException(status_code=404, detail="Cenário não encontrado")
-    return db_scenario
+    
+    variables_list = services.get_scenario_variables(id, db)
+    return ScenarioDetail(
+        id=db_scenario.id,
+        nome=db_scenario.nome,
+        year_harvest=db_scenario.year_harvest,
+        reference_month=db_scenario.reference_month,
+        version=db_scenario.version,
+        status=db_scenario.status,
+        variables=variables_list,
+        created_at=db_scenario.created_at,
+        updated_at=db_scenario.updated_at
+    )
 
 @app.patch("/api/scenarios/{id}/status", response_model=Scenario)
 def update_scenario_status(id: uuid.UUID, req: StatusUpdate, db=Depends(get_session)):
@@ -154,7 +132,6 @@ def run_goalseek_endpoint(req: GoalSeekRequest):
     min_v = req.min_val
     max_v = req.max_val
     
-    # Apply default bounds if none specified
     if min_v is None:
         min_v = 0.0 if curr_input_val >= 0 else curr_input_val * 2.0
     if max_v is None:
@@ -186,7 +163,9 @@ def export_pdf(id: uuid.UUID, db=Depends(get_session)):
     if not db_scenario:
         raise HTTPException(status_code=404, detail="Cenário não encontrado")
     
-    pdf_buffer = exports.generate_scenario_pdf(db_scenario)
+    variables = services.get_scenario_variables(id, db)
+    wrapper = ScenarioExportWrapper(db_scenario, variables)
+    pdf_buffer = exports.generate_scenario_pdf(wrapper)
     filename = f"cenario_{db_scenario.year_harvest.replace('/', '_')}_{db_scenario.reference_month}_v{db_scenario.version}.pdf"
     
     return StreamingResponse(
@@ -201,7 +180,9 @@ def export_xlsx(id: uuid.UUID, db=Depends(get_session)):
     if not db_scenario:
         raise HTTPException(status_code=404, detail="Cenário não encontrado")
         
-    xlsx_buffer = exports.generate_scenario_xlsx(db_scenario)
+    variables = services.get_scenario_variables(id, db)
+    wrapper = ScenarioExportWrapper(db_scenario, variables)
+    xlsx_buffer = exports.generate_scenario_xlsx(wrapper)
     filename = f"cenario_{db_scenario.year_harvest.replace('/', '_')}_{db_scenario.reference_month}_v{db_scenario.version}.xlsx"
     
     return StreamingResponse(
@@ -209,3 +190,39 @@ def export_xlsx(id: uuid.UUID, db=Depends(get_session)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+# Sector CRUD Endpoints
+@app.get("/api/sectors", response_model=List[SectorDetail])
+def get_sectors(db=Depends(get_session)):
+    try:
+        return services.list_sectors(db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/sectors", response_model=SectorDetail)
+def create_sector(req: SectorCreate, db=Depends(get_session)):
+    try:
+        return services.create_sector(req, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.patch("/api/sectors/{id}", response_model=SectorDetail)
+def update_sector(id: str, req: SectorUpdate, db=Depends(get_session)):
+    try:
+        return services.update_sector(id, req, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/sectors/{id}")
+def delete_sector(id: str, db=Depends(get_session)):
+    try:
+        services.delete_sector(id, db)
+        return {"success": True, "message": "Setor excluído com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

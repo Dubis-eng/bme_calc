@@ -114,4 +114,51 @@ def test_goal_seek_converge():
     data = response.json()
     assert data["converged"] is True
     assert abs(data["optimal_value"] - 200.0) < 0.01
-    assert abs(data["results"]["H2"] - 500.0) < 0.01
+    assert abs(data["results"]["H2"]["value"] - 500.0) < 0.01
+
+def test_sector_crud_and_validation():
+    # 1. Create a sector
+    payload = {"id": "NOVOS_PROJETOS", "nome": "Novos Projetos", "descricao": "Setor de testes"}
+    res = client.post("/api/sectors", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["id"] == "NOVOS_PROJETOS"
+    assert data["nome"] == "Novos Projetos"
+
+    # 2. Try to create duplicate sector (should fail)
+    res_dup = client.post("/api/sectors", json=payload)
+    assert res_dup.status_code == 400
+
+    # 3. List sectors (should contain NOVOS_PROJETOS)
+    list_res = client.get("/api/sectors")
+    assert list_res.status_code == 200
+    sectors = list_res.json()
+    assert any(s["id"] == "NOVOS_PROJETOS" for s in sectors)
+
+    # 4. Patch sector
+    patch_res = client.patch("/api/sectors/NOVOS_PROJETOS", json={"nome": "Projetos Especiais"})
+    assert patch_res.status_code == 200
+    assert patch_res.json()["nome"] == "Projetos Especiais"
+
+    # 5. Create scenario with variable associated to this sector
+    scen_payload = {
+        "year_harvest": "2026/2027",
+        "reference_month": "Maio",
+        "variables": [
+            {
+                "ID - REF": "H1000",
+                "SETOR": "NOVOS_PROJETOS",
+                "DEFINIÇÃO": "SUB_PROJ",
+                "DESCRIÇÃO": "Variável de teste",
+                "TIPO": "INPUT",
+                "UNIDADE DE MEDIDA": "t/d",
+                "EQUAÇÕES E VALORES": "500"
+            }
+        ]
+    }
+    client.post("/api/scenarios", json=scen_payload)
+
+    # 6. Try to delete sector (should fail because H1000 is associated)
+    del_res = client.delete("/api/sectors/NOVOS_PROJETOS")
+    assert del_res.status_code == 400
+    assert "Não é possível excluir" in del_res.json()["detail"]

@@ -21,22 +21,21 @@ def test_formula_normalization():
     assert normalize_formula("=PROCV(1,7;Vapor!$A$8:$I$61;6;FALSO)") == 'PROCV(1.7,"Vapor",6,False)'
 
 def test_lazy_evaluation():
-    # Test SE lazy evaluation where the unused branch would have error (e.g. div by 0)
-    # H5 = 0, H4 = 0, H6 = 2
     state = {
         "H5": Decimal("0"),
         "H4": Decimal("0"),
         "H6": Decimal("2")
     }
-    # This formula would raise ZeroDivisionError in false branch (H6/H4), but condition (H5==0) is true
     formula = "=SE(H5=0;0;H6/H4)"
     val = parse_equation(formula, state)
-    assert val == Decimal("0")
+    assert val["value"] == Decimal("0")
+    assert val["status"] == "OK"
 
     # Test SEERRO capturing error
     formula_error = "=SEERRO(H6/H4;999)"
     val_err = parse_equation(formula_error, state)
-    assert val_err == Decimal("999")
+    assert val_err["value"] == Decimal("999")
+    assert val_err["status"] == "OK"
 
 def test_soma_ranges():
     state = {
@@ -47,66 +46,55 @@ def test_soma_ranges():
         "H205": Decimal("5"),
         "H206": Decimal("5")
     }
-    # SOMA(H199:H202; H205; H206) = 10+20+30+40 + 5 + 5 = 110
     formula = "=SOMA(H199:H202;H205;H206)"
     val = parse_equation(formula, state)
-    assert val == Decimal("110")
+    assert val["value"] == Decimal("110")
+    assert val["status"] == "OK"
 
 def test_decimal_precision():
-    # Float precision problem: 0.1 + 0.2 != 0.3
-    # With Decimal, it should be exact
     state = {
         "H1": Decimal("0.1"),
         "H2": Decimal("0.2")
     }
     formula = "=H1+H2"
     val = parse_equation(formula, state)
-    assert val == Decimal("0.3")
+    assert val["value"] == Decimal("0.3")
+    assert val["status"] == "OK"
 
 def test_procv_vapor():
     state = {
-        "H363": Decimal("1.7") # 1.7 bar gauge
+        "H363": Decimal("1.7")
     }
     
-    # Test temperature column 2: saturated steam temp at 1.7 bar-g (approx 130.13 °C)
     formula_temp = "=PROCV(H363;Vapor!$A$8:$I$61;2;FALSO)"
     val_temp = parse_equation(formula_temp, state)
-    # Saturation temp at 2.71325 bar-a is 130.13... Celsius
-    assert abs(float(val_temp) - 130.13) < 0.2, f"Expected ~130.13, got {val_temp}"
+    assert abs(float(val_temp["value"]) - 130.13) < 0.2, f"Expected ~130.13, got {val_temp}"
+    assert val_temp["status"] == "OK"
 
-    # Test latent heat column 6: saturation latent heat at 1.7 bar-g in kcal/kg
     formula_heat = "=PROCV(1,7;Vapor!$A$8:$I$61;6;FALSO)"
     val_heat = parse_equation(formula_heat, state)
-    # latent heat of vaporization is approx 2174.4 kJ/kg -> 2174.4 / 4.18 = 520.19 kcal/kg
-    assert abs(float(val_heat) - 520.19) < 0.5, f"Expected ~520.19, got {val_heat}"
+    assert abs(float(val_heat["value"]) - 520.19) < 0.5, f"Expected ~520.19, got {val_heat}"
+    assert val_heat["status"] == "OK"
 
 def test_epic3_functions():
-    # Test LN
     state = {"H1": Decimal("2.718281828459")}
-    assert abs(float(parse_equation("=LN(H1)", state)) - 1.0) < 0.0001
+    assert abs(float(parse_equation("=LN(H1)", state)["value"]) - 1.0) < 0.0001
     
-    # Test SUBTOTAL (9 corresponds to SUM)
     state_sub = {
         "H203": Decimal("15"),
         "H204": Decimal("25")
     }
-    assert parse_equation("=SUBTOTAL(9;H203:H204)", state_sub) == Decimal("40")
+    assert parse_equation("=SUBTOTAL(9;H203:H204)", state_sub)["value"] == Decimal("40")
     
-    # Test SOMASES
     state_ses = {
         "H489": Decimal("10"), "H490": Decimal("20"), "H491": Decimal("30"),
         "H349": "v1", "H350": "v2", "H351": "v1"
     }
-    # SOMASES(H489:H491; H349:H351; "v1") should sum H489 and H491 -> 10 + 30 = 40
-    assert parse_equation("=SOMASES(H489:H491;H349:H351;\"v1\")", state_ses) == Decimal("40")
+    assert parse_equation("=SOMASES(H489:H491;H349:H351;\"v1\")", state_ses)["value"] == Decimal("40")
     
-    # Test H273 custom ethanol-water mixture density calculation based on H272 (INPM % of ethanol)
-    # INPM = 7.27
     state_density = {"H272": Decimal("7.27")}
     val_density = parse_equation("=SE(H272>100;0;H273)", state_density, ref="H273")
-    # density = 0.99823 - 0.001625 * 7.27 - 0.0000045 * (7.27 ** 2)
-    # density = 0.99823 - 0.01181375 - 0.0002378385 = 0.9861784
-    assert abs(float(val_density) - 0.9861784) < 0.0001, f"Expected ~0.9861784, got {val_density}"
+    assert abs(float(val_density["value"]) - 0.9861784) < 0.0001
 
 def test_epic1_baseline():
     import os
@@ -117,14 +105,8 @@ def test_epic1_baseline():
 
     res = calculate_state(data)
     
-    # H9 = (H7+H5)*H3 = (900+400)*24 = 31200
-    assert res["results"]["H9"] == 31200.0
-    
-    # H12 = "=SE(H5=0;0;H5*H8/H4*(H11/708)/H10)"
-    # 400 * 0.135 / 6 * (4000/708) / 0.119 = 427.289569... -> 427.2896
-    assert abs(res["results"]["H12"] - 427.2896) < 0.001
-    
-    # Check that metadata is returned
+    assert res["results"]["H9"]["value"] == 31200.0
+    assert abs(res["results"]["H12"]["value"] - 427.2896) < 0.001
     assert "convergence_error" in res
     assert "iterations" in res
     assert res["convergence_error"] is False
@@ -160,7 +142,7 @@ def test_custom_alphanumeric_ids():
         }
     ]
     res = calculate_state(variables)
-    assert res["results"]["MOENDA_VELOCIDADE"] == 9.0
+    assert res["results"]["MOENDA_VELOCIDADE"]["value"] == 9.0
     assert res["convergence_error"] is False
 
 if __name__ == "__main__":
@@ -173,4 +155,3 @@ if __name__ == "__main__":
     test_epic1_baseline()
     test_custom_alphanumeric_ids()
     print("All custom backend engine tests passed successfully!")
-
