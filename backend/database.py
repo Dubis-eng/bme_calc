@@ -1,17 +1,40 @@
 import os
 import datetime
 import uuid
+import json
+import re
 from enum import Enum
 from typing import List, Dict, Any, Optional
 from sqlmodel import SQLModel, Field, Session, create_engine, select, Column, JSON
+from sqlalchemy import text, inspect
 
-# Scenario Status Enum
+# ── ENUMS ───────────────────────────────────────────────────────────────────
+
 class ScenarioStatus(str, Enum):
     EM_EDICAO = "Em Edição"
     APROVADO = "Aprovado"
     FINAL = "Final"
 
-# Database Configuration
+class VariableType(str, Enum):
+    INPUT = "INPUT"
+    OUTPUT = "OUTPUT"
+    DERIVADA = "DERIVADA"
+    CENARIO = "CENARIO"
+
+class VariableStatus(str, Enum):
+    ATIVA = "ativa"
+    PENDENTE = "pendente"
+    INVALIDA = "inválida"
+    DESCONTINUADA = "descontinuada"
+
+class ResultStatus(str, Enum):
+    OK = "OK"
+    DIV_BY_ZERO = "DIV_BY_ZERO"
+    MISSING_VAR = "MISSING_VAR"
+    PENDING = "PENDING"
+
+# ── DATABASE CONFIGURATION ─────────────────────────────────────────────────
+
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://uisa_user:uisa_password@localhost:5432/bme_calc")
 
 connect_args = {}
@@ -20,16 +43,24 @@ if DATABASE_URL.startswith("sqlite"):
 
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
-# Scenario SQLModel Database Table
+# ── MODELS ──────────────────────────────────────────────────────────────────
+
+class Sector(SQLModel, table=True):
+    __tablename__ = "sectors"
+
+    id: str = Field(primary_key=True, index=True)  # Technical ID e.g. "MOAGEM"
+    nome: str = Field(index=True)                 # Friendly name
+    descricao: str = Field(default="")
+
 class Scenario(SQLModel, table=True):
     __tablename__ = "scenarios"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    nome: str = Field(index=True)
     year_harvest: str = Field(index=True)
     reference_month: str = Field(index=True)
     version: int = Field(default=1, index=True)
     status: ScenarioStatus = Field(default=ScenarioStatus.EM_EDICAO, sa_column_kwargs={"nullable": False})
-    variables: List[Dict[str, Any]] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     created_at: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow,
         sa_column_kwargs={"nullable": False}
@@ -39,9 +70,223 @@ class Scenario(SQLModel, table=True):
         sa_column_kwargs={"nullable": False}
     )
 
+class Variable(SQLModel, table=True):
+    __tablename__ = "variables"
+
+    id: str = Field(primary_key=True, index=True)  # ID/REF técnico ex: "MOENDA_RPM"
+    nome: str = Field(index=True)  # Nome amigável
+    descricao: str = Field(default="")
+    setor_id: str = Field(foreign_key="sectors.id", index=True)
+    tipo: VariableType = Field(default=VariableType.INPUT, sa_column_kwargs={"nullable": False})
+    unidade: str = Field(default="")
+    status: VariableStatus = Field(default=VariableStatus.ATIVA, sa_column_kwargs={"nullable": False})
+
+class Equation(SQLModel, table=True):
+    __tablename__ = "equations"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    variable_id: str = Field(foreign_key="variables.id", index=True)
+    expression_original: str = Field(sa_column_kwargs={"nullable": False})
+    expression_normalized: str = Field(sa_column_kwargs={"nullable": False})
+    version: int = Field(default=1)
+    status: str = Field(default="ativa")
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    updated_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+class Dependency(SQLModel, table=True):
+    __tablename__ = "dependencies"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    equation_id: uuid.UUID = Field(foreign_key="equations.id", index=True)
+    dependency_var_id: str = Field(foreign_key="variables.id", index=True)
+    evaluation_order: int = Field(default=0)
+
+class Result(SQLModel, table=True):
+    __tablename__ = "results"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    variable_id: str = Field(foreign_key="variables.id", index=True)
+    scenario_id: uuid.UUID = Field(foreign_key="scenarios.id", index=True)
+    value: Optional[float] = Field(default=None, sa_column_kwargs={"nullable": True})
+    status: ResultStatus = Field(default=ResultStatus.PENDING, sa_column_kwargs={"nullable": False})
+    error_message: str = Field(default="")
+    timestamp: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+# ── IMPLEMENTATION DETAILS & MIGRATIONS ────────────────────────────────────
+
+def migrate_legacy_data(session: Session):
+    inspector = inspect(session.bind)
+    if "scenarios" not in inspector.get_table_names():
+        return
+
+    columns = [col["name"] for col in inspector.get_columns("scenarios")]
+    if "variables" not in columns:
+        return
+
+    # 1. Fetch all records from the old table
+    rows = session.execute(
+        text("SELECT id, year_harvest, reference_month, version, status, variables, created_at, updated_at FROM scenarios")
+    ).fetchall()
+
+    # 2. Drop old scenarios table and its indexes to avoid conflicts
+    session.execute(text("DROP TABLE scenarios CASCADE"))
+    session.commit()
+
+    # 3. Create new tables
+    SQLModel.metadata.create_all(session.bind)
+
+    # 4. Migrate the data
+    for row in rows:
+        scenario_id, year_harvest, reference_month, version, status, variables_json, created_at, updated_at = row
+
+        if isinstance(variables_json, str):
+            variables_list = json.loads(variables_json)
+        else:
+            variables_list = variables_json
+
+        # Create new Scenario record
+        new_scenario = Scenario(
+            id=scenario_id,
+            nome=f"Cenário {year_harvest} - {reference_month} (v{version})",
+            year_harvest=year_harvest,
+            reference_month=reference_month,
+            status=status,
+            created_at=created_at,
+            updated_at=updated_at
+        )
+        session.add(new_scenario)
+        session.flush()
+
+        for v in variables_list:
+            var_ref = v["ID - REF"]
+
+            db_var = session.get(Variable, var_ref)
+            if not db_var:
+                old_type = v.get("TIPO", "INPUT")
+                tipo = VariableType.INPUT
+                if old_type == "OUTPUT":
+                    tipo = VariableType.OUTPUT
+
+                # Check if it is a known scenario variable based on user's input
+                if var_ref in {"DIA", "APROVEITAMENTO_OPERACIONAL", "DISPONIBILIDADE"}:
+                    tipo = VariableType.CENARIO
+
+                def_val = v.get("DEFINIÇÃO", "")
+                desc_val = v.get("DESCRIÇÃO", "")
+                nome = def_val.strip() if def_val.strip() else desc_val.strip()
+                if not nome:
+                    nome = var_ref
+
+                sector_str = v.get("SETOR", "OUTROS").strip().upper()
+                db_sector = session.get(Sector, sector_str)
+                if not db_sector:
+                    db_sector = Sector(
+                        id=sector_str,
+                        nome=sector_str.title(),
+                        descricao="Importado automaticamente"
+                    )
+                    session.add(db_sector)
+                    session.flush()
+
+                db_var = Variable(
+                    id=var_ref,
+                    nome=nome,
+                    descricao=desc_val,
+                    setor_id=sector_str,
+                    tipo=tipo,
+                    unidade=v.get("UNIDADE DE MEDIDA", ""),
+                    status=VariableStatus.ATIVA
+                )
+                session.add(db_var)
+                session.flush()
+
+            eq_val = v.get("EQUAÇÕES E VALORES", "")
+            if isinstance(eq_val, str) and eq_val.startswith("="):
+                stmt = select(Equation).where(Equation.variable_id == var_ref)
+                db_eq = session.exec(stmt).first()
+                if not db_eq:
+                    db_eq = Equation(
+                        variable_id=var_ref,
+                        expression_original=eq_val,
+                        expression_normalized=eq_val,
+                        version=1,
+                        status="ativa",
+                        created_at=created_at,
+                        updated_at=updated_at
+                    )
+                    session.add(db_eq)
+                    session.flush()
+
+                    # Extract dependencies
+                    deps = set(re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', eq_val))
+                    deps = deps - {'SE', 'SEERRO', 'SOMA', 'PROCV', 'LN', 'SUBTOTAL', 'SOMASES', 'Vapor', 'True', 'False'}
+                    for idx, dep_id in enumerate(sorted(deps)):
+                        db_dep = Dependency(
+                            equation_id=db_eq.id,
+                            dependency_var_id=dep_id,
+                            evaluation_order=idx
+                        )
+                        session.add(db_dep)
+
+            val_float = None
+            res_status = ResultStatus.PENDING
+            if not (isinstance(eq_val, str) and eq_val.startswith("=")):
+                try:
+                    val_float = float(str(eq_val).replace(",", "."))
+                    res_status = ResultStatus.OK
+                except ValueError:
+                    pass
+
+            db_res = Result(
+                variable_id=var_ref,
+                scenario_id=scenario_id,
+                value=val_float,
+                status=res_status,
+                error_message="",
+                timestamp=updated_at
+            )
+            session.add(db_res)
+
+    # 5. Commit any pending updates
+    session.commit()
+
+def migrate_database_schema(session: Session):
+    inspector = inspect(session.bind)
+    tables = inspector.get_table_names()
+    
+    if "variables" in tables and "sectors" not in tables:
+        SQLModel.metadata.create_all(session.bind)
+        columns = [col["name"] for col in inspector.get_columns("variables")]
+        if "setor" in columns:
+            rows = session.execute(text("SELECT id, setor FROM variables")).fetchall()
+            
+            unique_sectors = set(r[1] for r in rows if r[1])
+            for s in unique_sectors:
+                sector_id = s.strip().upper()
+                stmt = select(Sector).where(Sector.id == sector_id)
+                db_sector = session.exec(stmt).first()
+                if not db_sector:
+                    db_sector = Sector(id=sector_id, nome=sector_id.title(), descricao="Migrado do campo setor")
+                    session.add(db_sector)
+            session.commit()
+            
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN setor_id VARCHAR"))
+                session.commit()
+            except Exception:
+                pass
+                
+            session.execute(text("UPDATE variables SET setor_id = UPPER(TRIM(setor))"))
+            session.commit()
+
 def create_db_and_tables():
+    # Detect if we need migration first
+    with Session(engine) as session:
+        migrate_legacy_data(session)
+        migrate_database_schema(session)
     SQLModel.metadata.create_all(engine)
 
 def get_session():
     with Session(engine) as session:
         yield session
+

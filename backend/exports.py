@@ -124,8 +124,13 @@ def generate_scenario_pdf(scenario_data) -> BytesIO:
             unit = v.get("UNIDADE DE MEDIDA", "")
             
             # Format evaluated value
-            val = results.get(ref)
-            if val is not None:
+            val_entry = results.get(ref)
+            val = val_entry.get("value") if isinstance(val_entry, dict) else val_entry
+            status = val_entry.get("status", "OK") if isinstance(val_entry, dict) else "OK"
+            
+            if status != "OK":
+                val_str = status
+            elif val is not None:
                 if isinstance(val, (int, float)):
                     val_str = f"{val:,.4f}".replace(",", "X").replace(".", ",").replace("X", ".")
                 else:
@@ -197,9 +202,19 @@ def generate_scenario_xlsx(scenario_data) -> BytesIO:
         unit = v.get("UNIDADE DE MEDIDA", "")
         
         # Prefer calculated result if output, otherwise show raw input
-        val = results.get(ref)
-        if val is None:
-            val = v.get("EQUAÇÕES E VALORES", "")
+        val_entry = results.get(ref)
+        if isinstance(val_entry, dict):
+            status = val_entry.get("status", "OK")
+            if status != "OK":
+                val = status
+            else:
+                val = val_entry.get("value")
+                if val is None:
+                    val = v.get("EQUAÇÕES E VALORES", "")
+        else:
+            val = val_entry
+            if val is None:
+                val = v.get("EQUAÇÕES E VALORES", "")
             
         ws.append([ref, sector, definition, description, v_type, unit, val])
 

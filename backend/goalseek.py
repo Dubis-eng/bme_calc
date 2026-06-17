@@ -35,7 +35,12 @@ def run_goal_seek(
                 modified_vars.append(var)
         
         res_data = engine.calculate_state(modified_vars)
-        actual_val = float(res_data["results"].get(target_id, 0.0))
+        target_res = res_data["results"].get(target_id, {"value": 0.0})
+        if isinstance(target_res, dict):
+            val = target_res.get("value")
+            actual_val = float(val) if val is not None else 0.0
+        else:
+            actual_val = float(target_res)
         return actual_val - target_value
 
     converged = False

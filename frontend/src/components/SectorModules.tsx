@@ -4,7 +4,7 @@ import { Variable } from '../types';
 interface SectorModulesProps {
   activeSector: string;
   variables: Variable[];
-  results: Record<string, number>;
+  results: Record<string, any>;
   isLocked: boolean;
   highlightedVarId: string | null;
   onEditVariable: (variable: Variable) => void;
@@ -71,6 +71,7 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
         return (
           <div 
             key={groupName} 
+            data-group-name={groupName}
             className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden transition-all"
           >
             {/* Header section with toggle and add variable action */}
@@ -122,8 +123,8 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                   <tbody className="divide-y divide-slate-100 bg-white">
                     {varsInGroup.map(v => {
                       const id = v['ID - REF'];
-                      const resValue = results[id];
-                      const isInput = v.TIPO === 'INPUT';
+                      const res = results[id];
+                      const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
                       const isHighlighted = highlightedVarId === id;
 
                       return (
@@ -148,9 +149,13 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                           <td className="py-2 px-4 text-[10px]">
                             <span 
                               className={`px-1.5 py-0.5 inline-flex leading-4 font-semibold rounded-full border ${
-                                isInput 
+                                v.TIPO === 'INPUT' 
                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-                                  : 'bg-slate-50 text-slate-600 border-slate-200'
+                                  : v.TIPO === 'CENARIO'
+                                    ? 'bg-blue-50 text-blue-700 border-blue-100'
+                                    : v.TIPO === 'DERIVADA'
+                                      ? 'bg-cyan-50 text-cyan-700 border-cyan-100'
+                                      : 'bg-slate-50 text-slate-600 border-slate-200'
                               }`}
                             >
                               {v.TIPO}
@@ -182,11 +187,25 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                 />
                               </label>
                             ) : (
-                              resValue !== undefined 
-                                ? (typeof resValue === 'number' 
-                                    ? resValue.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) 
-                                    : String(resValue))
-                                : '-'
+                              res !== undefined ? (
+                                res.status === "OK" && res.value !== null ? (
+                                  res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+                                ) : (
+                                  <span 
+                                    className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${
+                                      res.status === "DIV_BY_ZERO" 
+                                        ? "bg-red-50 text-red-700 border-red-150" 
+                                        : res.status === "MISSING_VAR"
+                                          ? "bg-amber-50 text-amber-700 border-amber-150"
+                                          : "bg-slate-100 text-slate-700 border-slate-200"
+                                    }`} 
+                                    title={res.error_message || res.status}
+                                    aria-label={`Erro de cálculo: ${res.status}. ${res.error_message}`}
+                                  >
+                                    ⚠️ {res.status}
+                                  </span>
+                                )
+                              ) : '-'
                             )}
                           </td>
 

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-06-17
+
+### Added
+- **Navegação em Árvore Hierárquica (Sidebar)**: Refatoração do menu lateral para exibir uma árvore de dois níveis (Setor -> Subgrupo/Definição) com colapso dinâmico e rolagem suave (smooth scroll) direcionada ao clicar em subgrupos.
+- **Painel de Configurações de Setores**: Nova aba "Configurações" integrada na lateral direita do frontend (ao lado do Scenario Manager) permitindo o CRUD completo de setores (cadastro, edição de nome/descrição e exclusão).
+- **Modelo Relacional de Setores (SQLModel)**: Criação da tabela `Sector` persistida no PostgreSQL com integridade referencial vinculando variáveis a setores e bloqueando exclusões de setores associados a variáveis ativas.
+
+## [1.5.0] - 2026-06-16
+
+### Added
+- **Banco de Dados Relacional Normalizado (5 tabelas)**: Migração completa da coluna monolítica JSONB para uma estrutura normalizada de 5 tabelas (`scenarios`, `variables`, `equations`, `dependencies`, `results`) no PostgreSQL, aumentando a integridade e rastreabilidade dos dados.
+- **Tratamento de Erros no AST (Rich Results)**: O interpretador de fórmulas AST agora propaga e persiste objetos de resultado detalhados (`{value, status, error_message}`) contendo erros explícitos como `DIV_BY_ZERO` e `MISSING_VAR` em vez de mascará-los silenciosamente com `0`.
+- **Premissas de Cenário Dinâmicas**: Introdução do tipo de variável `CENARIO` para agrupar e exibir premissas de planejamento operacional (`DIA`, `APROVEITAMENTO_OPERACIONAL`, etc.) em um painel lateral separado de fácil edição.
+- **Auditoria de Densidade P0 de Arquivos**: Realizada refatoração minuciosa do backend (através de `evaluator.py`, `schemas.py` e `services.py`) e componentização do frontend (através de `Header.tsx`, `Sidebar.tsx` e `ScenarioPremises.tsx`), reduzindo e mantendo o tamanho de todos os arquivos abaixo do limite máximo de 300 linhas físicas.
+
 ## [1.4.1] - 2026-06-14
 
 ### Added
