@@ -169,3 +169,48 @@ def test_sector_crud_and_validation():
     del_res = client.delete("/api/sectors/NOVOS_PROJETOS")
     assert del_res.status_code == 400
     assert "Não é possível excluir" in del_res.json()["detail"]
+
+def test_update_scenario_endpoint():
+    # 1. Create a scenario
+    payload = {
+        "year_harvest": "2026/2027",
+        "reference_month": "Abril",
+        "variables": [
+            {
+                "ID - REF": "H99",
+                "SETOR": "MOAGEM",
+                "DEFINIÇÃO": "MOA_DIA",
+                "DESCRIÇÃO": "Moagem Diária",
+                "TIPO": "INPUT",
+                "UNIDADE DE MEDIDA": "t/d",
+                "EQUAÇÕES E VALORES": "10000"
+            }
+        ],
+        "status": "Em Edição"
+    }
+    response = client.post("/api/scenarios", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    scenario_id = data["id"]
+    assert data["variables"][0]["EQUAÇÕES E VALORES"] == "10000.0"
+
+    # 2. Update scenario variables via PUT
+    payload["variables"][0]["EQUAÇÕES E VALORES"] = "15000"
+    update_res = client.put(f"/api/scenarios/{scenario_id}", json=payload)
+    assert update_res.status_code == 200
+    updated_data = update_res.json()
+    assert updated_data["variables"][0]["EQUAÇÕES E VALORES"] == "15000.0"
+
+    # 3. Load scenario again and verify changes
+    get_res = client.get(f"/api/scenarios/{scenario_id}")
+    assert get_res.status_code == 200
+    assert get_res.json()["variables"][0]["EQUAÇÕES E VALORES"] == "15000.0"
+
+    # 4. Change status to Aprovado
+    client.patch(f"/api/scenarios/{scenario_id}/status", json={"status": "Aprovado"})
+
+    # 5. Try updating again (should return 400 since it is locked)
+    payload["variables"][0]["EQUAÇÕES E VALORES"] = "20000"
+    fail_res = client.put(f"/api/scenarios/{scenario_id}", json=payload)
+    assert fail_res.status_code == 400
+    assert "bloqueado" in fail_res.json()["detail"]
