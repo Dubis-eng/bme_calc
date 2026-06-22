@@ -100,6 +100,8 @@ def test_epic1_baseline():
     import os
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     epic_path = os.path.join(base_dir, 'docs', 'epic1.json')
+    if not os.path.exists(epic_path):
+        epic_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'epic1.json')
     with open(epic_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 

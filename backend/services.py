@@ -81,7 +81,9 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
             sector_str = v.get("SETOR", "OUTROS").strip().upper()
             db_sector = db.get(Sector, sector_str)
             if not db_sector:
-                db_sector = Sector(id=sector_str, nome=sector_str.title(), descricao="Criado automaticamente no cenário")
+                all_orders = db.exec(select(Sector.ordem)).all()
+                next_ordem = max(all_orders) + 10 if all_orders else 10
+                db_sector = Sector(id=sector_str, nome=sector_str.title(), descricao="Criado automaticamente no cenário", ordem=next_ordem)
                 db.add(db_sector)
                 db.flush()
 
@@ -140,11 +142,17 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
             try: val_float = float(str(eq_val).replace(",", "."))
             except: pass
 
+        status_str = var_calc.get("status", "OK")
+        if status_str not in {"OK", "DIV_BY_ZERO", "MISSING_VAR", "PENDING"}:
+            status_db = ResultStatus.PENDING
+        else:
+            status_db = ResultStatus(status_str)
+
         db_res = Result(
             variable_id=var_id,
             scenario_id=scenario_id,
             value=val_float,
-            status=var_calc.get("status", "OK"),
+            status=status_db,
             error_message=var_calc.get("error_message", "")
         )
         db.add(db_res)
@@ -164,7 +172,7 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
     )
 
 def list_sectors(db: Session) -> List[Sector]:
-    return db.exec(select(Sector).order_by(Sector.nome)).all()
+    return db.exec(select(Sector).order_by(Sector.ordem)).all()
 
 def create_sector(req: SectorCreate, db: Session) -> Sector:
     sector_id = req.id.strip().upper()
@@ -172,10 +180,15 @@ def create_sector(req: SectorCreate, db: Session) -> Sector:
     if existing:
         raise ValueError(f"Setor com ID '{sector_id}' já está cadastrado.")
     
+    existing_ordem = db.exec(select(Sector).where(Sector.ordem == req.ordem)).first()
+    if existing_ordem:
+        raise ValueError(f"A ordem {req.ordem} já está em uso pelo setor '{existing_ordem.nome}'.")
+    
     db_sector = Sector(
         id=sector_id,
         nome=req.nome.strip(),
-        descricao=req.descricao.strip() if req.descricao else ""
+        descricao=req.descricao.strip() if req.descricao else "",
+        ordem=req.ordem
     )
     db.add(db_sector)
     db.commit()
@@ -187,9 +200,14 @@ def update_sector(sector_id: str, req: SectorUpdate, db: Session) -> Sector:
     if not db_sector:
         raise ValueError("Setor não encontrado.")
     
+    existing_ordem = db.exec(select(Sector).where(Sector.ordem == req.ordem, Sector.id != sector_id)).first()
+    if existing_ordem:
+        raise ValueError(f"A ordem {req.ordem} já está em uso pelo setor '{existing_ordem.nome}'.")
+    
     db_sector.nome = req.nome.strip()
     if req.descricao is not None:
         db_sector.descricao = req.descricao.strip()
+    db_sector.ordem = req.ordem
     
     db.add(db_sector)
     db.commit()

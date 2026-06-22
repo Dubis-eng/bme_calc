@@ -1,6 +1,8 @@
 import os
-# Configure DATABASE_URL to use SQLite file for tests to avoid connection-isolation issues
-os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+if os.name == 'posix':
+    os.environ["DATABASE_URL"] = "sqlite:////tmp/test.db"
+else:
+    os.environ["DATABASE_URL"] = "sqlite:///./test.db"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -118,16 +120,21 @@ def test_goal_seek_converge():
 
 def test_sector_crud_and_validation():
     # 1. Create a sector
-    payload = {"id": "NOVOS_PROJETOS", "nome": "Novos Projetos", "descricao": "Setor de testes"}
+    payload = {"id": "NOVOS_PROJETOS", "nome": "Novos Projetos", "descricao": "Setor de testes", "ordem": 999}
     res = client.post("/api/sectors", json=payload)
     assert res.status_code == 200
     data = res.json()
     assert data["id"] == "NOVOS_PROJETOS"
     assert data["nome"] == "Novos Projetos"
 
-    # 2. Try to create duplicate sector (should fail)
+    # 2. Try to create duplicate sector ID (should fail)
     res_dup = client.post("/api/sectors", json=payload)
     assert res_dup.status_code == 400
+
+    # 2b. Try to create another sector with duplicate order (should fail)
+    payload_dup_ordem = {"id": "OUTRO_SETOR", "nome": "Outro Setor", "descricao": "Setor de testes", "ordem": 999}
+    res_dup_ordem = client.post("/api/sectors", json=payload_dup_ordem)
+    assert res_dup_ordem.status_code == 400
 
     # 3. List sectors (should contain NOVOS_PROJETOS)
     list_res = client.get("/api/sectors")
@@ -136,7 +143,7 @@ def test_sector_crud_and_validation():
     assert any(s["id"] == "NOVOS_PROJETOS" for s in sectors)
 
     # 4. Patch sector
-    patch_res = client.patch("/api/sectors/NOVOS_PROJETOS", json={"nome": "Projetos Especiais"})
+    patch_res = client.patch("/api/sectors/NOVOS_PROJETOS", json={"nome": "Projetos Especiais", "ordem": 999})
     assert patch_res.status_code == 200
     assert patch_res.json()["nome"] == "Projetos Especiais"
 

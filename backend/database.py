@@ -7,43 +7,30 @@ from enum import Enum
 from typing import List, Dict, Any, Optional
 from sqlmodel import SQLModel, Field, Session, create_engine, select, Column, JSON
 from sqlalchemy import text, inspect
-
-# ── ENUMS ───────────────────────────────────────────────────────────────────
-
 class ScenarioStatus(str, Enum):
     EM_EDICAO = "Em Edição"
     APROVADO = "Aprovado"
     FINAL = "Final"
-
 class VariableType(str, Enum):
     INPUT = "INPUT"
     OUTPUT = "OUTPUT"
     DERIVADA = "DERIVADA"
     CENARIO = "CENARIO"
-
 class VariableStatus(str, Enum):
     ATIVA = "ativa"
     PENDENTE = "pendente"
     INVALIDA = "inválida"
     DESCONTINUADA = "descontinuada"
-
 class ResultStatus(str, Enum):
     OK = "OK"
     DIV_BY_ZERO = "DIV_BY_ZERO"
     MISSING_VAR = "MISSING_VAR"
     PENDING = "PENDING"
-
-# ── DATABASE CONFIGURATION ─────────────────────────────────────────────────
-
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://uisa_user:uisa_password@localhost:5432/bme_calc")
-
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
-
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
-
-# ── MODELS ──────────────────────────────────────────────────────────────────
 
 class Sector(SQLModel, table=True):
     __tablename__ = "sectors"
@@ -51,6 +38,7 @@ class Sector(SQLModel, table=True):
     id: str = Field(primary_key=True, index=True)  # Technical ID e.g. "MOAGEM"
     nome: str = Field(index=True)                 # Friendly name
     descricao: str = Field(default="")
+    ordem: int = Field(default=0, index=True)
 
 class Scenario(SQLModel, table=True):
     __tablename__ = "scenarios"
@@ -278,6 +266,15 @@ def migrate_database_schema(session: Session):
                 
             session.execute(text("UPDATE variables SET setor_id = UPPER(TRIM(setor))"))
             session.commit()
+
+    if "sectors" in tables:
+        cols = [col["name"] for col in inspector.get_columns("sectors")]
+        if "ordem" not in cols:
+            try:
+                session.execute(text("ALTER TABLE sectors ADD COLUMN ordem INTEGER DEFAULT 0"))
+                session.commit()
+            except Exception:
+                pass
 
 def create_db_and_tables():
     # Detect if we need migration first

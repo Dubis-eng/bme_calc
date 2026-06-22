@@ -45,6 +45,18 @@
       "description": "Validação Local e Auditoria de Checklists",
       "scope": "project",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-906",
+      "description": "Semeadura de Banco e Integração com Frontend",
+      "scope": "backend/seeding.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-907",
+      "description": "Ordenação Única e Personalizada de Setores",
+      "scope": "backend/services.py",
+      "status": "DONE"
     }
   ]
 }

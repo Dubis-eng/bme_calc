@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-06-22
+
+### Added
+- **Ordenação Única de Setores (Sector Ordering)**: Adicionado o campo `ordem` no modelo de setores, implementando ordenação personalizada na barra de navegação.
+- **Validação de Unicidade de Posição**: Implementada validação de unicidade da ordenação no backend (retornando erro 400 em caso de colisões) e no formulário de configuração no frontend (exibindo avisos explicativos).
+- **Semeadura Sequencial por Incremento**: Ajustada a rotina de seeding do backend para atribuir ordenações sequenciais de 10 em 10 aos setores padrão com base na ordem física no JSON de premissas.
+
+## [1.7.0] - 2026-06-18
+
+### Added
+- **Semeadura Automática do Banco (Database Seeding)**: Novo módulo `seeding.py` que lê as variáveis e equações padrão de `memorial_de_calculo_balanco.json` e popula as tabelas do banco no startup (se estiverem vazias), criando também o "Cenário Base (Inicial)".
+- **Resolução de Erros de Unicidade e Enums no Seeding**: Mecanismo de UPSERT na semeadura para evitar colisões de chaves únicas com variáveis pendentes pré-criadas por dependências e coerção de status de erro para a especificação do enum.
+- **Carregamento Automático de Cenários no Frontend**: O frontend agora consome a API para buscar e carregar automaticamente o cenário mais recente na inicialização, com fallback local robusto se a API falhar.
+- **União Dinâmica de Setores**: Sidebar do frontend agora realiza a união dinâmica dos setores cadastrados no banco de dados e os presentes nas variáveis atuais, impedindo que setores sumam da barra lateral quando novos setores são configurados.
+
 ## [1.6.0] - 2026-06-17
 
 ### Added

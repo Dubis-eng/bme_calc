@@ -52,12 +52,15 @@ class SectorCreate(BaseModel):
     id: str
     nome: str
     descricao: Optional[str] = ""
+    ordem: int
 
 class SectorUpdate(BaseModel):
     nome: str
     descricao: Optional[str] = ""
+    ordem: int
 
 class SectorDetail(BaseModel):
     id: str
     nome: str
     descricao: str
+    ordem: int

@@ -19,4 +19,5 @@ export interface Sector {
     id: string;
     nome: string;
     descricao?: string;
+    ordem: number;
 }

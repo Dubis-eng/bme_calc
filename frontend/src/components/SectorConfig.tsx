@@ -13,6 +13,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
   const [id, setId] = useState('');
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [ordem, setOrdem] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +23,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
     setId('');
     setNome('');
     setDescricao('');
+    setOrdem('');
     setError('');
   };
 
@@ -30,6 +32,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
     setId(sector.id);
     setNome(sector.nome);
     setDescricao(sector.descricao || '');
+    setOrdem(sector.ordem.toString());
     setError('');
     setSuccess('');
   };
@@ -43,9 +46,21 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
     const cleanId = id.trim().toUpperCase();
     const cleanNome = nome.trim();
     const cleanDesc = descricao.trim();
+    const parsedOrdem = parseInt(ordem.trim(), 10);
 
     if (!cleanId || !cleanNome) {
       setError('ID e Nome são obrigatórios.');
+      return;
+    }
+
+    if (isNaN(parsedOrdem) || parsedOrdem < 1) {
+      setError('Ordem deve ser um número inteiro maior ou igual a 1.');
+      return;
+    }
+
+    const takenBy = sectors.find(s => s.ordem === parsedOrdem && s.id !== editingSector?.id);
+    if (takenBy) {
+      setError(`A ordem ${parsedOrdem} já está em uso pelo setor "${takenBy.nome}".`);
       return;
     }
 
@@ -55,7 +70,8 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
         // Update
         await axios.patch(`http://localhost:8000/api/sectors/${editingSector.id}`, {
           nome: cleanNome,
-          descricao: cleanDesc
+          descricao: cleanDesc,
+          ordem: parsedOrdem
         });
         setSuccess('Setor atualizado com sucesso!');
       } else {
@@ -63,7 +79,8 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
         await axios.post('http://localhost:8000/api/sectors', {
           id: cleanId,
           nome: cleanNome,
-          descricao: cleanDesc
+          descricao: cleanDesc,
+          ordem: parsedOrdem
         });
         setSuccess('Setor criado com sucesso!');
       }
@@ -106,7 +123,8 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
         <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Cadastro de Setores</h3>
         {editingSector && (
           <button 
-            onClick={resetForm} 
+            onClick={resetForm}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { resetForm(); } }}
             className="text-[10px] text-slate-500 hover:text-slate-800 font-semibold"
           >
             Cancelar Edição
@@ -127,10 +145,12 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <div className="col-span-1 flex flex-col">
-            <label className="text-[9px] uppercase font-bold text-slate-500 mb-1">ID (Ref)</label>
+            <label htmlFor="sector-id-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">ID (Ref)</label>
             <input
+              id="sector-id-input"
+              aria-label="ID de Referência do Setor"
               type="text"
               disabled={!!editingSector || isLocked}
               value={id}
@@ -141,8 +161,10 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
             />
           </div>
           <div className="col-span-2 flex flex-col">
-            <label className="text-[9px] uppercase font-bold text-slate-500 mb-1">Nome do Setor</label>
+            <label htmlFor="sector-nome-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Nome do Setor</label>
             <input
+              id="sector-nome-input"
+              aria-label="Nome do Setor"
               type="text"
               disabled={isLocked}
               value={nome}
@@ -152,11 +174,28 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               required
             />
           </div>
+          <div className="col-span-1 flex flex-col">
+            <label htmlFor="sector-ordem-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Ordem</label>
+            <input
+              id="sector-ordem-input"
+              aria-label="Ordem do Setor"
+              type="number"
+              disabled={isLocked}
+              value={ordem}
+              onChange={(e) => setOrdem(e.target.value)}
+              placeholder="Ex: 10"
+              className="border border-slate-200 rounded p-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              required
+              min="1"
+            />
+          </div>
         </div>
 
         <div className="flex flex-col">
-          <label className="text-[9px] uppercase font-bold text-slate-500 mb-1">Descrição</label>
+          <label htmlFor="sector-desc-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Descrição</label>
           <input
+            id="sector-desc-input"
+            aria-label="Descrição do Setor"
             type="text"
             disabled={isLocked}
             value={descricao}
@@ -184,6 +223,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                 <div className="flex items-baseline space-x-1.5">
                   <span className="font-bold text-[10px] text-teal-700">{sector.id}</span>
                   <span className="font-semibold text-slate-700 truncate">{sector.nome}</span>
+                  <span className="text-[9px] bg-slate-100 text-slate-500 px-1 rounded font-bold">#{sector.ordem}</span>
                 </div>
                 {sector.descricao && <p className="text-[10px] text-slate-400 truncate mt-0.5">{sector.descricao}</p>}
               </div>
@@ -191,6 +231,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                 <button
                   type="button"
                   onClick={() => handleEdit(sector)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleEdit(sector); } }}
                   disabled={isLocked}
                   className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200/50"
                   title="Editar"
@@ -200,6 +241,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                 <button
                   type="button"
                   onClick={() => handleDelete(sector.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleDelete(sector.id); } }}
                   disabled={isLocked}
                   className="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50"
                   title="Excluir"

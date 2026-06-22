@@ -44,15 +44,29 @@ function App() {
       .catch(console.error);
   };
 
-  useEffect(() => {
-    fetchSectors();
+  const loadLocalFallback = () => {
     fetch('/memorial_de_calculo_balanco.json')
       .then(res => res.json())
       .then(data => {
         setVariables(data);
         if (data.length > 0) setActiveSector(data[0].SETOR);
         setLoading(false);
-      });
+      }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchSectors();
+    axios.get('http://localhost:8000/api/scenarios')
+      .then(res => {
+        if (res.data?.length > 0) {
+          const latest = res.data[0];
+          axios.get(`http://localhost:8000/api/scenarios/${latest.id}`)
+            .then(detailRes => {
+              onLoadScenario(detailRes.data.variables, latest);
+              setLoading(false);
+            }).catch(() => loadLocalFallback());
+        } else loadLocalFallback();
+      }).catch(() => loadLocalFallback());
   }, []);
 
   const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
@@ -85,6 +99,7 @@ function App() {
     setCurrentScenario(meta);
     setAnoSafra(meta.year_harvest);
     setMesReferencia(meta.reference_month);
+    if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
     triggerCalculate(loadedVars);
   };
 
@@ -106,49 +121,39 @@ function App() {
     }
   };
 
-  const onApplyOptimalValue = (inputId: string, optimalValue: number, newResults: Record<string, number>) => {
-    setVariables(prev => prev.map(v => v["ID - REF"] === inputId ? { ...v, "EQUAÇÕES E VALORES": optimalValue } : v));
-    setResults(newResults);
+  const onApplyOptimalValue = (inputId: string, val: number, newRes: Record<string, number>) => {
+    setVariables(prev => prev.map(v => v["ID - REF"] === inputId ? { ...v, "EQUAÇÕES E VALORES": val } : v));
+    setResults(newRes);
   };
 
-  const handleEditVariable = (variable: Variable) => {
-    setVariableToEdit(variable);
-    setIsVariableModalOpen(true);
+  const handleEditVariable = (v: Variable) => { setVariableToEdit(v); setIsVariableModalOpen(true); };
+
+  const onScrollTo = (id: string) => {
+    const tv = variables.find(v => v['ID - REF'] === id);
+    if (tv) setActiveSector(tv.SETOR);
+    search.handleScrollTo(id);
   };
 
-  const onScrollTo = (varId: string) => {
-    const targetVar = variables.find(v => v['ID - REF'] === varId);
-    if (targetVar) setActiveSector(targetVar.SETOR);
-    search.handleScrollTo(varId);
-  };
+  const onSearchEdit = (id: string) => search.handleSearchEdit(id, handleEditVariable);
 
-  const onSearchEdit = (varId: string) => {
-    search.handleSearchEdit(varId, handleEditVariable);
-  };
-
-  const handleAddVariable = (sector: string, definition: string) => {
+  const handleAddVariable = (sec: string, def: string) => {
     setVariableToEdit(null);
-    setPrefilledSector(sector);
-    setPrefilledDefinition(definition);
+    setPrefilledSector(sec);
+    setPrefilledDefinition(def);
     setIsVariableModalOpen(true);
   };
 
-  const handleSaveVariable = (newVar: Variable, isEdit: boolean, originalId?: string) => {
+  const handleSaveVariable = (newVar: Variable, isEdit: boolean, origId?: string) => {
     if (isLocked) return;
-    const updated = isEdit && originalId
-      ? variables.map(v => v["ID - REF"] === originalId ? newVar : v)
-      : [...variables, newVar];
+    const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
     setVariables(updated);
     setIsVariableModalOpen(false);
     triggerCalculate(updated);
   };
 
-  const handleSubgroupClick = (sectorId: string, subgroupName: string) => {
-    setActiveSector(sectorId);
-    setTimeout(() => {
-      const el = document.querySelector(`[data-group-name="${subgroupName}"]`);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+  const handleSubgroupClick = (secId: string, subName: string) => {
+    setActiveSector(secId);
+    setTimeout(() => document.querySelector(`[data-group-name="${subName}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   };
 
   if (loading) {
@@ -160,7 +165,10 @@ function App() {
     );
   }
 
-  const uniqueSectors = sectors.length > 0 ? sectors.map(s => s.id) : Array.from(new Set(variables.map(v => v.SETOR)));
+  const uniqueSectors = Array.from(new Set([
+    ...sectors.map(s => s.id),
+    ...variables.map(v => v.SETOR)
+  ]));
   const scenarioVars = variables.filter(v => v.TIPO === 'CENARIO');
 
   return (

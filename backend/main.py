@@ -36,6 +36,8 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    import seeding
+    seeding.seed_initial_data()
 
 # Calculation Endpoint
 @app.post("/api/calculate", response_model=CalculateResponse)
