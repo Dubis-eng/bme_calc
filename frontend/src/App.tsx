@@ -45,13 +45,11 @@ function App() {
   };
 
   const loadLocalFallback = () => {
-    fetch('/memorial_de_calculo_balanco.json')
-      .then(res => res.json())
-      .then(data => {
-        setVariables(data);
-        if (data.length > 0) setActiveSector(data[0].SETOR);
-        setLoading(false);
-      }).catch(() => setLoading(false));
+    fetch('/memorial_de_calculo_balanco.json').then(res => res.json()).then(data => {
+      setVariables(data);
+      if (data.length > 0) setActiveSector(data[0].SETOR);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -72,8 +70,7 @@ function App() {
   const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
 
   const handleChange = (id: string, value: string) => {
-    if (isLocked) return;
-    setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
+    if (!isLocked) setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
   };
 
   const triggerCalculate = async (varsList: Variable[]) => {
@@ -87,9 +84,7 @@ function App() {
     } catch (err) {
       console.error(err);
       alert("Erro ao calcular.");
-    } finally {
-      setCalculating(false);
-    }
+    } finally { setCalculating(false); }
   };
 
   const handleCalculate = () => triggerCalculate(variables);
@@ -114,6 +109,7 @@ function App() {
         version: res.data.version, status: res.data.status
       });
       alert(`Cenário salvo com sucesso! Versão: v${res.data.version}`);
+      fetchSectors();
     } catch (err) {
       alert("Erro ao salvar cenário.");
     } finally {
@@ -143,8 +139,20 @@ function App() {
     setIsVariableModalOpen(true);
   };
 
-  const handleSaveVariable = (newVar: Variable, isEdit: boolean, origId?: string) => {
+  const handleSaveVariable = async (newVar: Variable, isEdit: boolean, origId?: string) => {
     if (isLocked) return;
+    const sectorId = newVar.SETOR.toUpperCase();
+    if (!sectors.some(s => s.id === sectorId)) {
+      try {
+        const maxO = sectors.reduce((m, s) => s.ordem > m ? s.ordem : m, 0);
+        await axios.post('http://localhost:8000/api/sectors', {
+          id: sectorId, nome: sectorId.charAt(0).toUpperCase() + sectorId.slice(1).toLowerCase(), descricao: 'Criado via variável', ordem: maxO > 0 ? maxO + 10 : 10
+        });
+        fetchSectors();
+      } catch (err) {
+        console.error(err);
+      }
+    }
     const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
     setVariables(updated);
     setIsVariableModalOpen(false);

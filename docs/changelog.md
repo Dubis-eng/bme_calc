@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-06-22
+
+### Fixed
+- **Auto-cadastro de Setores via Edição de Variáveis**: O frontend agora detecta a criação/edição de variáveis associadas a setores inexistentes e realiza a persistência imediata do novo setor no banco PostgreSQL, calculando a sequência de ordenação padrão (`maxOrdem + 10`) e atualizando a listagem.
+
 ## [1.8.0] - 2026-06-22
 
 ### Added
