@@ -23,6 +23,9 @@ interface ScenarioManagerProps {
     setMesReferencia: (val: string) => void;
     onSaveNew: () => Promise<void>;
     saving: boolean;
+    onSaveActive?: () => Promise<void>;
+    savingActive?: boolean;
+    hasUnsavedChanges?: boolean;
 }
 
 export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
@@ -35,7 +38,10 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
     mesReferencia,
     setMesReferencia,
     onSaveNew,
-    saving
+    saving,
+    onSaveActive,
+    savingActive = false,
+    hasUnsavedChanges = false
 }) => {
     const [scenarios, setScenarios] = useState<ScenarioMetadata[]>([]);
     const [loading, setLoading] = useState(false);
@@ -157,6 +163,23 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                             {currentScenario.status}
                         </span>
                     </div>
+
+                    {currentScenario.status === 'Em Edição' && (
+                        <div className="pt-1">
+                            <button
+                                onClick={onSaveActive}
+                                disabled={savingActive}
+                                aria-label="Salvar alterações do cenário ativo"
+                                className={`w-full text-white font-bold py-1.5 px-3 rounded text-xs transition-colors shadow-sm ${
+                                    hasUnsavedChanges
+                                        ? 'bg-amber-600 hover:bg-amber-700'
+                                        : 'bg-teal-600 hover:bg-teal-700'
+                                }`}
+                            >
+                                {savingActive ? 'Salvando...' : hasUnsavedChanges ? '⚠️ Salvar Alterações' : 'Salvar Alterações'}
+                            </button>
+                        </div>
+                    )}
 
                     {/* Change status action */}
                     <div className="flex flex-col space-y-1">

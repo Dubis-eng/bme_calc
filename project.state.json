@@ -57,6 +57,30 @@
       "description": "Ordenação Única e Personalizada de Setores",
       "scope": "backend/services.py",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-1001",
+      "description": "Backend Scenario Update Endpoint (PUT /api/scenarios/{id})",
+      "scope": "backend/main.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1002",
+      "description": "Frontend Save Changes Button and API integration",
+      "scope": "frontend/src/components/ScenarioManager.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1003",
+      "description": "Frontend Unsaved Changes warning listener",
+      "scope": "frontend/src/App.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1004",
+      "description": "Validation & Quality Checklist Audit",
+      "scope": "project",
+      "status": "DONE"
     }
   ]
 }

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-06-22
+
+### Added
+- **Salvamento de Alterações no Cenário Ativo (`PUT /api/scenarios/{id}`)**: Nova rota de API e lógica de serviço para salvar as modificações de variáveis e expressões de um cenário diretamente na base PostgreSQL caso seu status seja "Em Edição". Bloqueia requisições se o cenário estiver finalizado ou aprovado.
+- **Botão "Salvar Alterações" no Frontend**: Interface do `ScenarioManager` exibe o botão dinâmico para o cenário ativo, mudando de cor em caso de edições pendentes para guiar o usuário.
+- **Aviso de Saída Sem Salvar (`beforeunload`)**: Alerta nativo do navegador implementado no frontend para evitar perda acidental de dados ao fechar ou atualizar a aba com modificações pendentes.
+
+### Changed
+- **Refatoração Constitucional (SRP & 300 linhas)**: Decomposição e componentização da barra lateral direita em `RightPanel.tsx` e lógica de estado em `useScenario.ts`, mantendo `App.tsx` enxuto (~192 linhas) e em total conformidade com a densidade P0.
+- **Modularização de Funções (40 linhas)**: Divisão da persistência de cenários no backend em subfunções modulares (`_ensure_variable`, `_ensure_equation`, `_upsert_result`) limitando as funções a menos de 40 linhas.
+
 ## [1.8.1] - 2026-06-22
 
 ### Fixed

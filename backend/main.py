@@ -60,6 +60,15 @@ def create_scenario(req: ScenarioCreate, db=Depends(get_session)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.put("/api/scenarios/{id}", response_model=ScenarioDetail)
+def update_scenario(id: uuid.UUID, req: ScenarioCreate, db=Depends(get_session)):
+    try:
+        return services.update_existing_scenario(id, req, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/scenarios")
 def list_scenarios(db=Depends(get_session)):
     try:
