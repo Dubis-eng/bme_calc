@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-26
+
+### Added
+- **Persistência de Seleções do Plano de Safra (`HarvestPlanSelection`)**: Nova tabela no banco de dados para armazenar a seleção de cenário ou exclusão de cada mês por ano safra.
+- **API de Seleções do Plano de Safra**: Novos endpoints `GET /api/harvest-plan/selections` e `POST /api/harvest-plan/selections` para recuperar e salvar as seleções dinâmicas de cenário por mês.
+- **Seleção Dinâmica de Versões e Exclusão de Meses**: Componente `HarvestPlan.tsx` atualizado com seletores na tabela para escolher versões aprovadas dos cenários ou a opção "Padrão". Adicionada a opção "Não selecionar (Ocultar)" para excluir colunas de meses da matriz de consolidação.
+- **Botão "Adicionar Mês" (`HarvestPlan.tsx`)**: Permite reexibir e selecionar cenários para meses previamente ocultos.
+- **Testes de Integração de Seleções**: Adicionado caso de teste `test_harvest_plan_selections` em `backend/test_harvest_plan.py` cobrindo a recuperação e atualização das seleções via API.
+
+### Changed
+- **Refatoração e Modularização do Serviço**: Dividido `services.py` em sub-arquivos modulares (`services_harvest_plan.py`, `services_scenarios.py`, `services_variables.py`) para cumprir a regra P0 de limite de 300 linhas por arquivo.
+
 ## [2.3.0] - 2026-06-26
+
 
 ### Added
 - **Configurações Dinâmicas de Anos Safra (`/api/harvest-years`)**: Novas rotas `GET`, `POST` e `DELETE` para gerenciar os anos safra cadastrados no banco de dados. Suporte a exclusão em cascata de cenários vinculados, com aviso ao usuário da contagem antes de confirmar.
@@ -19,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Migração de Coluna `year_harvest` (VARCHAR → INTEGER)**: Rotina de migração automática no startup converte strings legadas (ex: `"2026/2027"`) para inteiros (ex: `2026`), normalizando os valores antes do `ALTER COLUMN` para evitar `NotNullViolation` no PostgreSQL.
 - **Motor de Consolidação de Safra Dinâmico**: `services.py::get_ordered_months` agora consulta a tabela `harvest_months` para obter os meses habilitados e sua ordem, em vez de usar uma lista estática.
 - **Anos Safra Disponíveis**: `services.py::get_harvest_years` agora lista os anos da tabela `harvest_years` com `active=True`, em vez de varrer os cenários existentes.
+
+### Fixed
+- **Exclusão de Ano Safra com Cenários**: Corrigido erro HTTP 500 no `DELETE /api/harvest-years/{year_start}` ao chamar `db.flush()` antes da exclusão do registro pai, garantindo que a remoção em cascata dos cenários e seus resultados seja enviada na ordem correta e respeite a chave estrangeira do PostgreSQL. Resolvido também NameError por falta de importação de `text` em `main.py`.
+- **Validação de Anos no Plano de Safra**: Corrigida falha de validação de resposta (HTTP 500 / CORS Blocked) na rota `GET /api/harvest-plan/years` ajustando o `response_model` para `List[int]` para coincidir com a modelagem do banco de dados (que usa anos como inteiros).
 
 ## [2.2.0] - 2026-06-26
 
