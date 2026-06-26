@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-06-26
+
+### Added
+- **Configurações Dinâmicas de Anos Safra (`/api/harvest-years`)**: Novas rotas `GET`, `POST` e `DELETE` para gerenciar os anos safra cadastrados no banco de dados. Suporte a exclusão em cascata de cenários vinculados, com aviso ao usuário da contagem antes de confirmar.
+- **Configurações Dinâmicas de Meses de Referência (`/api/harvest-months`)**: Novas rotas `GET` e `PATCH` para listar e habilitar/desabilitar individualmente os 12 meses pt-BR, com controle de ordem de exibição.
+- **Tabelas `harvest_years` e `harvest_months`**: Novos modelos no banco de dados com seeding automático de 3 anos safra (2026–2028) e 12 meses pt-BR no startup.
+- **Modal de Configurações do Sistema (`SystemSettingsModal.tsx`)**: Novo painel administrativo acessado pelo ícone ⚙️ no rodapé da Sidebar. Permite criar e excluir anos safra, e habilitar/desabilitar meses de referência via toggles.
+- **Seletor Dinâmico de Ano/Mês no Gerenciador de Cenários**: `ScenarioManager.tsx` e `HarvestPlan.tsx` agora carregam as listas de anos e meses ativos diretamente da API em vez de valores fixos hardcoded.
+- **Teste de Integração `test_harvest_years_and_months`**: Novo test case em `test_scenarios.py` validando os endpoints CRUD de anos safra e a filtragem de meses habilitados.
+
+### Changed
+- **Migração de Coluna `year_harvest` (VARCHAR → INTEGER)**: Rotina de migração automática no startup converte strings legadas (ex: `"2026/2027"`) para inteiros (ex: `2026`), normalizando os valores antes do `ALTER COLUMN` para evitar `NotNullViolation` no PostgreSQL.
+- **Motor de Consolidação de Safra Dinâmico**: `services.py::get_ordered_months` agora consulta a tabela `harvest_months` para obter os meses habilitados e sua ordem, em vez de usar uma lista estática.
+- **Anos Safra Disponíveis**: `services.py::get_harvest_years` agora lista os anos da tabela `harvest_years` com `active=True`, em vez de varrer os cenários existentes.
+
 ## [2.2.0] - 2026-06-26
 
 ### Added

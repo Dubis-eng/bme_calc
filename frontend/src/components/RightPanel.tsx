@@ -9,8 +9,8 @@ interface RightPanelProps {
     onLoadScenario: (variables: Variable[], metadata: ScenarioMetadata) => void;
     currentScenario: ScenarioMetadata | null;
     onStatusChange: (status: 'Em Edição' | 'Aprovado' | 'Final') => void;
-    anoSafra: string;
-    setAnoSafra: (val: string) => void;
+    anoSafra: number;
+    setAnoSafra: (val: number) => void;
     mesReferencia: string;
     setMesReferencia: (val: string) => void;
     onSaveNew: () => Promise<void>;
@@ -24,6 +24,8 @@ interface RightPanelProps {
     onGoalSeekOpen: () => void;
     sectors: Sector[];
     onRefreshSectors: () => void;
+    years: { id: number; active: boolean }[];
+    months: { id: number; name: string; order_index: number; enabled: boolean }[];
 }
 
 export const RightPanel: React.FC<RightPanelProps> = ({
@@ -45,7 +47,9 @@ export const RightPanel: React.FC<RightPanelProps> = ({
     onVariableChange,
     onGoalSeekOpen,
     sectors,
-    onRefreshSectors
+    onRefreshSectors,
+    years,
+    months
 }) => {
     const [rightTab, setRightTab] = useState<'scenarios' | 'config'>('scenarios');
 
@@ -86,6 +90,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                         onSaveActive={onSaveActive}
                         savingActive={savingActive}
                         hasUnsavedChanges={hasUnsavedChanges}
+                        years={years}
+                        months={months}
                     />
                     <ScenarioPremises scenarioVars={scenarioVars} isLocked={isLocked} onVariableChange={onVariableChange} />
                     <button

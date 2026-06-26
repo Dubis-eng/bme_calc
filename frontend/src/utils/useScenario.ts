@@ -3,9 +3,19 @@ import axios from 'axios';
 import { Variable, Sector } from '../types';
 import { ScenarioMetadata } from '../components/ScenarioManager';
 
+export function formatHarvestYear(year: number | string): string {
+  const y = typeof year === 'string' ? parseInt(year, 10) : year;
+  return isNaN(y) ? String(year) : `${y}/${y + 1}`;
+}
+
+export function parseHarvestYear(yearStr: string): number {
+  const match = yearStr.match(/\d{4}/);
+  return match ? parseInt(match[0], 10) : 2026;
+}
+
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [variables, setVariables] = useState<Variable[]>([]);
-  const [results, setResults] = useState<Record<string, any>>({});
+  const [results, setResults] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState(true);
   const [calculating, setCalculating] = useState(false);
   const [convergenceError, setConvergenceError] = useState(false);
@@ -13,10 +23,12 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [activeSector, setActiveSector] = useState<string>('');
   const [currentScenario, setCurrentScenario] = useState<ScenarioMetadata | null>(null);
   const [saving, setSaving] = useState(false);
-  const [anoSafra, setAnoSafra] = useState('2026/2027');
+  const [anoSafra, setAnoSafra] = useState<number>(2026);
   const [mesReferencia, setMesReferencia] = useState('Abril');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [savingActive, setSavingActive] = useState(false);
+  const [years, setYears] = useState<{ id: number; active: boolean }[]>([]);
+  const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
 
   const loadLocalFallback = () => {
     fetch('/memorial_de_calculo_balanco.json')
@@ -29,7 +41,19 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       .catch(() => setLoading(false));
   };
 
+  const fetchYearsAndMonths = async () => {
+    try {
+      const yrRes = await axios.get('http://localhost:8000/api/harvest-years');
+      setYears(yrRes.data);
+      const moRes = await axios.get('http://localhost:8000/api/harvest-months');
+      setMonths(moRes.data);
+    } catch (err) {
+      console.error("Erro ao carregar anos/meses:", err);
+    }
+  };
+
   useEffect(() => {
+    fetchYearsAndMonths();
     axios.get('http://localhost:8000/api/scenarios')
       .then(res => {
         if (res.data?.length > 0) {
@@ -86,7 +110,8 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const onLoadScenario = (loadedVars: Variable[], meta: ScenarioMetadata) => {
     setVariables(loadedVars);
     setCurrentScenario(meta);
-    setAnoSafra(meta.year_harvest);
+    const parsedYear = typeof meta.year_harvest === 'string' ? parseHarvestYear(meta.year_harvest) : meta.year_harvest;
+    setAnoSafra(parsedYear);
     setMesReferencia(meta.reference_month);
     setHasUnsavedChanges(false);
     if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
@@ -174,9 +199,10 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
       setVariables(updated);
       triggerCalculate(updated);
-    } catch (err: any) {
-      console.error(err);
-      alert(`Erro ao salvar variável globalmente: ${err.response?.data?.detail || err.message}`);
+    } catch (err) {
+      const error = err as { response?: { data?: { detail?: string } }; message?: string };
+      console.error(error);
+      alert(`Erro ao salvar variável globalmente: ${error.response?.data?.detail || error.message}`);
     }
   };
 
@@ -210,6 +236,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     handleSaveActive,
     onApplyOptimalValue,
     handleSaveVariable,
-    isLocked
+    isLocked,
+    years,
+    months,
+    fetchYearsAndMonths
   };
 }

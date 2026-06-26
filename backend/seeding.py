@@ -53,7 +53,7 @@ def seed_initial_data():
         db_scenario = Scenario(
             id=scenario_id,
             nome="Cenário Base (Inicial)",
-            year_harvest="2026/2027",
+            year_harvest=2026,
             reference_month="Abril",
             version=1,
             status=ScenarioStatus.EM_EDICAO,

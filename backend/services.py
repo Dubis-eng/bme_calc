@@ -130,8 +130,10 @@ def _upsert_result(var_id: str, scenario_id: uuid.UUID, eq_val: Any, var_calc: D
     db.add(db_res)
 
 def create_new_scenario(req, db: Session) -> ScenarioDetail:
+    from database import parse_year
+    year_harvest_int = parse_year(req.year_harvest)
     stmt = select(Scenario.version).where(
-        Scenario.year_harvest == req.year_harvest,
+        Scenario.year_harvest == year_harvest_int,
         Scenario.reference_month == req.reference_month
     ).order_by(Scenario.version.desc())
     versions = db.exec(stmt).all()
@@ -139,8 +141,8 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
     scenario_id = uuid.uuid4()
     db_scenario = Scenario(
         id=scenario_id,
-        nome=f"Cenário {req.year_harvest} - {req.reference_month} (v{next_version})",
-        year_harvest=req.year_harvest,
+        nome=f"Cenário {year_harvest_int} - {req.reference_month} (v{next_version})",
+        year_harvest=year_harvest_int,
         reference_month=req.reference_month,
         version=next_version,
         status=req.status or ScenarioStatus.EM_EDICAO
@@ -453,16 +455,22 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
 
 ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
-def get_ordered_months(start_month: str) -> List[str]:
-    if start_month not in ALL_MONTHS:
-        start_month = "Abril"
-    idx = ALL_MONTHS.index(start_month)
-    return ALL_MONTHS[idx:] + ALL_MONTHS[:idx]
+def get_ordered_months(start_month: str, db: Session) -> List[str]:
+    from database import HarvestMonth
+    stmt = select(HarvestMonth).where(HarvestMonth.enabled == True).order_by(HarvestMonth.order_index.asc())
+    db_months = db.exec(stmt).all()
+    enabled_names = [m.name for m in db_months]
+    if not enabled_names:
+        enabled_names = ALL_MONTHS
+    if start_month not in enabled_names:
+        return enabled_names
+    idx = enabled_names.index(start_month)
+    return enabled_names[idx:] + enabled_names[:idx]
 
-def get_harvest_years(db: Session) -> List[str]:
-    stmt = select(Scenario.year_harvest).distinct()
+def get_harvest_years(db: Session) -> List[int]:
+    from database import HarvestYear
+    stmt = select(HarvestYear.id).where(HarvestYear.active == True)
     years = db.exec(stmt).all()
-    # Unique and sorted descending
     return sorted(list(set(years)), reverse=True)
 
 def get_harvest_plan_settings(db: Session) -> HarvestPlanSetting:
@@ -512,9 +520,15 @@ def update_variables_harvest_config(configs: List[Dict[str, Any]], db: Session):
             db.add(db_var)
     db.commit()
 
-def calculate_harvest_plan_consolidation(year_harvest: str, db: Session) -> Dict[str, Any]:
+def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict[str, Any]:
+    from database import parse_year
+    if isinstance(year_harvest, str):
+        year_harvest_int = parse_year(year_harvest)
+    else:
+        year_harvest_int = int(year_harvest)
+        
     setting = get_harvest_plan_settings(db)
-    harvest_months = get_ordered_months(setting.start_month)
+    harvest_months = get_ordered_months(setting.start_month, db)
     
     # Get all variables
     stmt_vars = select(Variable)
@@ -523,7 +537,7 @@ def calculate_harvest_plan_consolidation(year_harvest: str, db: Session) -> Dict
     
     # Get all approved/final scenarios for the harvest year
     stmt_scenarios = select(Scenario).where(
-        Scenario.year_harvest == year_harvest,
+        Scenario.year_harvest == year_harvest_int,
         Scenario.status.in_([ScenarioStatus.APROVADO, ScenarioStatus.FINAL])
     )
     scenarios = db.exec(stmt_scenarios).all()

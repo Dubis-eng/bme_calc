@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Variable } from '../types';
+import { formatHarvestYear } from '../utils/useScenario';
 
 export interface ScenarioMetadata {
     id: string;
-    year_harvest: string;
+    year_harvest: string | number;
     reference_month: string;
     version: number;
     status: 'Em Edição' | 'Aprovado' | 'Final';
@@ -17,8 +18,8 @@ interface ScenarioManagerProps {
     onLoadScenario: (variables: Variable[], metadata: ScenarioMetadata) => void;
     currentScenario: ScenarioMetadata | null;
     onStatusChange: (status: 'Em Edição' | 'Aprovado' | 'Final') => void;
-    anoSafra: string;
-    setAnoSafra: (val: string) => void;
+    anoSafra: number;
+    setAnoSafra: (val: number) => void;
     mesReferencia: string;
     setMesReferencia: (val: string) => void;
     onSaveNew: () => Promise<void>;
@@ -26,6 +27,8 @@ interface ScenarioManagerProps {
     onSaveActive?: () => Promise<void>;
     savingActive?: boolean;
     hasUnsavedChanges?: boolean;
+    years: { id: number; active: boolean }[];
+    months: { id: number; name: string; order_index: number; enabled: boolean }[];
 }
 
 export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
@@ -41,7 +44,9 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
     saving,
     onSaveActive,
     savingActive = false,
-    hasUnsavedChanges = false
+    hasUnsavedChanges = false,
+    years,
+    months
 }) => {
     const [scenarios, setScenarios] = useState<ScenarioMetadata[]>([]);
     const [loading, setLoading] = useState(false);
@@ -119,11 +124,18 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                         <select
                             aria-label="Ano Safra para salvar"
                             value={anoSafra}
-                            onChange={(e) => setAnoSafra(e.target.value)}
+                            onChange={(e) => setAnoSafra(Number(e.target.value))}
                             className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-1.5 focus:ring-1 focus:ring-teal-500 focus:outline-none"
                         >
-                            <option value="2026/2027">2026/2027</option>
-                            <option value="2027/2028">2027/2028</option>
+                            {years.length === 0 ? (
+                                <option value={2026}>2026/2027</option>
+                            ) : (
+                                years.filter(y => y.active).map(y => (
+                                    <option key={y.id} value={y.id}>
+                                        {formatHarvestYear(y.id)}
+                                    </option>
+                                ))
+                            )}
                         </select>
                     </label>
                 </div>
@@ -136,9 +148,19 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                             onChange={(e) => setMesReferencia(e.target.value)}
                             className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-1.5 focus:ring-1 focus:ring-teal-500 focus:outline-none"
                         >
-                            <option value="Abril">Abril</option>
-                            <option value="Maio">Maio</option>
-                            <option value="Junho">Junho</option>
+                            {months.length === 0 ? (
+                                <>
+                                    <option value="Abril">Abril</option>
+                                    <option value="Maio">Maio</option>
+                                    <option value="Junho">Junho</option>
+                                </>
+                            ) : (
+                                months.filter(m => m.enabled).map(m => (
+                                    <option key={m.id} value={m.name}>
+                                        {m.name}
+                                    </option>
+                                ))
+                            )}
                         </select>
                     </label>
                 </div>
@@ -254,7 +276,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                             >
                                 <div className="flex justify-between w-full items-center">
                                     <span className="text-[11px] font-bold text-slate-700">
-                                        Safra {sc.year_harvest} - {sc.reference_month}
+                                        Safra {formatHarvestYear(sc.year_harvest)} - {sc.reference_month}
                                     </span>
                                     <span className={`px-1.5 py-0.5 text-[8px] font-bold rounded-full border ${getStatusBadgeClass(sc.status)}`}>
                                         {sc.status}

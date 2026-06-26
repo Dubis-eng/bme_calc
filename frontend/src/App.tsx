@@ -9,6 +9,7 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { RightPanel } from './components/RightPanel';
 import { HarvestPlan } from './components/HarvestPlan';
+import { SystemSettingsModal } from './components/SystemSettingsModal';
 import { useVariableSearch } from './utils/useVariableSearch';
 import { useSearch } from './utils/useSearch';
 import { useScenario } from './utils/useScenario';
@@ -20,6 +21,7 @@ function App() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isGoalSeekOpen, setIsGoalSeekOpen] = useState(false);
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [variableToEdit, setVariableToEdit] = useState<Variable | null>(null);
   const [prefilledSector, setPrefilledSector] = useState('');
   const [prefilledEtapa, setPrefilledEtapa] = useState('');
@@ -59,7 +61,10 @@ function App() {
     handleSaveActive,
     onApplyOptimalValue,
     handleSaveVariable,
-    isLocked
+    isLocked,
+    years,
+    months,
+    fetchYearsAndMonths
   } = useScenario(sectors, fetchSectors);
 
   const search = useSearch(variables);
@@ -138,6 +143,7 @@ function App() {
             sectors={sectors}
             onSubgroupClick={handleSubgroupClick}
             onVariableClick={onScrollTo}
+            onSettingsClick={() => setIsSettingsOpen(true)}
           />
 
           <main className="flex-1 flex flex-col overflow-hidden p-6 bg-slate-50">
@@ -201,6 +207,8 @@ function App() {
             onGoalSeekOpen={() => setIsGoalSeekOpen(true)}
             sectors={sectors}
             onRefreshSectors={fetchSectors}
+            years={years}
+            months={months}
           />
         </div>
       )}
@@ -208,6 +216,7 @@ function App() {
       <GoalSeekModal isOpen={isGoalSeekOpen} onClose={() => setIsGoalSeekOpen(false)} variables={variables} onApplyOptimalValue={onApplyOptimalValue} />
       <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} />
       <SearchPanel isOpen={search.isSearchPanelOpen} query={search.searchQuery} results={searchResults} onClose={search.closeSearchPanel} onScrollTo={onScrollTo} onEdit={onSearchEdit} />
+      <SystemSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} years={years} months={months} fetchYearsAndMonths={fetchYearsAndMonths} />
     </div>
   );
 }

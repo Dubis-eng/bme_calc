@@ -12,8 +12,25 @@ class CalculateResponse(BaseModel):
     convergence_error: bool
     iterations: int
 
+class HarvestYearCreate(BaseModel):
+    id: int
+
+class HarvestYearRead(BaseModel):
+    id: int
+    active: bool
+
+class HarvestMonthRead(BaseModel):
+    id: int
+    name: str
+    order_index: int
+    enabled: bool
+
+class HarvestMonthUpdate(BaseModel):
+    order_index: Optional[int] = None
+    enabled: Optional[bool] = None
+
 class ScenarioCreate(BaseModel):
-    year_harvest: str
+    year_harvest: Any
     reference_month: str
     variables: List[Dict[str, Any]]
     status: Optional[ScenarioStatus] = ScenarioStatus.EM_EDICAO
@@ -24,7 +41,7 @@ class StatusUpdate(BaseModel):
 class ScenarioDetail(BaseModel):
     id: uuid.UUID
     nome: str
-    year_harvest: str
+    year_harvest: int
     reference_month: str
     version: int
     status: ScenarioStatus

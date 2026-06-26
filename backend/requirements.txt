@@ -8,3 +8,5 @@ scipy
 reportlab
 openpyxl
 psycopg2-binary
+pytest
+httpx

@@ -63,9 +63,10 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
       setStartMonth(settingsRes.data.start_month);
 
       const yearsRes = await axios.get('http://localhost:8000/api/harvest-plan/years');
-      setYears(yearsRes.data);
-      if (yearsRes.data.length > 0) {
-        setSelectedYear(yearsRes.data[0]);
+      const yearStrings = yearsRes.data.map((y: string | number) => String(y));
+      setYears(yearStrings);
+      if (yearStrings.length > 0) {
+        setSelectedYear(yearStrings[0]);
       }
     } catch (err) {
       console.error('Erro ao carregar anos/configurações:', err);
@@ -123,7 +124,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
     }
   };
 
-  const handleConfigChange = (varId: string, field: keyof VariableConfig, value: any) => {
+  const handleConfigChange = (varId: string, field: keyof VariableConfig, value: string | boolean | null) => {
     setVariablesConfig(prev => prev.map(vc => {
       if (vc.id === varId) {
         const updated = { ...vc, [field]: value };
@@ -225,7 +226,11 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
                 onChange={(e) => setSelectedYear(e.target.value)}
                 className="bg-slate-800 text-white border border-slate-700 rounded px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal-500"
               >
-                {years.map(y => <option key={y} value={y}>{y}</option>)}
+                {years.map(y => (
+                  <option key={y} value={y}>
+                    {y.includes('/') ? y : `${y}/${parseInt(y, 10) + 1}`}
+                  </option>
+                ))}
               </select>
             ) : (
               <span className="text-xs text-slate-500 font-semibold">Nenhum cenário cadastrado</span>

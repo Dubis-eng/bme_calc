@@ -50,7 +50,7 @@ def test_create_and_version_scenario():
     data = response.json()
     assert data["version"] == 1
     assert data["status"] == "Em Edição"
-    assert data["year_harvest"] == "2026/2027"
+    assert data["year_harvest"] == 2026
     assert data["reference_month"] == "Abril"
     assert len(data["variables"]) == 1
     
@@ -214,3 +214,53 @@ def test_update_scenario_endpoint():
     fail_res = client.put(f"/api/scenarios/{scenario_id}", json=payload)
     assert fail_res.status_code == 400
     assert "bloqueado" in fail_res.json()["detail"]
+
+def test_harvest_years_and_months():
+    # 1. Get initial harvest years (seeded: 2026, 2027, 2028)
+    res_yrs = client.get("/api/harvest-years")
+    assert res_yrs.status_code == 200
+    yrs = res_yrs.json()
+    assert len(yrs) >= 3
+    years_ids = [y["id"] for y in yrs]
+    assert 2026 in years_ids
+    assert 2027 in years_ids
+    assert 2028 in years_ids
+
+    # 2. Add a new harvest year (2029)
+    res_add = client.post("/api/harvest-years", json={"id": 2029})
+    assert res_add.status_code == 200
+    assert res_add.json()["id"] == 2029
+
+    # 3. Get harvest years again to verify 2029 is present
+    res_yrs2 = client.get("/api/harvest-years")
+    years_ids2 = [y["id"] for y in res_yrs2.json()]
+    assert 2029 in years_ids2
+
+    # 4. Get harvest months
+    res_mths = client.get("/api/harvest-months")
+    assert res_mths.status_code == 200
+    months = res_mths.json()
+    assert len(months) == 12
+    assert months[0]["name"] == "Janeiro"
+
+    # 5. Disable "Fevereiro" (id = 2)
+    res_patch = client.patch("/api/harvest-months/2", json={"enabled": False})
+    assert res_patch.status_code == 200
+    assert res_patch.json()["enabled"] is False
+
+    # 6. List enabled months only
+    res_mths_enabled = client.get("/api/harvest-months?enabled_only=true")
+    assert res_mths_enabled.status_code == 200
+    enabled_months = res_mths_enabled.json()
+    assert len(enabled_months) == 11
+    assert not any(m["id"] == 2 for m in enabled_months)
+
+    # 7. Delete harvest year 2029
+    res_del = client.delete("/api/harvest-years/2029")
+    assert res_del.status_code == 200
+
+    # 8. Verify 2029 is deleted
+    res_yrs3 = client.get("/api/harvest-years")
+    years_ids3 = [y["id"] for y in res_yrs3.json()]
+    assert 2029 not in years_ids3
+

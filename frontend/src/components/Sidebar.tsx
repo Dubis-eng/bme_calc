@@ -12,6 +12,7 @@ interface SidebarProps {
   sectors: Sector[];
   onSubgroupClick: (sectorId: string, subgroupName: string) => void;
   onVariableClick: (varId: string) => void;
+  onSettingsClick: () => void;
 }
 
 export function Sidebar({
@@ -23,7 +24,8 @@ export function Sidebar({
   variables,
   sectors,
   onSubgroupClick,
-  onVariableClick
+  onVariableClick,
+  onSettingsClick
 }: SidebarProps) {
   const [expandedSectors, setExpandedSectors] = useState<Record<string, boolean>>({});
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({});
@@ -185,6 +187,17 @@ export function Sidebar({
           );
         })}
       </nav>
+      <div className="p-3 border-t border-slate-900 bg-slate-950/30 flex justify-center">
+        <button
+          onClick={onSettingsClick}
+          className={`flex items-center w-full p-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition-all duration-200 focus:outline-none ${isSidebarExpanded ? 'justify-start px-3' : 'justify-center'}`}
+          title="Configurações do Sistema"
+          aria-label="Configurações do Sistema"
+        >
+          <span className="text-sm">⚙️</span>
+          {isSidebarExpanded && <span className="ml-3 text-xs font-semibold tracking-wide">Configurações</span>}
+        </button>
+      </div>
     </aside>
   );
 }

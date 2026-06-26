@@ -26,11 +26,28 @@ class ResultStatus(str, Enum):
     DIV_BY_ZERO = "DIV_BY_ZERO"
     MISSING_VAR = "MISSING_VAR"
     PENDING = "PENDING"
+
+def parse_year(year_str: str) -> int:
+    match = re.search(r'\d{4}', str(year_str))
+    return int(match.group(0)) if match else 2026
+
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://uisa_user:uisa_password@localhost:5432/bme_calc")
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
+
+class HarvestYear(SQLModel, table=True):
+    __tablename__ = "harvest_years"
+    id: int = Field(primary_key=True)
+    active: bool = Field(default=True)
+
+class HarvestMonth(SQLModel, table=True):
+    __tablename__ = "harvest_months"
+    id: int = Field(primary_key=True)
+    name: str = Field(index=True)
+    order_index: int = Field(default=0, index=True)
+    enabled: bool = Field(default=True)
 
 class Sector(SQLModel, table=True):
     __tablename__ = "sectors"
@@ -45,7 +62,7 @@ class Scenario(SQLModel, table=True):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     nome: str = Field(index=True)
-    year_harvest: str = Field(index=True)
+    year_harvest: int = Field(foreign_key="harvest_years.id", index=True)
     reference_month: str = Field(index=True)
     version: int = Field(default=1, index=True)
     status: ScenarioStatus = Field(default=ScenarioStatus.EM_EDICAO, sa_column_kwargs={"nullable": False})
@@ -145,11 +162,12 @@ def migrate_legacy_data(session: Session):
         else:
             variables_list = variables_json
 
+        parsed_year = parse_year(year_harvest)
         # Create new Scenario record
         new_scenario = Scenario(
             id=scenario_id,
-            nome=f"Cenário {year_harvest} - {reference_month} (v{version})",
-            year_harvest=year_harvest,
+            nome=f"Cenário {parsed_year} - {reference_month} (v{version})",
+            year_harvest=parsed_year,
             reference_month=reference_month,
             status=status,
             created_at=created_at,
@@ -254,9 +272,48 @@ def migrate_legacy_data(session: Session):
     session.commit()
 
 def migrate_database_schema(session: Session):
+    SQLModel.metadata.create_all(session.bind)
+    session.commit()
     inspector = inspect(session.bind)
     tables = inspector.get_table_names()
-    
+
+    # 1. Migrate year_harvest from string to integer
+    if "scenarios" in tables:
+        cols = inspector.get_columns("scenarios")
+        y_col = next((c for c in cols if c["name"] == "year_harvest"), None)
+        if y_col and ("VARCHAR" in str(y_col["type"]).upper() or "TEXT" in str(y_col["type"]).upper()):
+            scenarios_data = session.execute(text("SELECT id, year_harvest FROM scenarios")).fetchall()
+            years = {2026, 2027, 2028}
+            s_years = {}
+            for s_id, y_h in scenarios_data:
+                p_y = parse_year(y_h)
+                years.add(p_y)
+                s_years[s_id] = p_y
+            for yr in years:
+                if not session.execute(text("SELECT 1 FROM harvest_years WHERE id=:yr"), {"yr": yr}).first():
+                    session.execute(text("INSERT INTO harvest_years (id, active) VALUES (:yr, true)"), {"yr": yr})
+            session.commit()
+            for s_id, p_y in s_years.items():
+                session.execute(text("UPDATE scenarios SET year_harvest=:yr WHERE id=:sid"), {"yr": str(p_y), "sid": s_id})
+            session.commit()
+            if session.bind.dialect.name == "postgresql":
+                session.execute(text("ALTER TABLE scenarios ALTER COLUMN year_harvest TYPE INTEGER USING (year_harvest::integer)"))
+                session.commit()
+
+    # 2. Seed harvest_years
+    if "harvest_years" in tables and session.execute(text("SELECT COUNT(*) FROM harvest_years")).scalar() == 0:
+        for yr in [2026, 2027, 2028]:
+            session.execute(text(f"INSERT INTO harvest_years (id, active) VALUES ({yr}, true)"))
+        session.commit()
+
+    # 3. Seed harvest_months
+    if "harvest_months" in tables and session.execute(text("SELECT COUNT(*) FROM harvest_months")).scalar() == 0:
+        months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+        for idx, m in enumerate(months):
+            session.execute(text("INSERT INTO harvest_months (id, name, order_index, enabled) VALUES (:id, :name, :order_index, :enabled)"),
+                            {"id": idx+1, "name": m, "order_index": idx, "enabled": True})
+        session.commit()
+
     if "variables" in tables and "sectors" not in tables:
         SQLModel.metadata.create_all(session.bind)
         columns = [col["name"] for col in inspector.get_columns("variables")]

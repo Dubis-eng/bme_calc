@@ -15,6 +15,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] [feat-011-steam-lookup.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/feat-011-steam-lookup.md)** — Novo Memorial e Motor de Busca Termodinâmico.
 * **[DONE] [feat-012-harvest-plan.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/feat-012-harvest-plan.md)** — Consolidação do Plano de Safra e Visualização Plurianual.
 * **[DONE] [task-master.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/task-master.md)** — Lista sequencial e grafo de tarefas de todas as entregas do sistema.
+* **[DONE] feat-013-harvest-settings** — Cadastro Dinâmico de Anos Safra e Meses de Referência (Épico 6, Tarefa 6.3): tabelas `harvest_years`/`harvest_months`, API CRUD, modal de Configurações do Sistema ⚙️ e seletores dinâmicos.
 
 
 ---
@@ -24,7 +25,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 ### Épico 6: Usabilidade e Calendário de Produção (PENDENTE)
 1. **Busca Global de Variável (6.1)**: Barra de pesquisa em tempo real por ID, Descrição ou Definição para navegação ágil no universo de +1000 variáveis durante edição de equações.
 2. **Método Padronizado de Equações (6.2)**: Guia ou painel de referência rápida embutido na interface com a sintaxe aceita pelo motor AST (operadores, funções suportadas, formatos de ID válidos).
-3. **Cadastro de Meses e Anos de Safra (6.3)**: Migrar o seletor estático para cadastro dinâmico no PostgreSQL com calendário real de operação, como base para acompanhamento histórico e projeções por período.
+3. ~~**Cadastro de Meses e Anos de Safra (6.3)**~~ ✅ Concluído — tabelas `harvest_years`/`harvest_months`, CRUD via API, modal ⚙️ de Configurações do Sistema e seletores dinâmicos.
 
 ### Outros Backlog Técnicos
 4. **Migração para Next.js**: Avaliada e classificada como pendência postergada. Não recomendada para o escopo atual (aplicação de página única interna corporativa). Reavaliar se houver necessidade de SEO público, rotas complexas ou SSR/SSG.
