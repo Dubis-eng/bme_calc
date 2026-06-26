@@ -145,6 +145,56 @@ class FormulaEvaluator:
                 except Exception as e:
                     return err_res("MATH_ERROR", f"Erro no PROCV: {str(e)}")
                 
+            if func_name in {'VAPOR_H', 'VAPOR_S', 'VAPOR_H_SAT', 'VAPOR_H_LIQ', 'VAPOR_H_PS', 'VAPOR_T_SAT', 'VAPOR_LATENT'}:
+                try:
+                    if func_name in {'VAPOR_H_SAT', 'VAPOR_H_LIQ', 'VAPOR_T_SAT', 'VAPOR_LATENT'}:
+                        if len(node.args) != 1: return err_res("INVALID_ARGS", f"{func_name} requer 1 argumento (Pressão)")
+                        P_res = self.evaluate(node.args[0])
+                        if P_res["status"] != "OK": return P_res
+                        P_abs = to_decimal(P_res["value"])
+                        P_abs_MPa = P_abs * Decimal('0.1')
+                        
+                        if func_name == 'VAPOR_H_SAT':
+                            state = IAPWS97(P=float(P_abs_MPa), x=1)
+                            return ok_res(Decimal(str(state.h)))
+                        elif func_name == 'VAPOR_H_LIQ':
+                            state = IAPWS97(P=float(P_abs_MPa), x=0)
+                            return ok_res(Decimal(str(state.h)))
+                        elif func_name == 'VAPOR_T_SAT':
+                            state = IAPWS97(P=float(P_abs_MPa), x=1)
+                            return ok_res(Decimal(str(state.T)) - Decimal('273.15'))
+                        elif func_name == 'VAPOR_LATENT':
+                            state_v = IAPWS97(P=float(P_abs_MPa), x=1)
+                            state_l = IAPWS97(P=float(P_abs_MPa), x=0)
+                            return ok_res(Decimal(str(state_v.h)) - Decimal(str(state_l.h)))
+                            
+                    elif func_name in {'VAPOR_H', 'VAPOR_S', 'VAPOR_H_PS'}:
+                        if len(node.args) != 2: return err_res("INVALID_ARGS", f"{func_name} requer 2 argumentos")
+                        P_res = self.evaluate(node.args[0])
+                        if P_res["status"] != "OK": return P_res
+                        param_res = self.evaluate(node.args[1])
+                        if param_res["status"] != "OK": return param_res
+                        
+                        P_abs = to_decimal(P_res["value"])
+                        P_abs_MPa = P_abs * Decimal('0.1')
+                        val_param = to_decimal(param_res["value"])
+                        
+                        if func_name == 'VAPOR_H':
+                            T_K = val_param + Decimal('273.15')
+                            state = IAPWS97(P=float(P_abs_MPa), T=float(T_K))
+                            return ok_res(Decimal(str(state.h)))
+                        elif func_name == 'VAPOR_S':
+                            T_K = val_param + Decimal('273.15')
+                            state = IAPWS97(P=float(P_abs_MPa), T=float(T_K))
+                            return ok_res(Decimal(str(state.s)))
+                        elif func_name == 'VAPOR_H_PS':
+                            s_val = val_param
+                            state = IAPWS97(P=float(P_abs_MPa), s=float(s_val))
+                            return ok_res(Decimal(str(state.h)))
+                            
+                except Exception as e:
+                    return err_res("MATH_ERROR", f"Erro no {func_name}: {str(e)}")
+                
             if func_name == 'LN':
                 if len(node.args) != 1: return err_res("INVALID_ARGS", "LN requer 1 argumento")
                 arg_res = self.evaluate(node.args[0])

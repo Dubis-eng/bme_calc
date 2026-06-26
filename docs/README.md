@@ -12,6 +12,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Épico 5: Edição de Equações e Módulos** — Parser AST para IDs alfanuméricos descritivos, painel modular por Definição (`SectorModules`), modal de cadastro/edição de variáveis (`VariableModal`).
 * **[DONE] [docs/features/feat-009-subgroups-sectors.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-009-subgroups-sectors.md)** — Navegação em Árvore (Subgrupos) e Cadastro de Setores.
 * **[ONGOING] [docs/features/feat-010-save-active-scenario.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/feat-010-save-active-scenario.md)** — Salvamento de Cenário Ativo e Prevenção de Perda de Dados.
+* **[ONGOING] [docs/features/feat-011-steam-lookup.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/feat-011-steam-lookup.md)** — Novo Memorial e Motor de Busca Termodinâmico.
 * **[DONE] [docs/features/task-master.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/task-master.md)** — Lista sequencial e grafo de tarefas de todas as entregas do sistema.
 
 

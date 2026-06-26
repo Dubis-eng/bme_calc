@@ -18,20 +18,21 @@ def parse_number(val):
 
 def expand_ranges(eq_str):
     def replacer(match):
-        start = int(match.group(1))
-        end = int(match.group(2))
+        prefix = match.group(1)
+        start = int(match.group(2))
+        end = int(match.group(3))
         if start <= end:
-            expanded = [f"H{i}" for i in range(start, end + 1)]
+            expanded = [f"{prefix}{i}" for i in range(start, end + 1)]
             return ", ".join(expanded)
         return match.group(0)
-    return re.sub(r'H(\d+):H(\d+)', replacer, eq_str)
+    return re.sub(r'\b([A-Z])(\d+):\1(\d+)\b', replacer, eq_str)
 
 def normalize_formula(eq_str):
     if not isinstance(eq_str, str) or not eq_str.startswith('='): return eq_str
     eq = eq_str[1:]
     eq = re.sub(r'Vapor!\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+', '"Vapor"', eq, flags=re.IGNORECASE)
     eq = re.sub(r'[a-zA-Z0-9_]+!', '', eq).replace('$', '')
-    eq = re.sub(r'@H(\d+):[A-Z]\d+', r'H\1', eq).replace('@', '').replace('<>', '!=')
+    eq = re.sub(r'@([A-Z])(\d+):[A-Z]\d+', r'\1\2', eq).replace('@', '').replace('<>', '!=')
     
     # Handle '=' replacement to '==' safely (avoid changing >=, <=, !=)
     eq = eq.replace('<=', '__LTE__').replace('>=', '__GTE__').replace('!=', '__NE__')
@@ -39,7 +40,10 @@ def normalize_formula(eq_str):
     eq = eq.replace('__LTE__', '<=').replace('__GTE__', '>=').replace('__NE__', '!=')
     
     eq = re.sub(r'(\d),(\d)', r'\1.\2', eq)
-    eq = re.sub(r'\bD(\d+)\b', r'H\1', eq)
+    if 'J' in eq:
+        eq = re.sub(r'\bD(\d+)\b', r'J\1', eq)
+    else:
+        eq = re.sub(r'\bD(\d+)\b', r'H\1', eq)
     eq = expand_ranges(eq)
     eq = re.sub(r'\bFALSO\b', 'False', eq, flags=re.IGNORECASE)
     eq = re.sub(r'\bVERDADEIRO\b', 'True', eq, flags=re.IGNORECASE).replace(';', ',').replace('^', '**')
@@ -48,14 +52,15 @@ def normalize_formula(eq_str):
 # FormulaEvaluator, ok_res, err_res, and to_decimal are imported from evaluator.py
 
 def parse_equation(eq_str, state, ref=None):
-    if ref == 'H273':
+    if ref in {'H273', 'J270'}:
         try:
-            h272_res = state.get('H272', ok_res(Decimal('0')))
-            if isinstance(h272_res, dict) and "status" in h272_res:
-                if h272_res["status"] != "OK": return h272_res
-                I = to_decimal(h272_res["value"])
+            inpm_ref = 'H272' if ref == 'H273' else 'J269'
+            inpm_res = state.get(inpm_ref, ok_res(Decimal('0')))
+            if isinstance(inpm_res, dict) and "status" in inpm_res:
+                if inpm_res["status"] != "OK": return inpm_res
+                I = to_decimal(inpm_res["value"])
             else:
-                I = to_decimal(h272_res)
+                I = to_decimal(inpm_res)
             if I > 100 or I < 0: return err_res("MATH_ERROR", "Teor alcoólico fora de 0-100")
             return ok_res(Decimal('0.99823') - Decimal('0.001625') * I - Decimal('0.0000045') * (I ** 2))
         except Exception as e:
@@ -82,7 +87,10 @@ def extract_dependencies(eq_str: str) -> set:
         for node in ast.walk(parsed_ast):
             if isinstance(node, ast.Name):
                 name = node.id
-                if name not in {'True', 'False', 'SE', 'SEERRO', 'SOMA', 'PROCV', 'LN', 'SUBTOTAL', 'SOMASES', 'Vapor'}:
+                if name not in {
+                    'True', 'False', 'SE', 'SEERRO', 'SOMA', 'PROCV', 'LN', 'SUBTOTAL', 'SOMASES', 'Vapor',
+                    'VAPOR_H', 'VAPOR_S', 'VAPOR_H_SAT', 'VAPOR_H_LIQ', 'VAPOR_H_PS', 'VAPOR_T_SAT', 'VAPOR_LATENT'
+                }:
                     deps.add(name)
         return deps
     except Exception:
@@ -111,9 +119,10 @@ def calculate_state(variables_list):
             deps = extract_dependencies(normalized_val)
             for dep in deps:
                 graph.add_edge(dep, ref)
-        elif ref == 'H273':
-            formulas['H273'] = '=H272'
-            graph.add_edge('H272', 'H273')
+        elif ref in {'H273', 'J270'}:
+            inpm_ref = 'H272' if ref == 'H273' else 'J269'
+            formulas[ref] = f'={inpm_ref}'
+            graph.add_edge(inpm_ref, ref)
                 
     try:
         order = list(nx.topological_sort(graph))

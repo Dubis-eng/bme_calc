@@ -1,16 +1,17 @@
 # SESSION
 
-> Last updated: 2026-06-22
+> Last updated: 2026-06-26
 
 ## Status
 - Status: COMMITTED
-- Última Sessão: Ordenação Personalizada e Única de Setores (Tarefa 9.7)
+- Última Sessão: Novo Memorial de Cálculo e Busca Termodinâmica (Épico 11 & Limpeza Hierárquica)
 - Entregues:
-  - Adicionado o campo `ordem` ao banco de dados (`Sector` model) e sua respectiva migração automática no startup.
-  - Implementada validação de unicidade de ordenação no backend (services) e frontend (SectorConfig), impedindo que dois setores compartilhem a mesma posição.
-  - Implementada a semeadura incremental por 10 em ordem de aparição física no arquivo JSON.
-  - Sidebar e listas de setores agora renderizam e ordenam de forma crescente por esse índice de ordenação.
-- Próximos Passos (Backlog Épico 6):
-  1. **Tarefa 6.2** — Painel/guia padronizado de sintaxe de equações para evitar erros na escrita de fórmulas.
-  2. **Tarefa 6.3** — Cadastro dinâmico de meses e anos de safra no PostgreSQL, como base para acompanhamento por calendário real de produção.
+  - Definido e executado o plano de implementação para carga limpa do memorial (prefixo J).
+  - Implementado o motor termodinâmico com IAPWS-IF97 usando pressões absolutas.
+  - Removido o campo legado `DEFINIÇÃO` no backend e frontend.
+  - Reestruturada a organização visual do frontend e banco para a árvore de 4 níveis (Setor -> Etapa -> Ponto de Controle -> Variável).
+  - Refatorado `VariableModal.tsx` separando `EquationDropdown.tsx` para cumprir a regra de limite de 300 linhas físicas.
+- Próximos Passos:
+  1. Acompanhar feedback do usuário em homologação de produção.
+  2. Planejar Épico 6 (Usabilidade e Calendário de Produção).
 

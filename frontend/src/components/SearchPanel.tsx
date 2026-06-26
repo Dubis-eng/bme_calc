@@ -18,7 +18,7 @@ function HighlightedSnippet({ match }: { match: SearchMatch }) {
   const fieldLabel: Record<SearchMatch['field'], string> = {
     id: 'ID',
     description: 'Descrição',
-    definition: 'Definição',
+    definition: 'Ponto de Controle',
   };
 
   return (

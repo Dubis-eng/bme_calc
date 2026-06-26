@@ -68,6 +68,8 @@ class Variable(SQLModel, table=True):
     tipo: VariableType = Field(default=VariableType.INPUT, sa_column_kwargs={"nullable": False})
     unidade: str = Field(default="")
     status: VariableStatus = Field(default=VariableStatus.ATIVA, sa_column_kwargs={"nullable": False})
+    etapa: str = Field(default="", index=True)
+    ponto_controle: str = Field(default="", index=True)
 
 class Equation(SQLModel, table=True):
     __tablename__ = "equations"

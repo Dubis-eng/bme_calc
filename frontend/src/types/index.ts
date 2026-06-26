@@ -1,7 +1,8 @@
 export interface Variable {
     "ID - REF": string;
     "SETOR": string;
-    "DEFINIÇÃO": string;  // Nome amigável
+    "ETAPA": string;
+    "PONTO DE CONTROLE": string;
     "DESCRIÇÃO": string;
     "TIPO": "INPUT" | "OUTPUT" | "DERIVADA" | "CENARIO";
     "UNIDADE DE MEDIDA": string;

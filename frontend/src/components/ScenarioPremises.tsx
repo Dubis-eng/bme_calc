@@ -24,7 +24,7 @@ export function ScenarioPremises({
           return (
             <div key={id} className="flex flex-col space-y-1">
               <div className="flex justify-between items-center text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
-                <span>{v['DEFINIÇÃO'] || v['DESCRIÇÃO'] || id} ({id})</span>
+                <span>{v['PONTO DE CONTROLE'] || v['DESCRIÇÃO'] || id} ({id})</span>
                 <span className="text-slate-400 font-mono lowercase">{v['UNIDADE DE MEDIDA']}</span>
               </div>
               <input

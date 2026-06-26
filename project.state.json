@@ -1,7 +1,7 @@
 {
   "$schema": "antigravity_sdd_v2",
   "project_status": {
-    "current_phase": "4_SURGICAL_EXECUTION",
+    "current_phase": "5_INTEGRATION_GATE",
     "execution_locked": false
   },
   "phase_gates": {
@@ -17,68 +17,44 @@
   },
   "atomic_tasks": [
     {
-      "id": "TASK-901",
-      "description": "Nova Tabela de Setores e Migração no Backend (database.py)",
-      "scope": "backend/database.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-902",
-      "description": "Roteamento CRUD de Setores (main.py, services.py, schemas.py)",
-      "scope": "backend/main.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-903",
-      "description": "Árvore Hierárquica na Sidebar (Sidebar.tsx)",
-      "scope": "frontend/src/components/Sidebar.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-904",
-      "description": "Painel de Configurações de Setor (SectorConfig.tsx, App.tsx)",
-      "scope": "frontend/src/components/SectorConfig.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-905",
-      "description": "Validação Local e Auditoria de Checklists",
-      "scope": "project",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-906",
-      "description": "Semeadura de Banco e Integração com Frontend",
+      "id": "TASK-1101",
+      "description": "Sincronizar arquivos json nas pastas do projeto",
       "scope": "backend/seeding.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-907",
-      "description": "Ordenação Única e Personalizada de Setores",
-      "scope": "backend/services.py",
+      "id": "TASK-1102",
+      "description": "Purga de dados legados do banco de dados no startup",
+      "scope": "backend/seeding.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-1001",
-      "description": "Backend Scenario Update Endpoint (PUT /api/scenarios/{id})",
-      "scope": "backend/main.py",
+      "id": "TASK-1103",
+      "description": "Ajustar interpretador engine.py para o prefixo J de variáveis e densidade J270",
+      "scope": "backend/engine.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-1002",
-      "description": "Frontend Save Changes Button and API integration",
-      "scope": "frontend/src/components/ScenarioManager.tsx",
+      "id": "TASK-1104",
+      "description": "Implementar as funções termodinâmicas no evaluator.py usando iapws",
+      "scope": "backend/evaluator.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-1003",
-      "description": "Frontend Unsaved Changes warning listener",
-      "scope": "frontend/src/App.tsx",
+      "id": "TASK-1105",
+      "description": "Substituir valores fixos de turbinas por fórmulas de vapor no memorial",
+      "scope": "docs/memorial_de_calculo_balanco.json",
       "status": "DONE"
     },
     {
-      "id": "TASK-1004",
-      "description": "Validation & Quality Checklist Audit",
+      "id": "TASK-1106",
+      "description": "Adicionar tooltips e guias das funções de vapor no frontend",
+      "scope": "frontend/src/components/SectorConfig.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1107",
+      "description": "Auditoria de checklists e testes de convergência",
       "scope": "project",
       "status": "DONE"
     }
