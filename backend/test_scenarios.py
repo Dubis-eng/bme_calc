@@ -236,6 +236,27 @@ def test_harvest_years_and_months():
     years_ids2 = [y["id"] for y in res_yrs2.json()]
     assert 2029 in years_ids2
 
+    # 3.5. Create a scenario under year 2029 to verify cascade delete
+    payload = {
+        "year_harvest": "2029/2030",
+        "reference_month": "Abril",
+        "variables": [
+            {
+                "ID - REF": "H1",
+                "SETOR": "MOAGEM",
+                "DEFINIÇÃO": "",
+                "DESCRIÇÃO": "Moagem Diária",
+                "TIPO": "INPUT",
+                "UNIDADE DE MEDIDA": "t/d",
+                "EQUAÇÕES E VALORES": "10000"
+            }
+        ],
+        "status": "Em Edição"
+    }
+    res_sc = client.post("/api/scenarios", json=payload)
+    assert res_sc.status_code == 200
+    sc_id = res_sc.json()["id"]
+
     # 4. Get harvest months
     res_mths = client.get("/api/harvest-months")
     assert res_mths.status_code == 200
@@ -255,7 +276,7 @@ def test_harvest_years_and_months():
     assert len(enabled_months) == 11
     assert not any(m["id"] == 2 for m in enabled_months)
 
-    # 7. Delete harvest year 2029
+    # 7. Delete harvest year 2029 (which should delete the associated scenario and results first)
     res_del = client.delete("/api/harvest-years/2029")
     assert res_del.status_code == 200
 
@@ -263,4 +284,9 @@ def test_harvest_years_and_months():
     res_yrs3 = client.get("/api/harvest-years")
     years_ids3 = [y["id"] for y in res_yrs3.json()]
     assert 2029 not in years_ids3
+
+    # 9. Verify the scenario is also deleted (cascade)
+    res_sc_get = client.get(f"/api/scenarios/{sc_id}")
+    assert res_sc_get.status_code == 404
+
 

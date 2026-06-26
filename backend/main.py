@@ -29,7 +29,9 @@ from schemas import (
     HarvestYearCreate,
     HarvestYearRead,
     HarvestMonthRead,
-    HarvestMonthUpdate
+    HarvestMonthUpdate,
+    HarvestPlanSelectionUpdate,
+    HarvestPlanSelectionsResponse
 )
 
 app = FastAPI()
@@ -190,7 +192,7 @@ def update_variable_endpoint(id: str, req: VariableUpdate, db=Depends(get_sessio
         raise HTTPException(status_code=500, detail=str(e))
 
 # Harvest Plan Endpoints
-@app.get("/api/harvest-plan/years", response_model=List[str])
+@app.get("/api/harvest-plan/years", response_model=List[int])
 def list_harvest_plan_years(db=Depends(get_session)):
     try:
         return services.get_harvest_years(db)
@@ -237,6 +239,20 @@ def get_harvest_plan_consolidation_endpoint(year_harvest: str, db=Depends(get_se
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/harvest-plan/selections", response_model=HarvestPlanSelectionsResponse)
+def get_harvest_plan_selections_endpoint(year_harvest: int, db=Depends(get_session)):
+    try:
+        return services.get_harvest_plan_selections(year_harvest, db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/harvest-plan/selections")
+def update_harvest_plan_selection_endpoint(req: HarvestPlanSelectionUpdate, year_harvest: int, db=Depends(get_session)):
+    try:
+        return services.update_harvest_plan_selection(year_harvest, req.month, req.scenario_id, req.exclude, db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/harvest-years", response_model=List[HarvestYearRead])
 def list_harvest_years_endpoint(db=Depends(get_session)):
     try:
@@ -268,16 +284,17 @@ def create_harvest_year_endpoint(req: HarvestYearCreate, db=Depends(get_session)
 @app.delete("/api/harvest-years/{year_start}")
 def delete_harvest_year_endpoint(year_start: int, db=Depends(get_session)):
     try:
-        from sqlmodel import select
+        from sqlmodel import select, text
         db_year = db.get(HarvestYear, year_start)
         if not db_year:
             raise HTTPException(status_code=404, detail="Ano Safra não encontrado")
         
         scenarios_to_delete = db.exec(select(Scenario).where(Scenario.year_harvest == year_start)).all()
         for sc in scenarios_to_delete:
-            db.execute(text("DELETE FROM results WHERE scenario_id = :sid"), {"sid": sc.id})
+            db.execute(text("DELETE FROM results WHERE scenario_id = :sid"), {"sid": str(sc.id)})
             db.delete(sc)
             
+        db.flush()  # Force deletion of child scenarios first to satisfy PostgreSQL FK constraint
         db.delete(db_year)
         db.commit()
         return {"success": True, "message": f"Ano Safra {year_start} e seus cenários excluídos com sucesso."}

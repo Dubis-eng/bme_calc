@@ -48,6 +48,8 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   const [variablesConfig, setVariablesConfig] = useState<VariableConfig[]>([]);
   const [consolidationData, setConsolidationData] = useState<ConsolidatedItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selections, setSelections] = useState<Array<{ month: string; scenario_id: string | null; exclude: boolean }>>([]);
+  const [availableScenarios, setAvailableScenarios] = useState<Record<string, Array<{ id: string; nome: string; version: number; status: string }>>>({});
   const [savingConfig, setSavingConfig] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSector, setSelectedSector] = useState<string>('TODOS');
@@ -55,6 +57,38 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   // Autocomplete weight state per variable
   const [focusedVarId, setFocusedVarId] = useState<string | null>(null);
   const [weightSearchQuery, setWeightSearchQuery] = useState<string>('');
+
+  const fetchSelections = async () => {
+    if (!selectedYear) return;
+    try {
+      const yearNum = parseInt(selectedYear.split('/')[0], 10);
+      const res = await axios.get(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`);
+      setSelections(res.data.selections || []);
+      setAvailableScenarios(res.data.available_scenarios || {});
+    } catch (err) {
+      console.error('Erro ao carregar seleções de cenários:', err);
+    }
+  };
+
+  const handleSelectScenario = async (month: string, scenarioId: string | null, exclude: boolean) => {
+    if (!selectedYear) return;
+    try {
+      setLoading(true);
+      const yearNum = parseInt(selectedYear.split('/')[0], 10);
+      await axios.post(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`, {
+        month,
+        scenario_id: scenarioId,
+        exclude
+      });
+      await fetchConsolidation();
+      await fetchSelections();
+    } catch (err) {
+      console.error('Erro ao salvar seleção de cenário:', err);
+      alert('Erro ao atualizar seleção de cenário do mês.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchSettingsAndYears = async () => {
     try {
@@ -106,6 +140,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   useEffect(() => {
     if (selectedYear) {
       fetchConsolidation();
+      fetchSelections();
     }
   }, [selectedYear]);
 
@@ -300,6 +335,30 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
             <option value="TODOS">Todos os Setores</option>
             {sectors.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
           </select>
+          
+          {(() => {
+            const inactiveMonths = Object.keys(availableScenarios).filter(m => !months.includes(m));
+            if (activeSubTab === 'visualizacao' && inactiveMonths.length > 0) {
+              return (
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const m = e.target.value;
+                    if (m) {
+                      handleSelectScenario(m, null, false);
+                    }
+                  }}
+                  className="border border-slate-300 rounded px-2.5 py-1 text-xs bg-teal-50 text-teal-700 font-bold hover:bg-teal-100 cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-500"
+                >
+                  <option value="">➕ Adicionar Mês</option>
+                  {inactiveMonths.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              );
+            }
+            return null;
+          })()}
 
           {activeSubTab === 'configuracao' && (
             <button
@@ -346,9 +405,39 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
                       <th className="py-2.5 px-3 text-[10px] font-bold uppercase tracking-wider min-w-[70px]">Setor</th>
                       <th className="py-2.5 px-3 text-[10px] font-bold uppercase tracking-wider min-w-[50px] text-center">Un.</th>
                       <th className="py-2.5 px-3 text-[10px] font-bold uppercase tracking-wider min-w-[70px] text-center">Regra</th>
-                      {months.map(m => (
-                        <th key={m} className="py-2.5 px-3 text-[10px] font-bold uppercase tracking-wider min-w-[100px] text-right">{m}</th>
-                      ))}
+                      {months.map(m => {
+                        const currentSel = selections.find(s => s.month === m);
+                        const availScs = availableScenarios[m] || [];
+                        const value = currentSel?.exclude ? "exclude" : (currentSel?.scenario_id || "auto");
+                        
+                        return (
+                          <th key={m} className="py-1.5 px-2 text-[10px] font-bold uppercase tracking-wider min-w-[125px] text-right bg-slate-900 sticky top-0">
+                            <div className="flex flex-col items-end">
+                              <span className="text-[9px] text-slate-400 mb-0.5">{m}</span>
+                              <select
+                                value={value}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (val === "exclude") {
+                                    handleSelectScenario(m, null, true);
+                                  } else if (val === "auto") {
+                                    handleSelectScenario(m, null, false);
+                                  } else {
+                                    handleSelectScenario(m, val, false);
+                                  }
+                                }}
+                                className="bg-slate-800 text-slate-200 border border-slate-700 text-[8px] py-0.5 px-1 rounded cursor-pointer max-w-[115px] focus:outline-none focus:ring-1 focus:ring-teal-500 font-bold uppercase"
+                              >
+                                <option value="auto">⚙️ Padrão</option>
+                                {availScs.map(sc => (
+                                  <option key={sc.id} value={sc.id}>v{sc.version} ({sc.status})</option>
+                                ))}
+                                <option value="exclude">❌ Ocultar</option>
+                              </select>
+                            </div>
+                          </th>
+                        );
+                      })}
                       <th className="py-2.5 px-3 text-[10px] font-bold uppercase tracking-wider min-w-[120px] text-right bg-teal-950 text-teal-300">Acumulado</th>
                     </tr>
                   </thead>

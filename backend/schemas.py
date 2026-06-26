@@ -129,3 +129,18 @@ class VariableHarvestPlanConfig(BaseModel):
 class BulkHarvestPlanConfigUpdate(BaseModel):
     configs: List[VariableHarvestPlanConfig]
 
+class HarvestPlanSelectionUpdate(BaseModel):
+    month: str
+    scenario_id: Optional[uuid.UUID] = None
+    exclude: bool = False
+
+class AvailableScenarioInfo(BaseModel):
+    id: uuid.UUID
+    nome: str
+    version: int
+    status: str
+
+class HarvestPlanSelectionsResponse(BaseModel):
+    selections: List[Dict[str, Any]]
+    available_scenarios: Dict[str, List[AvailableScenarioInfo]]
+

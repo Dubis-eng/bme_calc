@@ -156,10 +156,10 @@ def test_harvest_plan_consolidation_calculation():
     assert res_cons.status_code == 200
     cons_data = res_cons.json()
 
-    # Verify months order starting in Abril
+    # Verify months list contains only active months with data
+    assert len(cons_data["months"]) == 2
     assert cons_data["months"][0] == "Abril"
     assert cons_data["months"][1] == "Maio"
-    assert cons_data["months"][11] == "Março"
 
     # Verify consolidated values
     vars_data = {v["variable_id"]: v for v in cons_data["data"]}
@@ -182,3 +182,75 @@ def test_harvest_plan_consolidation_calculation():
     assert vars_data["X3"]["monthly_values"]["Abril"] == 500.0
     assert vars_data["X3"]["monthly_values"]["Maio"] == 1600.0
     assert vars_data["X3"]["accumulated"]["value"] == 2100.0
+
+def test_harvest_plan_selections():
+    # 1. Set settings start_month to Abril
+    client.put("/api/harvest-plan/settings", json={"start_month": "Abril"})
+    
+    # Create variables
+    v1 = {
+        "id": "Y1", "nome": "Test Volume", "descricao": "Y1", "setor_id": "MOAGEM",
+        "tipo": "INPUT", "unidade": "t", "status": "ativa", "etapa": "E1", "ponto_controle": "P1", "equation_value": ""
+    }
+    client.post("/api/variables", json=v1)
+    
+    # Configure variables in plan
+    config_payload = {
+        "configs": [
+            {"id": "Y1", "in_harvest_plan": True, "harvest_plan_op": "SUM", "harvest_plan_weight_var_id": None}
+        ]
+    }
+    client.post("/api/harvest-plan/config/bulk", json=config_payload)
+    
+    # Create Abril and Maio approved scenarios
+    sc_abril = {
+        "year_harvest": "2026/2027", "reference_month": "Abril",
+        "variables": [{"ID - REF": "Y1", "SETOR": "MOAGEM", "TIPO": "INPUT", "EQUAÇÕES E VALORES": "150"}],
+        "status": "Aprovado"
+    }
+    client.post("/api/scenarios", json=sc_abril)
+    
+    sc_maio = {
+        "year_harvest": "2026/2027", "reference_month": "Maio",
+        "variables": [{"ID - REF": "Y1", "SETOR": "MOAGEM", "TIPO": "INPUT", "EQUAÇÕES E VALORES": "250"}],
+        "status": "Aprovado"
+    }
+    res_maio = client.post("/api/scenarios", json=sc_maio)
+    maio_scenario_id = res_maio.json()["id"]
+    
+    # 2. Get available selections (available_scenarios should have Abril and Maio)
+    res_sel = client.get("/api/harvest-plan/selections?year_harvest=2026")
+    assert res_sel.status_code == 200
+    sel_data = res_sel.json()
+    assert "Abril" in sel_data["available_scenarios"]
+    assert "Maio" in sel_data["available_scenarios"]
+    assert len(sel_data["selections"]) == 0
+    
+    # 3. Exclude Maio from harvest plan
+    res_post = client.post("/api/harvest-plan/selections?year_harvest=2026", json={
+        "month": "Maio", "scenario_id": None, "exclude": True
+    })
+    assert res_post.status_code == 200
+    
+    # 4. Get consolidation and verify Maio is excluded
+    res_cons = client.get("/api/harvest-plan/consolidation?year_harvest=2026/2027")
+    assert res_cons.status_code == 200
+    cons_data = res_cons.json()
+    assert len(cons_data["months"]) == 1
+    assert cons_data["months"][0] == "Abril"
+    assert cons_data["data"][0]["accumulated"]["value"] == 150.0 # Only Abril's 150
+    
+    # 5. Include Maio back with specific scenario
+    res_post2 = client.post("/api/harvest-plan/selections?year_harvest=2026", json={
+        "month": "Maio", "scenario_id": maio_scenario_id, "exclude": False
+    })
+    assert res_post2.status_code == 200
+    
+    # 6. Verify Maio is back
+    res_cons2 = client.get("/api/harvest-plan/consolidation?year_harvest=2026/2027")
+    assert res_cons2.status_code == 200
+    cons_data2 = res_cons2.json()
+    assert len(cons_data2["months"]) == 2
+    assert "Maio" in cons_data2["months"]
+    assert cons_data2["data"][0]["accumulated"]["value"] == 400.0 # 150 + 250
+
