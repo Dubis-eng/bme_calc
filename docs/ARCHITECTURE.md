@@ -41,10 +41,20 @@ Utiliza `scipy.optimize.root_scalar` para encontrar o valor de um input que zera
 3. **Nelder-Mead**: Fallback robótico multidimensional de minimização caso ocorra descontinuidade matemática (erros de domínio, divisão por zero ou IAPWS).
 
 ### 3. Persistência e Governança (`backend/database.py`)
-Persiste o estado das 1108 variáveis em uma coluna do tipo `JSONB` no PostgreSQL.
+Persiste os dados de maneira estruturada e relacional através do PostgreSQL normalizado em tabelas:
+* **Tabelas do Sistema**: `scenarios` (cenários de safra/mês), `variables` (propriedades de variáveis globais), `equations` (fórmulas das variáveis), `dependencies` (grafo de dependências de cálculo), `results` (valores resultantes por cenário/versão), `sectors` (cadastro e ordenação de setores de processo) e `harvest_plan_settings` (configurações do plano de safra).
 * **Versionamento Incremental**: O backend localiza automaticamente a versão máxima para aquele período e incrementa (`version + 1`).
 * **Bloqueio de Edição**: Caso o status do cenário no banco mude para `Aprovado` ou `Final`, o frontend desabilita todas as caixas de texto de entrada e o botão "Calcular", impedindo alterações acidentais.
 
 ### 4. Modelo Termodinâmico Físico
-* **Vapor**: Quando uma fórmula solicita `PROCV` com a tabela `Vapor`, é resolvido via biblioteca `iapws` usando o padrão internacional **IAPWS-IF97** para vapor saturado.
-* **Densidade (`H273`)**: Resolvido via polinômio físico de densidade OIML a 20°C para misturas hidroalcoólicas baseado na variável de entrada de INPM (`H272`).
+* **Vapor**: Quando uma fórmula solicita `PROCV` com a tabela `Vapor` ou chama as funções `VAPOR_*` (ex: `VAPOR_H`, `VAPOR_S`), é resolvido via biblioteca `iapws` usando o padrão internacional **IAPWS-IF97** com suporte a pressões absolutas.
+* **Densidade (`J270`)**: Resolvido via polinômio físico de densidade OIML a 20°C para misturas hidroalcoólicas baseado na variável de entrada de INPM (`J269`).
+
+### 5. Consolidação do Plano de Safra (`backend/services.py` & `HarvestPlan.tsx`)
+* **Agregação Mensal e Anual**: Consolida dados operacionais e de balanço ao longo dos 12 meses do ano safra selecionado com base nos cenários homologados/aprovados.
+* **Operadores de Consolidação**:
+  * `SUM`: Somatório dos valores mensais.
+  * `AVERAGE`: Média aritmética simples dos meses.
+  * `WEIGHTED_AVERAGE`: Média ponderada baseada em outra variável de peso (como volume de moenda).
+  * `CALCULATE`: Avaliação da fórmula matemática usando como entradas os valores já consolidados de suas variáveis dependentes.
+* **Ordenação de Meses Dinâmica**: Reordena a exibição e os cálculos de forma lógica e sequencial a partir do mês de início do ciclo configurado na tabela `harvest_plan_settings`.

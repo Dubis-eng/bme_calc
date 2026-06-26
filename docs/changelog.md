@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-06-26
+
+### Added
+- **Consolidação do Plano de Safra (`HarvestPlan.tsx`)**: Novo painel completo contendo sub-aba de visualização plurianual e sub-aba de configuração de variáveis do plano de safra.
+- **Parametrização de Agregação de Safra**: Suporte para definição de métodos de agregação por variável (`SUM`, `AVERAGE`, `WEIGHTED_AVERAGE`, `CALCULATE`), incluindo associação inteligente de variável de peso.
+- **Configuração de Início do Ciclo**: Rota e interface de configuração para definir o mês inicial do ano safra (ex: Janeiro, Abril), reordenando cronologicamente os 12 meses na API e no frontend.
+- **Motor de Agregação Topológica**: Processador backend que avalia as variáveis em ordem lógica de dependências durante a consolidação anual (operador `CALCULATE`).
+- **Migração de Banco Automática**: Schema alterado com adição dos campos de configuração na tabela `variables` e criação da tabela `harvest_plan_settings` com seeding padrão de mês inicial.
+- **Testes de Integração de Safra (`test_harvest_plan.py`)**: Validação ponta-a-ponta dos operadores de consolidação e alteração dinâmica de ciclo de meses.
+
 ## [2.1.0] - 2026-06-26
 
 ### Added

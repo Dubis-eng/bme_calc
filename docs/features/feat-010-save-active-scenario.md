@@ -1,7 +1,7 @@
 ---
 id: FEAT-010
 title: Salvamento de Cenário Ativo e Prevenção de Perda de Dados
-status: ongoing
+status: done
 prd_reference: Chamado do Usuário - Melhoria no método de atualização da versão
 last_updated: 2026-06-22
 ---

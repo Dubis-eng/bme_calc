@@ -12,6 +12,10 @@ graph TD
     E3 --> E4[Épico 4: Busca de Metas e Governança]
     E4 --> E5[Épico 5: Edição de Equações e Módulos]
     E5 --> E6[Épico 6: Usabilidade e Calendário de Produção]
+    E5 --> E9[Épico 9: Árvore de Subgrupos e Cadastro de Setores]
+    E9 --> E10[Épico 10: Melhoria na Atualização de Versões e Salvamento de Cenários]
+    E10 --> E11[Épico 11: Novo Memorial de Cálculo e Busca Termodinâmica]
+    E11 --> E12[Épico 12: Consolidação do Plano de Safra]
 ```
 
 ---
@@ -92,6 +96,15 @@ graph TD
 * [x] **Tarefa 11.6** *(Tooltips no Frontend)* — Adicionar orientações e tooltips explicativos sobre as novas funções de vapor no painel lateral esquerdo/guia do frontend.
 * [x] **Tarefa 11.7** *(Auditoria e Validação)* — Rodar suite de testes automatizados e validar convergência de cálculo local.
 * [x] **Tarefa 11.8** *(Limpeza e Refatoração de Árvore)* — Limpar a extração de dados do Excel sem históricos antigos, reestruturar a árvore visual em 4 níveis (Setor -> Etapa -> Ponto de Controle -> Variável), remover o campo obsoleto `DEFINIÇÃO` de toda a arquitetura, e refatorar `VariableModal.tsx` separando `EquationDropdown.tsx` (respeitando o limite constitucional de 300 linhas).
+
+---
+
+### Épico 12: Consolidação do Plano de Safra (CONCLUÍDO)
+
+* [x] **Tarefa 12.1** *(Esquema de Banco e Migração)* — Adicionar campos `in_harvest_plan`, `harvest_plan_op` e `harvest_plan_weight_var_id` à tabela `variables` e criar a nova tabela `harvest_plan_settings` no PostgreSQL/SQLite com migração automática no startup.
+* [x] **Tarefa 12.2** *(Roteamento e Serviços Backend)* — Implementar endpoints de listagem de safras, recuperação/atualização de configurações de início de ciclo, recuperação/atualização em lote de configurações de variáveis e motor de consolidação anual com ordenação de meses e agregação topológica/ponderada.
+* [x] **Tarefa 12.3** *(Interface do Plano de Safra)* — Criar aba dedicada "Plano de Safra" no frontend contendo painéis para visualização multi-anual dos cenários aprovados e configuração de variáveis (com autocompletar inteligente para seleção de pesos).
+* [x] **Tarefa 12.4** *(Testes e Homologação)* — Implementar testes unitários e de integração abrangentes em `backend/test_harvest_plan.py` validando os operadores de agregação (`SUM`, `AVERAGE`, `WEIGHTED_AVERAGE`, `CALCULATE`) e o fluxo de alteração de mês inicial.
 
 ---
 
