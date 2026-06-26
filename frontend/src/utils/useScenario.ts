@@ -150,11 +150,36 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         console.error(err);
       }
     }
-    const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
-    setVariables(updated);
-    setHasUnsavedChanges(true);
-    triggerCalculate(updated);
+
+    const payload = {
+      id: newVar["ID - REF"],
+      nome: newVar["DESCRIÇÃO"] || newVar["ID - REF"],
+      descricao: newVar["DESCRIÇÃO"] || "",
+      setor_id: newVar["SETOR"],
+      tipo: newVar["TIPO"],
+      unidade: newVar["UNIDADE DE MEDIDA"] || "",
+      status: newVar["STATUS"] || "ativa",
+      etapa: newVar["ETAPA"] || "",
+      ponto_controle: newVar["PONTO DE CONTROLE"] || "",
+      equation_value: String(newVar["EQUAÇÕES E VALORES"] || "")
+    };
+
+    try {
+      if (isEdit && origId) {
+        await axios.put(`http://localhost:8000/api/variables/${origId}`, payload);
+      } else {
+        await axios.post('http://localhost:8000/api/variables', payload);
+      }
+      
+      const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
+      setVariables(updated);
+      triggerCalculate(updated);
+    } catch (err: any) {
+      console.error(err);
+      alert(`Erro ao salvar variável globalmente: ${err.response?.data?.detail || err.message}`);
+    }
   };
+
 
   return {
     variables,
