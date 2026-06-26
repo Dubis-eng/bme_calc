@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-06-26
+
+### Added
+- **Componente EquationDropdown (`EquationDropdown.tsx`)**: Criação de um novo arquivo de componente separado para o autocomplete de fórmulas, reduzindo `VariableModal.tsx` de 308 para ~242 linhas e garantindo total conformidade com a regra constitucional P0 de limite de 300 linhas por arquivo.
+- **Árvore Hierárquica de 4 Níveis (Sidebar)**: Adicionado o 4º nível na árvore de navegação lateral (Setor -> Etapa -> Ponto de Controle -> Variável). Cada ponto de controle agora é expansível para listar as variáveis pertencentes a ele de forma compacta.
+- **Navegação Direta por Árvore**: Integração de cliques em variáveis da árvore lateral para rolar suavemente a tela central até o elemento correspondente e destacá-lo temporariamente.
+
+### Changed
+- **Extração de Dados Limpa (`convert_xlsx_to_json.py`)**: Atualizada a rotina de extração para não mais gerar o campo legado `DEFINIÇÃO`, e alterada para sincronizar a saída limpa nos três diretórios de destino (backend, docs e frontend/public).
+- **Adequação à Hierarquia de 3 Níveis**: Remoção total do campo obsoleto `DEFINIÇÃO` em favor do fluxo puramente centrado em `SETOR`, `ETAPA` e `PONTO DE CONTROLE` no backend (`seeding.py`, `services.py`, `exports.py`) e no frontend (`types/index.ts`, `VariableModal.tsx`, `useVariableSearch.ts`, `ScenarioPremises.tsx`).
+- **Seeding e Banco de Dados**: A base de dados foi dropada e reconstruída a partir da nova carga limpa do JSON sem histórico residual.
+
+## [2.0.0] - 2026-06-25
+
+### Added
+- **Motor Termodinâmico IAPWS-IF97 (`evaluator.py`)**: Implementação de 7 novas funções de cálculo físico no interpretador AST (`VAPOR_H`, `VAPOR_S`, `VAPOR_H_SAT`, `VAPOR_H_LIQ`, `VAPOR_H_PS`, `VAPOR_T_SAT`, `VAPOR_LATENT`) utilizando a biblioteca `iapws` com suporte a pressões absolutas (bar -> MPa).
+- **Mapeamento Dinâmico de Turbinas**: Substituição dos valores fixos hardcoded do setor de Turbinas por fórmulas dinâmicas que buscam propriedades de entalpia e entropia de vapor superaquecido/saturado diretamente do modelo físico.
+- **Painel de Ajuda no Frontend**: Adicionadas orientações e tooltips informativos diretamente abaixo do input de fórmulas em `VariableModal.tsx`, orientando o usuário sobre a sintaxe das funções `VAPOR_*` e o requisito de usar pressão absoluta.
+
+### Changed
+- **Carga de Novo Memorial (J-prefix)**: Substituição do memorial padrão por `docs/memorial_de_calculo_balanco.json` com variáveis reestruturadas no prefixo `J`.
+- **Interpretador Prefix-Agnostic (`engine.py`)**: Refatoradas lógicas de regex e expansão de ranges para detectar e suportar dinamicamente o prefixo `J` (além do legado `H`), além de suportar mapeamento condicional de coluna `D` para `J` ou `H` dependendo do contexto.
+- **Densidade OIML Dinâmica para J270**: A densidade do vinho `J270` agora é calculada dinamicamente com base em `J269` ("INPM Vinho") usando o polinômio OIML de densidade.
+- **Purga de Dados no Startup (`seeding.py`)**: Adicionado detector de variáveis legadas `H`. Se encontradas, as tabelas do banco PostgreSQL são limpas (`TRUNCATE CASCADE`) no startup para permitir a semeadura limpa das novas variáveis e setores de prefixo `J`.
+
 ## [1.9.0] - 2026-06-22
 
 ### Added

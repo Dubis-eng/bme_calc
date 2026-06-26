@@ -185,7 +185,7 @@ def generate_scenario_xlsx(scenario_data) -> BytesIO:
     ws.append([])  # Spacer
 
     # Headers
-    headers = ["ID", "Setor", "Definição", "Descrição", "Tipo", "Unidade", "Valor Final / Fórmula"]
+    headers = ["ID", "Setor", "Etapa", "Ponto de Controle", "Descrição", "Tipo", "Unidade", "Valor Final / Fórmula"]
     ws.append(headers)
 
     # Calculate values
@@ -196,7 +196,8 @@ def generate_scenario_xlsx(scenario_data) -> BytesIO:
     for v in scenario_data.variables:
         ref = v.get("ID - REF", "")
         sector = v.get("SETOR", "")
-        definition = v.get("DEFINIÇÃO", "")
+        etapa = v.get("ETAPA", "")
+        pc = v.get("PONTO DE CONTROLE", "")
         description = v.get("DESCRIÇÃO", "")
         v_type = v.get("TIPO", "")
         unit = v.get("UNIDADE DE MEDIDA", "")
@@ -216,7 +217,7 @@ def generate_scenario_xlsx(scenario_data) -> BytesIO:
             if val is None:
                 val = v.get("EQUAÇÕES E VALORES", "")
             
-        ws.append([ref, sector, definition, description, v_type, unit, val])
+        ws.append([ref, sector, etapa, pc, description, v_type, unit, val])
 
     # Auto-fit column widths
     for col in ws.columns:

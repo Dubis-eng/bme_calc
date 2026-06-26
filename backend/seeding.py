@@ -7,19 +7,35 @@ from database import (
     engine, Scenario, Variable, Equation, Dependency, Result, Sector,
     ScenarioStatus, VariableType, VariableStatus, ResultStatus
 )
+from sqlalchemy import text
 import engine as calc_engine
 
 def seed_initial_data():
+    print("Dropping all tables to rebuild database from scratch with new schema...")
     with Session(engine) as session:
-        # Check if database already has scenarios or variables
-        stmt_scen = select(Scenario)
-        has_scenarios = session.exec(stmt_scen).first() is not None
-        stmt_vars = select(Variable)
-        has_variables = session.exec(stmt_vars).first() is not None
-        
-        if has_scenarios or has_variables:
-            print("Database already contains data. Skipping initial seeding.")
-            return
+        if engine.url.drivername.startswith("sqlite"):
+            session.execute(text("DROP TABLE IF EXISTS results"))
+            session.execute(text("DROP TABLE IF EXISTS dependencies"))
+            session.execute(text("DROP TABLE IF EXISTS equations"))
+            session.execute(text("DROP TABLE IF EXISTS variables"))
+            session.execute(text("DROP TABLE IF EXISTS scenarios"))
+            session.execute(text("DROP TABLE IF EXISTS sectors"))
+        else:
+            session.execute(text("DROP TABLE IF EXISTS results CASCADE"))
+            session.execute(text("DROP TABLE IF EXISTS dependencies CASCADE"))
+            session.execute(text("DROP TABLE IF EXISTS equations CASCADE"))
+            session.execute(text("DROP TABLE IF EXISTS variables CASCADE"))
+            session.execute(text("DROP TABLE IF EXISTS scenarios CASCADE"))
+            session.execute(text("DROP TABLE IF EXISTS sectors CASCADE"))
+        session.commit()
+    
+    # Recreate tables
+    from sqlmodel import SQLModel
+    SQLModel.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        has_variables = False
+        has_scenarios = False
 
         json_path = os.path.join(os.path.dirname(__file__), "memorial_de_calculo_balanco.json")
         if not os.path.exists(json_path):
@@ -80,10 +96,10 @@ def seed_initial_data():
             elif tipo_str == "CENARIO":
                 tipo = VariableType.CENARIO
             
-            if var_id in {"DIA", "APROVEITAMENTO_OPERACIONAL", "DISPONIBILIDADE"}:
+            if var_id in {"J3", "J16", "J20"}:
                 tipo = VariableType.CENARIO
 
-            nome = v.get("DEFINIÇÃO", "").strip() or v.get("DESCRIÇÃO", "").strip() or var_id
+            nome = v.get("DESCRIÇÃO", "").strip() or var_id
             
             db_var = session.get(Variable, var_id)
             if db_var:
@@ -93,6 +109,8 @@ def seed_initial_data():
                 db_var.tipo = tipo
                 db_var.unidade = v.get("UNIDADE DE MEDIDA", "") or ""
                 db_var.status = VariableStatus.ATIVA
+                db_var.etapa = v.get("ETAPA", "").strip()
+                db_var.ponto_controle = v.get("PONTO DE CONTROLE", "").strip()
             else:
                 db_var = Variable(
                     id=var_id,
@@ -101,7 +119,9 @@ def seed_initial_data():
                     setor_id=sector_str,
                     tipo=tipo,
                     unidade=v.get("UNIDADE DE MEDIDA", "") or "",
-                    status=VariableStatus.ATIVA
+                    status=VariableStatus.ATIVA,
+                    etapa=v.get("ETAPA", "").strip(),
+                    ponto_controle=v.get("PONTO DE CONTROLE", "").strip()
                 )
             session.add(db_var)
             session.flush()

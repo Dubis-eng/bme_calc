@@ -29,7 +29,8 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
         variables_list.append({
             "ID - REF": var.id,
             "SETOR": var.setor_id,
-            "DEFINIÇÃO": var.nome,
+            "ETAPA": var.etapa,
+            "PONTO DE CONTROLE": var.ponto_controle,
             "DESCRIÇÃO": var.descricao,
             "TIPO": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
             "UNIDADE DE MEDIDA": var.unidade,
@@ -41,15 +42,19 @@ def _ensure_variable(v: Dict[str, Any], db: Session) -> Variable:
     var_id = v["ID - REF"]
     db_var = db.get(Variable, var_id)
     if db_var:
+        if v.get("ETAPA"):
+            db_var.etapa = v["ETAPA"].strip()
+        if v.get("PONTO DE CONTROLE"):
+            db_var.ponto_controle = v["PONTO DE CONTROLE"].strip()
         return db_var
     tipo_str = v.get("TIPO", "INPUT")
     tipo = VariableType.INPUT
     if tipo_str == "OUTPUT": tipo = VariableType.OUTPUT
     elif tipo_str == "DERIVADA": tipo = VariableType.DERIVADA
     elif tipo_str == "CENARIO": tipo = VariableType.CENARIO
-    if var_id in {"DIA", "APROVEITAMENTO_OPERACIONAL", "DISPONIBILIDADE"}:
+    if var_id in {"J3", "J16", "J20"}:
         tipo = VariableType.CENARIO
-    nome = v.get("DEFINIÇÃO", "").strip() or v.get("DESCRIÇÃO", "").strip() or var_id
+    nome = v.get("DESCRIÇÃO", "").strip() or var_id
     sector_str = v.get("SETOR", "OUTROS").strip().upper()
     db_sector = db.get(Sector, sector_str)
     if not db_sector:
@@ -61,7 +66,9 @@ def _ensure_variable(v: Dict[str, Any], db: Session) -> Variable:
     db_var = Variable(
         id=var_id, nome=nome, descricao=v.get("DESCRIÇÃO", ""),
         setor_id=sector_str, tipo=tipo, unidade=v.get("UNIDADE DE MEDIDA", ""),
-        status=VariableStatus.ATIVA
+        status=VariableStatus.ATIVA,
+        etapa=v.get("ETAPA", "").strip() if v.get("ETAPA") else "",
+        ponto_controle=v.get("PONTO DE CONTROLE", "").strip() if v.get("PONTO DE CONTROLE") else ""
     )
     db.add(db_var)
     db.flush()

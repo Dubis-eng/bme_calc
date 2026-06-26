@@ -20,7 +20,7 @@ function App() {
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
   const [variableToEdit, setVariableToEdit] = useState<Variable | null>(null);
   const [prefilledSector, setPrefilledSector] = useState('');
-  const [prefilledDefinition, setPrefilledDefinition] = useState('');
+  const [prefilledEtapa, setPrefilledEtapa] = useState('');
 
   const fetchSectors = () => {
     axios.get('http://localhost:8000/api/sectors')
@@ -73,10 +73,10 @@ function App() {
 
   const onSearchEdit = (id: string) => search.handleSearchEdit(id, handleEditVariable);
 
-  const handleAddVariable = (sec: string, def: string) => {
+  const handleAddVariable = (sec: string, etapaName: string) => {
     setVariableToEdit(null);
     setPrefilledSector(sec);
-    setPrefilledDefinition(def);
+    setPrefilledEtapa(etapaName);
     setIsVariableModalOpen(true);
   };
 
@@ -126,6 +126,7 @@ function App() {
           variables={variables}
           sectors={sectors}
           onSubgroupClick={handleSubgroupClick}
+          onVariableClick={onScrollTo}
         />
 
         <main className="flex-1 flex flex-col overflow-hidden p-6 bg-slate-50">
@@ -193,7 +194,7 @@ function App() {
       </div>
 
       <GoalSeekModal isOpen={isGoalSeekOpen} onClose={() => setIsGoalSeekOpen(false)} variables={variables} onApplyOptimalValue={onApplyOptimalValue} />
-      <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledDefinition={prefilledDefinition} />
+      <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} />
       <SearchPanel isOpen={search.isSearchPanelOpen} query={search.searchQuery} results={searchResults} onClose={search.closeSearchPanel} onScrollTo={onScrollTo} onEdit={onSearchEdit} />
     </div>
   );

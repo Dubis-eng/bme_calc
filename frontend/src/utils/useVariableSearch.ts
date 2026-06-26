@@ -69,9 +69,15 @@ export function useVariableSearch(
         continue;
       }
 
-      const defMatch = findMatch(variable['DEFINIÇÃO'] || '', trimmed);
-      if (defMatch) {
-        results.push(buildResult(variable, defMatch, 'definition'));
+      const pcMatch = findMatch(variable['PONTO DE CONTROLE'] || '', trimmed);
+      if (pcMatch) {
+        results.push(buildResult(variable, pcMatch, 'definition'));
+        continue;
+      }
+
+      const etapaMatch = findMatch(variable['ETAPA'] || '', trimmed);
+      if (etapaMatch) {
+        results.push(buildResult(variable, etapaMatch, 'definition'));
       }
     }
 

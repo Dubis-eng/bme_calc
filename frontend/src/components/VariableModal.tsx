@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Variable } from '../types';
 import { useEquationAutocomplete } from '../utils/useEquationAutocomplete';
+import { EquationDropdown } from './EquationDropdown';
 
 interface VariableModalProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface VariableModalProps {
   variableToEdit?: Variable | null;
   variables: Variable[];
   prefilledSector?: string;
-  prefilledDefinition?: string;
+  prefilledEtapa?: string;
 }
 
 export const VariableModal: React.FC<VariableModalProps> = ({
@@ -19,13 +20,14 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   variableToEdit,
   variables,
   prefilledSector = '',
-  prefilledDefinition = ''
+  prefilledEtapa = ''
 }) => {
   const isEdit = !!variableToEdit;
 
   const [idRef, setIdRef] = useState('');
   const [sector, setSector] = useState('');
-  const [definition, setDefinition] = useState('');
+  const [etapa, setEtapa] = useState('');
+  const [pontoControle, setPontoControle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO'>('INPUT');
   const [status, setStatus] = useState<'ativa' | 'pendente' | 'inválida' | 'descontinuada'>('ativa');
@@ -41,7 +43,8 @@ export const VariableModal: React.FC<VariableModalProps> = ({
       if (variableToEdit) {
         setIdRef(variableToEdit['ID - REF']);
         setSector(variableToEdit['SETOR']);
-        setDefinition(variableToEdit['DEFINIÇÃO']);
+        setEtapa(variableToEdit['ETAPA'] || '');
+        setPontoControle(variableToEdit['PONTO DE CONTROLE'] || '');
         setDescription(variableToEdit['DESCRIÇÃO']);
         setType(variableToEdit['TIPO']);
         setStatus(variableToEdit['STATUS'] || 'ativa');
@@ -55,7 +58,8 @@ export const VariableModal: React.FC<VariableModalProps> = ({
         const maxId = hIds.length > 0 ? Math.max(...hIds) : 0;
         setIdRef(`H${maxId + 1}`);
         setSector(prefilledSector);
-        setDefinition(prefilledDefinition);
+        setEtapa(prefilledEtapa);
+        setPontoControle('');
         setDescription('');
         setType('INPUT');
         setStatus('ativa');
@@ -63,7 +67,7 @@ export const VariableModal: React.FC<VariableModalProps> = ({
         setEquationValue('');
       }
     }
-  }, [isOpen, variableToEdit, prefilledSector, prefilledDefinition, variables]);
+  }, [isOpen, variableToEdit, prefilledSector, prefilledEtapa, variables]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -91,13 +95,15 @@ export const VariableModal: React.FC<VariableModalProps> = ({
     }
 
     if (!sector.trim()) return setError('O Setor é obrigatório.');
-    if (!definition.trim()) return setError('A Definição é obrigatória.');
+    if (!etapa.trim()) return setError('A Etapa é obrigatória.');
+    if (!pontoControle.trim()) return setError('O Ponto de Controle é obrigatório.');
     if (!description.trim()) return setError('A Descrição é obrigatória.');
 
     const newVar: Variable = {
       'ID - REF': cleanId,
       'SETOR': sector.trim().toUpperCase(),
-      'DEFINIÇÃO': definition.trim().toUpperCase(),
+      'ETAPA': etapa.trim().toUpperCase(),
+      'PONTO DE CONTROLE': pontoControle.trim().toUpperCase(),
       'DESCRIÇÃO': description.trim(),
       'TIPO': type,
       'UNIDADE DE MEDIDA': unit.trim(),
@@ -109,7 +115,8 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   };
 
   const uniqueSectors = Array.from(new Set(variables.map(v => v.SETOR)));
-  const uniqueDefinitions = Array.from(new Set(variables.map(v => v.DEFINIÇÃO)));
+  const uniqueEtapas = Array.from(new Set(variables.map(v => v.ETAPA || '')));
+  const uniqueCps = Array.from(new Set(variables.map(v => v['PONTO DE CONTROLE'] || '')));
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -147,16 +154,21 @@ export const VariableModal: React.FC<VariableModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex flex-col">
               <label htmlFor="var-sector" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Setor</label>
               <input id="var-sector" type="text" list="sectors-list" value={sector} onChange={(e) => setSector(e.target.value)} placeholder="Ex: MOAGEM" className="border border-slate-200 rounded p-2 text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-teal-500 focus:outline-none" required />
               <datalist id="sectors-list">{uniqueSectors.map(s => <option key={s} value={s} />)}</datalist>
             </div>
             <div className="flex flex-col">
-              <label htmlFor="var-def" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Definição (Subgrupo)</label>
-              <input id="var-def" type="text" list="defs-list" value={definition} onChange={(e) => setDefinition(e.target.value)} placeholder="Ex: MOENDA 1" className="border border-slate-200 rounded p-2 text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-teal-500 focus:outline-none" required />
-              <datalist id="defs-list">{uniqueDefinitions.map(d => <option key={d} value={d} />)}</datalist>
+              <label htmlFor="var-etapa" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Etapa (Módulo)</label>
+              <input id="var-etapa" type="text" list="etapas-list" value={etapa} onChange={(e) => setEtapa(e.target.value)} placeholder="Ex: MOENDA 1" className="border border-slate-200 rounded p-2 text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-teal-500 focus:outline-none" required />
+              <datalist id="etapas-list">{uniqueEtapas.map(e => <option key={e} value={e} />)}</datalist>
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="var-cp" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Ponto de Controle</label>
+              <input id="var-cp" type="text" list="cps-list" value={pontoControle} onChange={(e) => setPontoControle(e.target.value)} placeholder="Ex: TURBINAS" className="border border-slate-200 rounded p-2 text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-teal-500 focus:outline-none" required />
+              <datalist id="cps-list">{uniqueCps.map(c => <option key={c} value={c} />)}</datalist>
             </div>
           </div>
 
@@ -213,6 +225,11 @@ export const VariableModal: React.FC<VariableModalProps> = ({
                   });
                 }}
               />
+              <div className="mt-1.5 text-[10px] text-slate-400 bg-slate-50 p-2 rounded border border-slate-100/80 leading-relaxed">
+                <span className="font-semibold text-teal-600 block mb-0.5">Guia de Funções e Termodinâmica (IAPWS-IF97):</span>
+                <span>Fórmulas: <code>=VAPOR_H(P; T)</code> (entalpia), <code>=VAPOR_S(P; T)</code> (entropia), <code>=VAPOR_H_SAT(P)</code> (entalpia sat. vapor), <code>=VAPOR_H_LIQ(P)</code> (entalpia sat. líquido), <code>=VAPOR_H_PS(P; s)</code> (entalpia teórica por entropia <code>s</code>), <code>=VAPOR_T_SAT(P)</code> (temp. saturação), <code>=VAPOR_LATENT(P)</code> (calor latente).</span>
+                <span className="block mt-1 font-semibold text-amber-600">⚠️ Importante: Use PRESSÃO ABSOLUTA em bar nas funções VAPOR_*. Ex: J645 (21 bar abs).</span>
+              </div>
             </div>
           </div>
 
@@ -227,64 +244,3 @@ export const VariableModal: React.FC<VariableModalProps> = ({
     </div>
   );
 };
-
-// ── Dropdown sub-component ─────────────────────────────────────────────────
-
-interface DropdownProps {
-  isOpen: boolean;
-  results: import('../utils/useEquationAutocomplete').AutocompleteResult[];
-  selectedIndex: number;
-  token: string;
-  onSelect: (variable: Variable) => void;
-}
-
-function HighlightMatch({ text, token }: { text: string; token: string }) {
-  const idx = text.toLowerCase().indexOf(token.toLowerCase());
-  if (idx === -1) return <span>{text}</span>;
-  return (
-    <span>
-      {text.slice(0, idx)}
-      <mark className="bg-yellow-200 text-yellow-900 font-semibold rounded-sm px-0.5 not-italic">
-        {text.slice(idx, idx + token.length)}
-      </mark>
-      {text.slice(idx + token.length)}
-    </span>
-  );
-}
-
-function EquationDropdown({ isOpen, results, selectedIndex, token, onSelect }: DropdownProps) {
-  if (!isOpen || results.length === 0) return null;
-
-  return (
-    <ul
-      role="listbox"
-      aria-label="Sugestões de variáveis"
-      className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto"
-    >
-      {results.map(({ variable, matchedField }, index) => {
-        const varId = variable['ID - REF'];
-        const varDesc = variable['DESCRIÇÃO'];
-        const isSelected = index === selectedIndex;
-
-        return (
-          <li
-            key={varId}
-            role="option"
-            aria-selected={isSelected}
-            onMouseDown={(e) => { e.preventDefault(); onSelect(variable); }}
-            className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-xs transition-colors ${isSelected ? 'bg-teal-50 border-l-2 border-teal-500' : 'hover:bg-slate-50'
-              }`}
-          >
-            <span className="font-mono font-bold text-teal-600 flex-shrink-0">
-              {matchedField === 'id' ? <HighlightMatch text={varId} token={token} /> : varId}
-            </span>
-            <span className="text-slate-400">—</span>
-            <span className="text-slate-600 truncate">
-              {matchedField === 'description' ? <HighlightMatch text={varDesc} token={token} /> : varDesc}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}

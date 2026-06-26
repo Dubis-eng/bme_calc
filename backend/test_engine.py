@@ -96,6 +96,37 @@ def test_epic3_functions():
     val_density = parse_equation("=SE(H272>100;0;H273)", state_density, ref="H273")
     assert abs(float(val_density["value"]) - 0.9861784) < 0.0001
 
+def test_vapor_new_functions():
+    # Test superheated steam enthalpy VAPOR_H(P; T) and entropy VAPOR_S(P; T)
+    # For J645=21 bar (absolute) and J646=305 °C
+    # state = IAPWS97(P=2.1 MPa, T=305+273.15) -> h=3033.04, s=6.7624
+    state = {
+        "J645": Decimal("21"),
+        "J646": Decimal("305")
+    }
+    formula_h = "=VAPOR_H(J645;J646)"
+    val_h = parse_equation(formula_h, state)
+    assert abs(float(val_h["value"]) - 3033.04) < 0.1, f"Expected ~3033.04, got {val_h}"
+    assert val_h["status"] == "OK"
+
+    formula_s = "=VAPOR_S(J645;J646)"
+    val_s = parse_equation(formula_s, state)
+    assert abs(float(val_s["value"]) - 6.7624) < 0.01, f"Expected ~6.7624, got {val_s}"
+    assert val_s["status"] == "OK"
+
+    # Test saturated vapor enthalpy and saturation temperature
+    # at P=2.5 bar absolute
+    state_sat = {
+        "J650": Decimal("2.5")
+    }
+    formula_h_sat = "=VAPOR_H_SAT(J650)"
+    val_h_sat = parse_equation(formula_h_sat, state_sat)
+    assert abs(float(val_h_sat["value"]) - 2716.5) < 0.1, f"Expected ~2716.5, got {val_h_sat}"
+
+    formula_t_sat = "=VAPOR_T_SAT(J650)"
+    val_t_sat = parse_equation(formula_t_sat, state_sat)
+    assert abs(float(val_t_sat["value"]) - 127.41) < 0.1, f"Expected ~127.41, got {val_t_sat}"
+
 def test_epic1_baseline():
     import os
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -156,4 +187,5 @@ if __name__ == "__main__":
     test_epic3_functions()
     test_epic1_baseline()
     test_custom_alphanumeric_ids()
+    test_vapor_new_functions()
     print("All custom backend engine tests passed successfully!")
