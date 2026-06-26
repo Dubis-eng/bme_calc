@@ -64,3 +64,51 @@ class SectorDetail(BaseModel):
     nome: str
     descricao: str
     ordem: int
+
+class VariableCreate(BaseModel):
+    id: str
+    nome: str
+    descricao: Optional[str] = ""
+    setor_id: str
+    tipo: str
+    unidade: Optional[str] = ""
+    status: Optional[str] = "ativa"
+    etapa: Optional[str] = ""
+    ponto_controle: Optional[str] = ""
+    equation_value: Optional[str] = ""
+
+class VariableUpdate(BaseModel):
+    nome: str
+    descricao: Optional[str] = ""
+    setor_id: str
+    tipo: str
+    unidade: Optional[str] = ""
+    status: Optional[str] = "ativa"
+    etapa: Optional[str] = ""
+    ponto_controle: Optional[str] = ""
+    equation_value: Optional[str] = ""
+
+class VariableDetail(BaseModel):
+    id: str
+    nome: str
+    descricao: str
+    setor_id: str
+    tipo: str
+    unidade: str
+    status: str
+    etapa: str
+    ponto_controle: str
+    equation_value: str
+
+class HarvestPlanSettingUpdate(BaseModel):
+    start_month: str
+
+class VariableHarvestPlanConfig(BaseModel):
+    id: str
+    in_harvest_plan: bool
+    harvest_plan_op: Optional[str] = None
+    harvest_plan_weight_var_id: Optional[str] = None
+
+class BulkHarvestPlanConfigUpdate(BaseModel):
+    configs: List[VariableHarvestPlanConfig]
+

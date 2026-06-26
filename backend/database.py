@@ -70,6 +70,11 @@ class Variable(SQLModel, table=True):
     status: VariableStatus = Field(default=VariableStatus.ATIVA, sa_column_kwargs={"nullable": False})
     etapa: str = Field(default="", index=True)
     ponto_controle: str = Field(default="", index=True)
+    
+    # Harvest Plan configurations
+    in_harvest_plan: bool = Field(default=False)
+    harvest_plan_op: Optional[str] = Field(default=None)
+    harvest_plan_weight_var_id: Optional[str] = Field(default=None, foreign_key="variables.id")
 
 class Equation(SQLModel, table=True):
     __tablename__ = "equations"
@@ -101,6 +106,12 @@ class Result(SQLModel, table=True):
     status: ResultStatus = Field(default=ResultStatus.PENDING, sa_column_kwargs={"nullable": False})
     error_message: str = Field(default="")
     timestamp: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+class HarvestPlanSetting(SQLModel, table=True):
+    __tablename__ = "harvest_plan_settings"
+    
+    id: str = Field(primary_key=True, default="default")
+    start_month: str = Field(default="Abril", sa_column_kwargs={"nullable": False})
 
 # ── IMPLEMENTATION DETAILS & MIGRATIONS ────────────────────────────────────
 
@@ -156,6 +167,8 @@ def migrate_legacy_data(session: Session):
                 tipo = VariableType.INPUT
                 if old_type == "OUTPUT":
                     tipo = VariableType.OUTPUT
+                elif old_type == "DERIVADA":
+                    tipo = VariableType.DERIVADA
 
                 # Check if it is a known scenario variable based on user's input
                 if var_ref in {"DIA", "APROVEITAMENTO_OPERACIONAL", "DISPONIBILIDADE"}:
@@ -277,6 +290,39 @@ def migrate_database_schema(session: Session):
                 session.commit()
             except Exception:
                 pass
+
+    # Ensure harvest_plan_settings exists and has default row
+    SQLModel.metadata.create_all(session.bind)
+    tables = inspect(session.bind).get_table_names()
+    if "harvest_plan_settings" in tables:
+        # Check if default setting row exists
+        stmt = text("SELECT COUNT(*) FROM harvest_plan_settings WHERE id = 'default'")
+        count = session.execute(stmt).scalar()
+        if count == 0:
+            session.execute(text("INSERT INTO harvest_plan_settings (id, start_month) VALUES ('default', 'Abril')"))
+            session.commit()
+
+    # Ensure new columns exist on variables table
+    if "variables" in tables:
+        cols = [col["name"] for col in inspect(session.bind).get_columns("variables")]
+        if "in_harvest_plan" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN in_harvest_plan BOOLEAN DEFAULT FALSE"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating in_harvest_plan: {e}")
+        if "harvest_plan_op" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN harvest_plan_op VARCHAR DEFAULT NULL"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating harvest_plan_op: {e}")
+        if "harvest_plan_weight_var_id" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN harvest_plan_weight_var_id VARCHAR DEFAULT NULL"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating harvest_plan_weight_var_id: {e}")
 
 def create_db_and_tables():
     # Detect if we need migration first
