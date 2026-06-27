@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-06-27
+
+### Added
+- **Centralização e Unificação do Design System (`design-system.tsx`)**: Nova especificação de tema em TypeScript contendo constantes centralizadas para Badges de tipos de variáveis (`TYPE_BADGE`), erros de convergência (`ERROR_BADGE`) e status de cenários (`SCENARIO_STATUS_BADGE`).
+- **Componente Unificado `<BmeIcon />`**: Componente reutilizável para renderização de ícones SVG semânticos (lápis, fechar, engrenagem, setas e ícones industriais específicos para cada setor), eliminando SVGs inline repetidos e emojis da interface.
+- **Classes Utilitárias Semânticas (`index.css`)**: Novas classes usando `@apply` para tabelas (`.bme-table*`) e modais (`.bme-modal*`), limpando o JSX e centralizando o comportamento estrutural do CSS.
+
+### Changed
+- **Refatoração e Divisão do Plano de Safra (`HarvestPlan.tsx`)**: Modularização do componente original de 625 linhas para respeitar a regra constitucional P0 de limite de 300 linhas, dividindo-o em:
+  - `HarvestPlan.tsx`: Controlador de estados, filtros de busca, início do ciclo e cabeçalho superior.
+  - `HarvestPlanTable.tsx`: Renderização da matriz de consolidação mensal do plano com colunas sticky laterais e seletores.
+  - `HarvestPlanConfigTable.tsx`: Formulário de parametrização de operadores de consolidação e pesos das variáveis.
+- **Refatoração de Componentes para o Design System**: Atualização completa de `SectorModules.tsx`, `Sidebar.tsx`, `SearchPanel.tsx`, `RightPanel.tsx`, `ScenarioManager.tsx`, `SectorConfig.tsx`, `GoalSeekModal.tsx`, `VariableModal.tsx` e `SystemSettingsModal.tsx` para usar as novas classes utilitárias e o componente `<BmeIcon />`.
+
+### Fixed
+- **Ajuste de Tipagem de Cadastro**: Corrigido erro de compilação TypeScript em `VariableModal` garantindo que campos opcionais no formulário sejam convertidos para strings vazias em vez de `undefined` para satisfazer o contrato estrito da interface `Variable`.
+
 ## [2.4.0] - 2026-06-26
 
 ### Added

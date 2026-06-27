@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Sector } from '../types';
+import { BmeIcon } from '../theme/design-system';
 
 interface SectorConfigProps {
   sectors: Sector[];
@@ -67,7 +68,6 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
     setSubmitting(true);
     try {
       if (editingSector) {
-        // Update
         await axios.patch(`http://localhost:8000/api/sectors/${editingSector.id}`, {
           nome: cleanNome,
           descricao: cleanDesc,
@@ -75,7 +75,6 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
         });
         setSuccess('Setor atualizado com sucesso!');
       } else {
-        // Create
         await axios.post('http://localhost:8000/api/sectors', {
           id: cleanId,
           nome: cleanNome,
@@ -118,14 +117,14 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
   };
 
   return (
-    <div className="flex flex-col space-y-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs">
-      <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Cadastro de Setores</h3>
+    <div className="glass-card p-4 space-y-4 text-xs">
+      <div className="flex justify-between items-center border-b border-slate-800/40 pb-2">
+        <h3 className="font-bold text-slate-300 text-sm uppercase tracking-wide">Cadastro de Setores</h3>
         {editingSector && (
           <button 
             onClick={resetForm}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { resetForm(); } }}
-            className="text-[10px] text-slate-500 hover:text-slate-800 font-semibold"
+            className="text-[10px] text-slate-500 hover:text-slate-350 font-semibold"
           >
             Cancelar Edição
           </button>
@@ -133,13 +132,13 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
       </div>
 
       {error && (
-        <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg font-medium leading-4 animate-shake">
+        <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg font-medium leading-4">
           ⚠️ {error}
         </div>
       )}
 
       {success && (
-        <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg font-medium">
+        <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-450 rounded-lg font-medium">
           ✓ {success}
         </div>
       )}
@@ -156,7 +155,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               value={id}
               onChange={(e) => setId(e.target.value)}
               placeholder="Ex: DESTILARIA"
-              className="border border-slate-200 rounded p-1.5 font-bold uppercase text-slate-700 bg-slate-50/50 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="input-field p-1.5 font-bold uppercase disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800 focus:outline-none"
               required
             />
           </div>
@@ -170,7 +169,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Destilação & Retificação"
-              className="border border-slate-200 rounded p-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="input-field p-1.5 focus:outline-none"
               required
             />
           </div>
@@ -184,7 +183,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               value={ordem}
               onChange={(e) => setOrdem(e.target.value)}
               placeholder="Ex: 10"
-              className="border border-slate-200 rounded p-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="input-field p-1.5 focus:outline-none"
               required
               min="1"
             />
@@ -201,31 +200,31 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
             placeholder="Opcional. Ex: Produção de etanol hidratado/anidro."
-            className="border border-slate-200 rounded p-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="input-field p-1.5 focus:outline-none"
           />
         </div>
 
         <button
           type="submit"
           disabled={submitting || isLocked}
-          className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 disabled:from-slate-300 disabled:to-slate-400 text-white font-bold py-2 px-4 rounded text-xs transition-all shadow-sm"
+          className="btn-primary w-full py-2 text-xs font-bold"
         >
           {submitting ? 'Salvando...' : editingSector ? 'Atualizar Setor' : 'Cadastrar Setor'}
         </button>
       </form>
 
-      <div className="border-t border-slate-100 pt-3">
+      <div className="border-t border-slate-800/40 pt-3">
         <h4 className="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-2">Setores Cadastrados ({sectors.length})</h4>
         <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
           {sectors.map((sector) => (
-            <div key={sector.id} className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-100/50 hover:bg-slate-100/30 transition-colors">
-              <div className="min-w-0 pr-2">
+            <div key={sector.id} className="flex items-center justify-between p-2 bg-slate-900/60 rounded border border-slate-800/40 hover:bg-slate-900/80 transition-colors">
+              <div className="min-w-0 pr-2 flex-1">
                 <div className="flex items-baseline space-x-1.5">
-                  <span className="font-bold text-[10px] text-teal-700">{sector.id}</span>
-                  <span className="font-semibold text-slate-700 truncate">{sector.nome}</span>
-                  <span className="text-[9px] bg-slate-100 text-slate-500 px-1 rounded font-bold">#{sector.ordem}</span>
+                  <span className="font-bold text-[10px] text-teal-400">{sector.id}</span>
+                  <span className="font-semibold text-slate-200 truncate">{sector.nome}</span>
+                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded font-bold">#{sector.ordem}</span>
                 </div>
-                {sector.descricao && <p className="text-[10px] text-slate-400 truncate mt-0.5">{sector.descricao}</p>}
+                {sector.descricao && <p className="text-[10px] text-slate-500 truncate mt-0.5">{sector.descricao}</p>}
               </div>
               <div className="flex items-center space-x-1.5 flex-shrink-0">
                 <button
@@ -233,20 +232,20 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                   onClick={() => handleEdit(sector)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleEdit(sector); } }}
                   disabled={isLocked}
-                  className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200/50"
+                  className="text-slate-500 hover:text-slate-300 p-1.5 rounded hover:bg-slate-800/60 flex items-center justify-center"
                   title="Editar"
                 >
-                  ✏️
+                  <BmeIcon name="pencil" size={12} />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(sector.id)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleDelete(sector.id); } }}
                   disabled={isLocked}
-                  className="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50"
+                  className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 flex items-center justify-center"
                   title="Excluir"
                 >
-                  🗑️
+                  <BmeIcon name="close" size={12} className="text-rose-400" />
                 </button>
               </div>
             </div>

@@ -30,7 +30,7 @@ export function EquationDropdown({ isOpen, results, selectedIndex, token, onSele
     <ul
       role="listbox"
       aria-label="Sugestões de variáveis"
-      className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto"
+      className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700/60 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto"
     >
       {results.map(({ variable, matchedField }, index) => {
         const varId = variable['ID - REF'];

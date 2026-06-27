@@ -10,14 +10,18 @@ import { Sidebar } from './components/Sidebar';
 import { RightPanel } from './components/RightPanel';
 import { HarvestPlan } from './components/HarvestPlan';
 import { SystemSettingsModal } from './components/SystemSettingsModal';
+import { StatusDashboard } from './components/StatusDashboard';
+import { FlowchartPlaceholder } from './components/FlowchartPlaceholder';
 import { useVariableSearch } from './utils/useVariableSearch';
 import { useSearch } from './utils/useSearch';
 import { useScenario } from './utils/useScenario';
 import { getFriendlySectorName } from './utils/helpers';
 
+type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';
+
 function App() {
   const [sectors, setSectors] = useState<Sector[]>([]);
-  const [activeTab, setActiveTab] = useState<'calculator' | 'harvest_plan'>('calculator');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('calculator');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isGoalSeekOpen, setIsGoalSeekOpen] = useState(false);
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
@@ -25,6 +29,7 @@ function App() {
   const [variableToEdit, setVariableToEdit] = useState<Variable | null>(null);
   const [prefilledSector, setPrefilledSector] = useState('');
   const [prefilledEtapa, setPrefilledEtapa] = useState('');
+  const [showDashboard, setShowDashboard] = useState(true);
 
   const fetchSectors = () => {
     axios.get('http://localhost:8000/api/sectors')
@@ -32,45 +37,26 @@ function App() {
       .catch(console.error);
   };
 
-  useEffect(() => {
-    fetchSectors();
-  }, []);
+  useEffect(() => { fetchSectors(); }, []);
 
   const {
-    variables,
-    results,
-    loading,
-    calculating,
-    convergenceError,
-    iterations,
-    activeSector,
-    setActiveSector,
-    currentScenario,
-    setCurrentScenario,
-    saving,
-    anoSafra,
-    setAnoSafra,
-    mesReferencia,
-    setMesReferencia,
-    hasUnsavedChanges,
-    savingActive,
-    handleChange,
-    handleCalculate,
-    onLoadScenario,
-    handleSaveNew,
-    handleSaveActive,
-    onApplyOptimalValue,
-    handleSaveVariable,
-    isLocked,
-    years,
-    months,
-    fetchYearsAndMonths
+    variables, results, loading, calculating, convergenceError, iterations,
+    activeSector, setActiveSector,
+    currentScenario, setCurrentScenario,
+    saving, anoSafra, setAnoSafra, mesReferencia, setMesReferencia,
+    hasUnsavedChanges, savingActive,
+    handleChange, handleCalculate, onLoadScenario, handleSaveNew,
+    handleSaveActive, onApplyOptimalValue, handleSaveVariable, isLocked,
+    years, months, fetchYearsAndMonths
   } = useScenario(sectors, fetchSectors);
 
   const search = useSearch(variables);
   const searchResults = useVariableSearch(variables, search.debouncedQuery);
 
-  const handleEditVariable = (v: Variable) => { setVariableToEdit(v); setIsVariableModalOpen(true); };
+  const handleEditVariable = (v: Variable) => {
+    setVariableToEdit(v);
+    setIsVariableModalOpen(true);
+  };
 
   const onScrollTo = (id: string) => {
     const tv = variables.find(v => v['ID - REF'] === id);
@@ -94,26 +80,38 @@ function App() {
 
   const handleSubgroupClick = (secId: string, subName: string) => {
     setActiveSector(secId);
+    setShowDashboard(false);
     setTimeout(() => document.querySelector(`[data-group-name="${subName}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  };
+
+  const handleSectorFromDashboard = (sectorId: string) => {
+    setActiveSector(sectorId);
+    setShowDashboard(false);
+  };
+
+  const handleSectorNavClick = (sectorId: string) => {
+    setActiveSector(sectorId);
+    setShowDashboard(false);
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mb-4"></div>
-        <p className="text-slate-400 font-medium">Carregando memorial de cálculo...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-bme-bg text-white gap-4">
+        <div className="w-10 h-10 border-2 border-slate-700 border-t-teal-500 rounded-full animate-spin" />
+        <p className="text-slate-500 text-sm">Carregando memorial de cálculo...</p>
       </div>
     );
   }
 
   const uniqueSectors = Array.from(new Set([
     ...sectors.map(s => s.id),
-    ...variables.map(v => v.SETOR)
+    ...variables.map(v => v.SETOR),
   ]));
   const scenarioVars = variables.filter(v => v.TIPO === 'CENARIO');
+  const resultsMap = results as Record<string, { value: number | null; status: string }>;
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 text-slate-800 font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-bme-bg text-slate-200 font-sans overflow-hidden">
       <Header
         searchQuery={search.searchQuery}
         onSearchInput={search.handleSearchInput}
@@ -125,73 +123,109 @@ function App() {
         setActiveTab={setActiveTab}
       />
 
-      {activeTab === 'harvest_plan' ? (
+      {activeTab === 'flowchart' && (
+        <div className="flex-1 relative overflow-hidden">
+          <FlowchartPlaceholder />
+        </div>
+      )}
+
+      {activeTab === 'harvest_plan' && (
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 flex flex-col overflow-hidden p-6 bg-slate-50">
+          <main className="flex-1 flex flex-col overflow-hidden p-6">
             <HarvestPlan sectors={sectors} />
           </main>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'calculator' && (
         <div className="flex flex-1 overflow-hidden">
           <Sidebar
             isSidebarExpanded={isSidebarExpanded}
             setIsSidebarExpanded={setIsSidebarExpanded}
             uniqueSectors={uniqueSectors}
             activeSector={activeSector}
-            setActiveSector={setActiveSector}
+            setActiveSector={handleSectorNavClick}
             variables={variables}
             sectors={sectors}
+            results={resultsMap}
             onSubgroupClick={handleSubgroupClick}
             onVariableClick={onScrollTo}
             onSettingsClick={() => setIsSettingsOpen(true)}
           />
 
-          <main className="flex-1 flex flex-col overflow-hidden p-6 bg-slate-50">
-            {isLocked && (
-              <div className="mb-4 p-3 bg-slate-200 border-l-4 border-slate-600 text-slate-700 text-xs font-semibold rounded-r-lg flex items-center space-x-2">
-                <span>🔒 Cênario Congelado (Status: {currentScenario?.status}). Edições e recalculações estão bloqueadas.</span>
-              </div>
-            )}
-
-            {convergenceError && (
-              <div className="mb-4 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 flex items-start space-x-3 shadow-sm animate-pulse">
-                <span>⚠️ O resultado não fechou. Limite de 100 ciclos atingido. Revise os dados de entrada.</span>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">{getFriendlySectorName(activeSector)}</h2>
-                <p className="text-xs text-slate-400 mt-0.5">Mostrando {variables.filter(v => v.SETOR === activeSector).length} variáveis</p>
-              </div>
-              <button
-                onClick={() => handleAddVariable(activeSector, '')}
-                disabled={isLocked}
-                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 disabled:from-slate-300 disabled:to-slate-400 text-white font-bold py-1.5 px-4 rounded text-xs transition-all shadow-sm flex items-center space-x-1"
-              >
-                <span>➕ Cadastrar Variável</span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <SectorModules
-                activeSector={activeSector}
+          <main className="flex-1 flex flex-col overflow-hidden bg-slate-900/20">
+            {showDashboard ? (
+              <StatusDashboard
+                sectors={sectors}
                 variables={variables}
-                results={results}
-                isLocked={isLocked}
-                highlightedVarId={search.highlightedVarId}
-                onEditVariable={handleEditVariable}
-                onAddVariable={handleAddVariable}
-                onVariableChange={handleChange}
+                results={resultsMap}
+                onSectorClick={handleSectorFromDashboard}
               />
-            </div>
+            ) : (
+              <div className="flex flex-col flex-1 overflow-hidden p-5">
+                {/* ── Breadcrumb ── */}
+                <div className="flex items-center gap-2 text-[11px] text-slate-600 mb-3">
+                  <button onClick={() => setShowDashboard(true)} className="hover:text-teal-400 transition-colors">
+                    Dashboard
+                  </button>
+                  <span>/</span>
+                  <span className="text-slate-400 font-medium">{getFriendlySectorName(activeSector)}</span>
+                </div>
+
+                {/* ── Status banners ── */}
+                {isLocked && (
+                  <div className="mb-3 px-4 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg text-slate-400 text-xs font-semibold flex items-center gap-2">
+                    <span>🔒</span>
+                    <span>Cenário Congelado (Status: {currentScenario?.status}). Edições e recalculações bloqueadas.</span>
+                  </div>
+                )}
+                {convergenceError && (
+                  <div className="mb-3 px-4 py-2.5 bg-amber-950/40 border border-amber-800/40 rounded-lg text-amber-400 text-xs flex items-center gap-2">
+                    <span>⚠️</span>
+                    <span>Resultado não convergiu. Limite de 100 ciclos atingido. Revise os dados de entrada.</span>
+                  </div>
+                )}
+
+                {/* ── Sector header ── */}
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-white">{getFriendlySectorName(activeSector)}</h2>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {variables.filter(v => v.SETOR === activeSector).length} variáveis cadastradas
+                    </p>
+                  </div>
+                  <button
+                    id="btn-add-variable"
+                    onClick={() => handleAddVariable(activeSector, '')}
+                    disabled={isLocked}
+                    className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs"
+                  >
+                    <span>+</span>
+                    <span>Cadastrar Variável</span>
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto min-h-0">
+                  <SectorModules
+                    activeSector={activeSector}
+                    variables={variables}
+                    results={results}
+                    isLocked={isLocked}
+                    highlightedVarId={search.highlightedVarId}
+                    onEditVariable={handleEditVariable}
+                    onAddVariable={handleAddVariable}
+                    onVariableChange={handleChange}
+                  />
+                </div>
+              </div>
+            )}
           </main>
 
           <RightPanel
             variables={variables}
             onLoadScenario={onLoadScenario}
             currentScenario={currentScenario}
-            onStatusChange={(newStatus) => setCurrentScenario(prev => prev ? { ...prev, status: newStatus } : null)}
+            onStatusChange={newStatus => setCurrentScenario(prev => prev ? { ...prev, status: newStatus } : null)}
             anoSafra={anoSafra}
             setAnoSafra={setAnoSafra}
             mesReferencia={mesReferencia}

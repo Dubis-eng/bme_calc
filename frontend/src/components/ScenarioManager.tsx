@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Variable } from '../types';
 import { formatHarvestYear } from '../utils/useScenario';
+import { SCENARIO_STATUS_BADGE } from '../theme/design-system';
 
 export interface ScenarioMetadata {
     id: string;
@@ -101,23 +102,13 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
         }
     };
 
-    const getStatusBadgeClass = (status: string) => {
-        switch (status) {
-            case 'Aprovado':
-                return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-            case 'Final':
-                return 'bg-slate-700 text-slate-100 border-slate-600';
-            default:
-                return 'bg-teal-50 text-teal-800 border-teal-200';
-        }
-    };
 
     return (
-        <div className="flex flex-col space-y-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Gerenciador de Cenários</h3>
+        <div className="glass-card p-4 space-y-4">
+            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Gerenciador de Cenários</h3>
 
             {/* Save Form controls */}
-            <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200/60">
+            <div className="grid grid-cols-2 gap-3 bg-slate-900/60 p-3 rounded-lg border border-slate-800/40">
                 <div className="flex flex-col">
                     <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">
                         Ano Safra
@@ -125,7 +116,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                             aria-label="Ano Safra para salvar"
                             value={anoSafra}
                             onChange={(e) => setAnoSafra(Number(e.target.value))}
-                            className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-1.5 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                            className="block mt-1 w-full input-field text-xs font-semibold rounded p-1.5"
                         >
                             {years.length === 0 ? (
                                 <option value={2026}>2026/2027</option>
@@ -146,7 +137,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                             aria-label="Mês Referência para salvar"
                             value={mesReferencia}
                             onChange={(e) => setMesReferencia(e.target.value)}
-                            className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-1.5 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                            className="block mt-1 w-full input-field text-xs font-semibold rounded p-1.5"
                         >
                             {months.length === 0 ? (
                                 <>
@@ -178,10 +169,10 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
 
             {/* Current Scenario controls */}
             {currentScenario && (
-                <div className="bg-teal-50/55 p-3.5 rounded-lg border border-teal-200/50 space-y-2">
+                <div className="bg-teal-600/10 p-3.5 rounded-lg border border-teal-500/20 space-y-2">
                     <div className="flex justify-between items-center">
-                        <span className="text-xs font-semibold text-teal-900">Cenário Ativo: v{currentScenario.version}</span>
-                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${getStatusBadgeClass(currentScenario.status)}`}>
+                        <span className="text-xs font-semibold text-teal-400">Cenário Ativo: v{currentScenario.version}</span>
+                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${SCENARIO_STATUS_BADGE[currentScenario.status] ?? 'badge-idle'}`}>
                             {currentScenario.status}
                         </span>
                     </div>
@@ -214,7 +205,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                                     className={`flex-1 py-1 px-1.5 rounded text-[10px] font-medium border transition-colors ${
                                         currentScenario.status === st
                                             ? 'bg-teal-600 border-teal-600 text-white font-bold'
-                                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                                     }`}
                                 >
                                     {st}
@@ -224,18 +215,18 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                     </div>
 
                     {/* Export Actions */}
-                    <div className="flex space-x-2 pt-2 border-t border-teal-200/40">
+                    <div className="flex space-x-2 pt-2 border-t border-slate-800/40">
                         <a
                             href={`http://localhost:8000/api/scenarios/${currentScenario.id}/export/pdf`}
                             download
-                            className="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors shadow-sm flex items-center justify-center space-x-1"
+                            className="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors flex items-center justify-center space-x-1"
                         >
                             <span>📄 Baixar PDF</span>
                         </a>
                         <a
                             href={`http://localhost:8000/api/scenarios/${currentScenario.id}/export/xlsx`}
                             download
-                            className="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors shadow-sm flex items-center justify-center space-x-1"
+                            className="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors flex items-center justify-center space-x-1"
                         >
                             <span>📊 Baixar Excel</span>
                         </a>
@@ -265,24 +256,24 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                 ) : scenarios.length === 0 ? (
                     <p className="text-xs text-slate-400 text-center py-4">Nenhum cenário salvo.</p>
                 ) : (
-                    <div className="overflow-y-auto max-h-[200px] border border-slate-100 rounded-lg divide-y divide-slate-100">
+                    <div className="overflow-y-auto max-h-[200px] border border-slate-800/40 rounded-lg divide-y divide-slate-800/30">
                         {scenarios.map((sc) => (
                             <button
                                 key={sc.id}
                                 onClick={() => handleLoad(sc.id)}
-                                className={`w-full flex flex-col p-2 text-left transition-colors hover:bg-slate-50 border-none outline-none ${
-                                    currentScenario?.id === sc.id ? 'bg-teal-50/30 font-semibold' : ''
+                                className={`w-full flex flex-col p-2 text-left transition-colors hover:bg-slate-900/60 border-none outline-none ${
+                                    currentScenario?.id === sc.id ? 'bg-teal-500/10 font-semibold' : ''
                                 }`}
                             >
                                 <div className="flex justify-between w-full items-center">
-                                    <span className="text-[11px] font-bold text-slate-700">
+                                    <span className="text-[11px] font-bold text-slate-200">
                                         Safra {formatHarvestYear(sc.year_harvest)} - {sc.reference_month}
                                     </span>
-                                    <span className={`px-1.5 py-0.5 text-[8px] font-bold rounded-full border ${getStatusBadgeClass(sc.status)}`}>
+                                    <span className={`px-1.5 py-0.5 text-[8px] font-bold rounded-full border ${SCENARIO_STATUS_BADGE[sc.status] ?? 'badge-idle'}`}>
                                         {sc.status}
                                     </span>
                                 </div>
-                                <span className="text-[10px] text-slate-400 mt-0.5">Versão v{sc.version}</span>
+                                <span className="text-[10px] text-slate-500 mt-0.5">Versão v{sc.version}</span>
                             </button>
                         ))}
                     </div>

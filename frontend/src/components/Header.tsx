@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
+type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';
 
 interface HeaderProps {
   searchQuery: string;
@@ -7,9 +9,34 @@ interface HeaderProps {
   handleCalculate: () => void;
   calculating: boolean;
   isLocked: boolean;
-  activeTab: 'calculator' | 'harvest_plan';
-  setActiveTab: (tab: 'calculator' | 'harvest_plan') => void;
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
 }
+
+type ConnectionStatus = 'connected' | 'disconnected' | 'checking';
+
+function useBackendStatus(): ConnectionStatus {
+  const [status, setStatus] = useState<ConnectionStatus>('checking');
+
+  useEffect(() => {
+    const check = () => {
+      fetch('http://localhost:8000/api/sectors', { signal: AbortSignal.timeout(3000) })
+        .then(() => setStatus('connected'))
+        .catch(() => setStatus('disconnected'));
+    };
+    check();
+    const interval = setInterval(check, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return status;
+}
+
+const TABS: { id: ActiveTab; label: string; icon: string }[] = [
+  { id: 'calculator',   label: 'Calculadora',   icon: '⚙️' },
+  { id: 'harvest_plan', label: 'Plano de Safra', icon: '📆' },
+  { id: 'flowchart',   label: 'Fluxograma',    icon: '🔀' },
+];
 
 export function Header({
   searchQuery,
@@ -19,81 +46,103 @@ export function Header({
   calculating,
   isLocked,
   activeTab,
-  setActiveTab
+  setActiveTab,
 }: HeaderProps) {
+  const connStatus = useBackendStatus();
+
+  const statusColors: Record<ConnectionStatus, string> = {
+    connected:    'bg-emerald-400',
+    disconnected: 'bg-rose-400',
+    checking:     'bg-amber-400',
+  };
+  const statusLabels: Record<ConnectionStatus, string> = {
+    connected:    'Backend Conectado',
+    disconnected: 'Desconectado',
+    checking:     'Verificando...',
+  };
+
   return (
-    <header className="flex justify-between items-center bg-slate-900 text-white px-6 py-4 shadow-md z-20 border-b border-slate-800">
-      <div className="flex items-center space-x-3">
-        <div className="h-8 w-8 bg-gradient-to-tr from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-white shadow-sm">
-          𝚽
+    <header className="flex items-center justify-between bg-slate-950 border-b border-slate-800/60 px-5 py-0 z-20 h-[56px] shrink-0">
+      {/* ── Logo ── */}
+      <div className="flex items-center gap-3 min-w-[200px]">
+        <div className="h-8 w-8 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-lg flex items-center justify-center font-black text-slate-950 text-lg shadow-glow-sm shrink-0">
+          ⚡
         </div>
-        <div>
-          <h1 className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-            Calculadora de Balanço
-          </h1>
-          <p className="text-xs text-slate-400">Massa &amp; Energia</p>
+        <div className="leading-none">
+          <p className="text-[13px] font-bold text-white tracking-tight">BME Calc</p>
+          <p className="text-[10px] text-slate-500 tracking-wide">Balanço de Massa & Energia</p>
         </div>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="flex space-x-1 bg-slate-800/80 p-1 rounded-lg border border-slate-700/50">
-        <button
-          onClick={() => setActiveTab('calculator')}
-          className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center space-x-1.5 ${
-            activeTab === 'calculator' 
-              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md' 
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span>🎛️</span>
-          <span>Calculadora</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('harvest_plan')}
-          className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center space-x-1.5 ${
-            activeTab === 'harvest_plan' 
-              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md' 
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span>📆</span>
-          <span>Plano de Safra</span>
-        </button>
-      </div>
+      {/* ── Tabs ── */}
+      <nav className="flex items-center gap-0.5 bg-slate-900/60 border border-slate-800/60 rounded-xl p-1">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            id={`tab-${tab.id}`}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === tab.id
+                ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+            }`}
+          >
+            <span>{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
 
-      <div className="flex items-center space-x-3">
+      {/* ── Right Side ── */}
+      <div className="flex items-center gap-3 min-w-[200px] justify-end">
+        {/* Connection status */}
+        <div className="flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full ${statusColors[connStatus]} animate-pulse-dot`} />
+          <span className="text-[10px] text-slate-500 hidden lg:block">{statusLabels[connStatus]}</span>
+        </div>
+
+        {/* Lock badge */}
+        {isLocked && (
+          <span className="badge-warn">🔒 Congelado</span>
+        )}
+
+        {/* Search (calculator only) */}
         {activeTab === 'calculator' && (
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">🔍</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none">🔍</span>
             <input
               id="global-search"
               type="search"
               placeholder="Buscar variável..."
               value={searchQuery}
-              onChange={(e) => onSearchInput(e.target.value)}
+              onChange={e => onSearchInput(e.target.value)}
               onFocus={() => { if (searchQuery.trim()) onSearchInput(searchQuery); }}
-              className="pl-8 pr-3 py-1.5 rounded text-xs bg-slate-800 text-slate-200 placeholder-slate-500 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-teal-500 w-52 transition-all"
+              className="input-field pl-8 pr-3 py-1.5 w-44 text-xs"
               aria-label="Buscar variável por ID, Descrição ou Definição"
             />
           </div>
         )}
+
+        {/* Iterations badge */}
         {iterations > 1 && activeTab === 'calculator' && (
-          <span className="text-xs text-slate-400">
-            Iterações: <span className="font-semibold text-teal-400">{iterations}</span>
-          </span>
+          <span className="badge-info">{iterations} it.</span>
         )}
+
+        {/* Calculate button */}
         {activeTab === 'calculator' && (
           <button
+            id="btn-calculate"
             onClick={handleCalculate}
             disabled={calculating || isLocked}
-            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 disabled:from-slate-700 disabled:to-slate-800 text-white font-bold py-1.5 px-5 rounded text-sm shadow-md transition-all flex items-center space-x-2 border border-teal-500/20"
+            className="btn-primary flex items-center gap-2 px-4 py-1.5 text-xs"
           >
-            {calculating && <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>}
-            <span>{calculating ? 'Calculando...' : 'Calcular'}</span>
+            {calculating && (
+              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            )}
+            <span>{calculating ? 'Calculando...' : '▶ Calcular'}</span>
           </button>
         )}
       </div>
     </header>
   );
 }
-

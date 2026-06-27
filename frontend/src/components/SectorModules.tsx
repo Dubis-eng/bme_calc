@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Variable } from '../types';
+import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
 
 interface SectorModulesProps {
   activeSector: string;
@@ -22,182 +23,154 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   onAddVariable,
   onVariableChange
 }) => {
-  // Filter variables of the active sector
   const sectorVariables = variables.filter(v => v.SETOR === activeSector);
 
-  // Group by ETAPA and then by PONTO DE CONTROLE
+  // Group by ETAPA → PONTO DE CONTROLE
   const stages: Record<string, Record<string, Variable[]>> = {};
   sectorVariables.forEach(v => {
     const stage = v.ETAPA || 'GERAL';
-    const pc = v["PONTO DE CONTROLE"] || 'GERAL';
-    
-    if (!stages[stage]) {
-      stages[stage] = {};
-    }
-    if (!stages[stage][pc]) {
-      stages[stage][pc] = [];
-    }
+    const pc    = v['PONTO DE CONTROLE'] || 'GERAL';
+    if (!stages[stage])     stages[stage] = {};
+    if (!stages[stage][pc]) stages[stage][pc] = [];
     stages[stage][pc].push(v);
   });
 
-  // Track expanded/collapsed state of each stage group panel
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (groupName: string) => {
-    setCollapsedGroups(prev => ({
-      ...prev,
-      [groupName]: !prev[groupName]
-    }));
+    setCollapsedGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }));
   };
 
   const stageNames = Object.keys(stages);
 
   if (stageNames.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white border border-slate-200 rounded-xl text-slate-400">
-        <span className="text-xl mb-2">📋</span>
-        <p className="text-xs font-semibold">Nenhuma variável cadastrada para este setor.</p>
+      <div className="flex flex-col items-center justify-center p-8 glass-card text-slate-500">
+        <span className="text-2xl mb-3 opacity-40">◈</span>
+        <p className="text-sm font-semibold text-slate-400 mb-1">Setor sem variáveis</p>
+        <p className="text-xs text-slate-600 mb-4">Nenhuma variável cadastrada para este setor.</p>
         <button
           onClick={() => onAddVariable(activeSector, 'GERAL')}
-          className="mt-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-4 rounded text-xs transition-colors"
+          className="btn-primary px-4 py-1.5 text-xs"
         >
-          ➕ Cadastrar Primeira Variável
+          + Cadastrar Primeira Variável
         </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 overflow-y-auto pr-1">
+    <div className="space-y-4">
       {stageNames.map(stageName => {
         const isCollapsed = !!collapsedGroups[stageName];
-        const pcsInStage = stages[stageName];
-        const totalVars = Object.values(pcsInStage).reduce((acc, curr) => acc + curr.length, 0);
+        const pcsInStage  = stages[stageName];
+        const totalVars   = Object.values(pcsInStage).reduce((acc, curr) => acc + curr.length, 0);
 
         return (
-          <div 
-            key={stageName} 
-            className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden transition-all animate-fade-in"
-          >
-            {/* Header section with toggle and add variable action */}
-            <div className="bg-slate-50 px-5 py-3 flex justify-between items-center border-b border-slate-100">
-              <div className="flex items-center space-x-3">
+          <div key={stageName} className="glass-card overflow-hidden animate-fade-in-up">
+            {/* ── Stage Header ── */}
+            <div className="px-5 py-3 flex justify-between items-center border-b border-slate-800/60 bg-slate-900/40">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => toggleGroup(stageName)}
-                  className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200/50 transition-colors focus:outline-none"
-                  aria-label={isCollapsed ? `Expandir etapa ${stageName}` : `Recolher etapa ${stageName}`}
+                  className="btn-ghost p-1 rounded text-slate-500"
+                  aria-label={isCollapsed ? `Expandir ${stageName}` : `Recolher ${stageName}`}
                 >
-                  <span className="text-[10px] inline-block transform transition-transform duration-200">
-                    {isCollapsed ? '▶' : '▼'}
-                  </span>
+                  <BmeIcon
+                    name={isCollapsed ? 'chevron-right' : 'chevron-down'}
+                    className="text-slate-500 transition-transform duration-200"
+                    size={10}
+                  />
                 </button>
-                <h3 className="text-xs font-bold text-slate-700 tracking-wider uppercase">
+                <h3 className="text-[11px] font-bold text-slate-300 tracking-widest uppercase">
                   {stageName}
                 </h3>
-                <span className="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded-full text-slate-500 font-semibold">
-                  {totalVars}
-                </span>
+                <span className="badge-idle">{totalVars}</span>
               </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onAddVariable(activeSector, stageName)}
-                  disabled={isLocked}
-                  className="bg-white hover:bg-slate-50 text-teal-600 hover:text-teal-700 disabled:text-slate-300 disabled:bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-[10px] font-bold transition-all flex items-center space-x-1"
-                >
-                  <span>➕ Nova Variável</span>
-                </button>
-              </div>
+              <button
+                onClick={() => onAddVariable(activeSector, stageName)}
+                disabled={isLocked}
+                className="text-[10px] font-semibold text-teal-500 hover:text-teal-300 disabled:text-slate-700 border border-teal-600/30 hover:border-teal-500/50 disabled:border-slate-800 rounded px-2.5 py-1 transition-all"
+              >
+                + Nova Variável
+              </button>
             </div>
 
-            {/* Table wrapper grouped by Control Point */}
+            {/* ── Control Point Groups ── */}
             {!isCollapsed && (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-800/40">
                 {Object.keys(pcsInStage).map(pcName => {
                   const varsInGroup = pcsInStage[pcName];
 
                   return (
-                    <div 
-                      key={pcName}
-                      data-group-name={pcName}
-                      className="p-5 flex flex-col space-y-3"
-                    >
-                      <div className="flex items-center justify-between pb-1 border-b border-slate-100 bg-slate-50/20 px-3 py-1.5 rounded-lg">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center">
-                          <span className="text-teal-500 mr-1.5">📍</span> {pcName}
+                    <div key={pcName} data-group-name={pcName} className="flex flex-col">
+                      {/* ── Control Point title row ── */}
+                      <div className="flex items-center gap-3 px-5 py-2 bg-slate-900/60 border-b border-slate-800/30">
+                        <span className="w-[3px] h-4 rounded-full bg-teal-500/70 shrink-0" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400">
+                          {pcName}
                         </span>
-                        <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-400 font-bold">
+                        <span className="text-[9px] text-slate-600 ml-auto">
                           {varsInGroup.length} {varsInGroup.length === 1 ? 'variável' : 'variáveis'}
                         </span>
                       </div>
 
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-100">
-                          <thead className="bg-slate-50/40">
-                            <tr>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider w-28">ID</th>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Descrição</th>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20">Tipo</th>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20">Unidade</th>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fórmula</th>
-                              <th className="py-2 px-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider w-36">Valor</th>
-                              <th className="py-2 px-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider w-16">Ações</th>
+                      {/* ── Variables Table ── */}
+                      <div className="bme-table-wrapper">
+                        <table className="bme-table">
+                          <thead>
+                            <tr className="bme-table-header-row">
+                              <th className="bme-table-header-cell w-28">ID</th>
+                              <th className="bme-table-header-cell">Descrição</th>
+                              <th className="bme-table-header-cell w-24">Tipo</th>
+                              <th className="bme-table-header-cell w-24">Unidade</th>
+                              <th className="bme-table-header-cell">Fórmula</th>
+                              <th className="bme-table-header-cell w-36">Valor</th>
+                              <th className="bme-table-header-cell w-16 text-center">Ações</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100 bg-white">
+                          <tbody className="divide-y divide-slate-800/30">
                             {varsInGroup.map(v => {
-                              const id = v['ID - REF'];
-                              const res = results[id];
-                              const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
-                              const isHighlighted = highlightedVarId === id;
+                              const id          = v['ID - REF'];
+                              const res         = results[id];
+                              const isInput     = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
+                              const isHighlight = highlightedVarId === id;
 
                               return (
                                 <tr
                                   key={id}
                                   data-var-id={id}
-                                  className={`hover:bg-slate-50/40 transition-colors ${
-                                    isHighlighted ? 'var-row-highlight' : ''
-                                  }`}
+                                  className={`bme-table-row ${isHighlight ? 'var-row-highlight' : ''}`}
                                 >
                                   {/* ID */}
-                                  <td className="py-2 px-4 text-xs font-semibold text-slate-600 truncate max-w-[120px]" title={id}>
+                                  <td className="bme-table-cell font-mono font-semibold text-teal-500 truncate max-w-[120px]" title={id}>
                                     {id}
                                   </td>
 
                                   {/* Description */}
-                                  <td className="py-2 px-4 text-xs text-slate-700 font-medium truncate max-w-[200px]" title={v['DESCRIÇÃO']}>
+                                  <td className="bme-table-cell text-slate-300 truncate max-w-[200px]" title={v['DESCRIÇÃO']}>
                                     {v['DESCRIÇÃO']}
                                   </td>
 
-                                  {/* Badge Type */}
-                                  <td className="py-2 px-4 text-[10px]">
-                                    <span 
-                                      className={`px-1.5 py-0.5 inline-flex leading-4 font-semibold rounded-full border ${
-                                        v.TIPO === 'INPUT' 
-                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-                                          : v.TIPO === 'CENARIO'
-                                            ? 'bg-blue-50 text-blue-700 border-blue-100'
-                                            : v.TIPO === 'DERIVADA'
-                                              ? 'bg-cyan-50 text-cyan-700 border-cyan-100'
-                                              : 'bg-slate-50 text-slate-600 border-slate-200'
-                                      }`}
-                                    >
+                                  {/* Type Badge */}
+                                  <td className="bme-table-cell">
+                                    <span className={`px-2 py-0.5 inline-flex text-[9px] font-bold leading-4 rounded-full border ${TYPE_BADGE[v.TIPO] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}>
                                       {v.TIPO}
                                     </span>
                                   </td>
 
                                   {/* Unit */}
-                                  <td className="py-2 px-4 text-xs text-slate-400 font-semibold">
-                                    {v['UNIDADE DE MEDIDA']}
+                                  <td className="bme-table-cell text-slate-500">
+                                    {v['UNIDADE DE MEDIDA'] || '—'}
                                   </td>
 
                                   {/* Formula */}
-                                  <td className="py-2 px-4 text-xs text-slate-400 font-mono max-w-[150px] truncate" title={String(v['EQUAÇÕES E VALORES'])}>
-                                    {isInput ? '-' : v['EQUAÇÕES E VALORES']}
+                                  <td className="bme-table-cell text-slate-600 font-mono max-w-[150px] truncate" title={String(v['EQUAÇÕES E VALORES'])}>
+                                    {isInput ? <span className="text-slate-700">—</span> : v['EQUAÇÕES E VALORES']}
                                   </td>
 
-                                  {/* Calculated / Input Value */}
-                                  <td className="py-2 px-4 text-xs font-mono font-bold text-slate-900">
+                                  {/* Value / Input */}
+                                  <td className="bme-table-cell font-mono font-bold">
                                     {isInput ? (
                                       <label className="flex items-center">
                                         <span className="sr-only">Valor para {id}</span>
@@ -206,42 +179,43 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                           aria-label={`Valor para ${id}`}
                                           disabled={isLocked}
                                           value={String(v['EQUAÇÕES E VALORES'])}
-                                          onChange={(e) => onVariableChange(id, e.target.value)}
-                                          className="border border-slate-200 rounded px-2 py-0.5 w-28 text-xs font-semibold focus:ring-1 focus:ring-teal-500 focus:outline-none bg-slate-50/20 disabled:bg-slate-100 disabled:text-slate-400"
+                                          onChange={e => onVariableChange(id, e.target.value)}
+                                          className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md
+                                            bg-slate-800 border border-slate-700/60 text-slate-200
+                                            placeholder-slate-600
+                                            focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50
+                                            disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800
+                                            transition-all duration-150"
                                         />
                                       </label>
                                     ) : (
                                       res !== undefined ? (
-                                        res.status === "OK" && res.value !== null ? (
-                                          res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+                                        res.status === 'OK' && res.value !== null ? (
+                                          <span className="text-slate-200 tabular-nums">
+                                            {res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                                          </span>
                                         ) : (
-                                          <span 
-                                            className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${
-                                              res.status === "DIV_BY_ZERO" 
-                                                ? "bg-red-50 text-red-700 border-red-150" 
-                                                : res.status === "MISSING_VAR"
-                                                  ? "bg-amber-50 text-amber-700 border-amber-150"
-                                                  : "bg-slate-100 text-slate-700 border-slate-200"
-                                            }`} 
+                                          <span
+                                            className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[res.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}
                                             title={res.error_message || res.status}
-                                            aria-label={`Erro de cálculo: ${res.status}. ${res.error_message}`}
+                                            aria-label={`Erro: ${res.status}. ${res.error_message}`}
                                           >
-                                            ⚠️ {res.status}
+                                            ⚠ {res.status}
                                           </span>
                                         )
-                                      ) : '-'
+                                      ) : <span className="text-slate-700">—</span>
                                     )}
                                   </td>
 
-                                  {/* Row actions */}
-                                  <td className="py-2 px-4 text-center">
+                                  {/* Edit action */}
+                                  <td className="bme-table-cell text-center">
                                     <button
                                       type="button"
                                       onClick={() => onEditVariable(v)}
-                                      className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 p-1.5 rounded transition-all focus:outline-none"
+                                      className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 p-1.5 rounded-md transition-all focus:outline-none"
                                       aria-label={`Editar variável ${id}`}
                                     >
-                                      ✏️
+                                      <BmeIcon name="pencil" />
                                     </button>
                                   </td>
                                 </tr>

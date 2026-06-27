@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Variable } from '../types';
+import { BmeIcon } from '../theme/design-system';
 
 interface GoalSeekModalProps {
     isOpen: boolean;
@@ -81,16 +82,18 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="bme-modal-overlay">
+            <div className="bme-modal-container max-w-md">
                 
                 {/* Header */}
-                <div className="bg-slate-900 px-5 py-4 flex justify-between items-center text-white">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400">Busca de Metas Físicas</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white font-bold" aria-label="Fechar modal">✕</button>
+                <div className="bme-modal-header">
+                    <h3 className="text-sm font-bold tracking-tight">Busca de Metas</h3>
+                    <button onClick={onClose} className="btn-ghost p-1.5 flex items-center justify-center" aria-label="Fechar modal">
+                        <BmeIcon name="close" size={14} />
+                    </button>
                 </div>
 
-                <div className="p-5 flex-1 overflow-y-auto space-y-4">
+                <div className="bme-modal-body text-xs text-slate-300">
                     {errorMsg && (
                         <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
                             {errorMsg}
@@ -106,7 +109,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                                     aria-label="Variável de Entrada"
                                     value={inputId}
                                     onChange={(e) => setInputId(e.target.value)}
-                                    className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-2 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="block mt-1 w-full input-field text-xs font-semibold rounded p-2"
                                 >
                                     <option value="">Selecione...</option>
                                     {inputVars.map(v => (
@@ -125,7 +128,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                                     aria-label="Variável de Saída"
                                     value={targetId}
                                     onChange={(e) => setTargetId(e.target.value)}
-                                    className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-2 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="block mt-1 w-full input-field text-xs font-semibold rounded p-2"
                                 >
                                     <option value="">Selecione...</option>
                                     {outputVars.map(v => (
@@ -146,7 +149,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                                     value={targetValue}
                                     onChange={(e) => setTargetValue(e.target.value)}
                                     placeholder="Ex: 500 ou 0.85"
-                                    className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-2 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="block mt-1 w-full input-field text-xs font-semibold rounded p-2"
                                 />
                             </label>
                         </div>
@@ -173,7 +176,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                                             value={minVal}
                                             onChange={(e) => setMinVal(e.target.value)}
                                             placeholder="Mín"
-                                            className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-2 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                            className="block mt-1 w-full input-field text-xs font-semibold rounded p-2"
                                         />
                                     </label>
                                 </div>
@@ -186,7 +189,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                                             value={maxVal}
                                             onChange={(e) => setMaxVal(e.target.value)}
                                             placeholder="Máx"
-                                            className="block mt-1 w-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded p-2 focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                            className="block mt-1 w-full input-field text-xs font-semibold rounded p-2"
                                         />
                                     </label>
                                 </div>
@@ -215,10 +218,10 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                 </div>
 
                 {/* Footer buttons */}
-                <div className="bg-slate-50 px-5 py-3.5 border-t border-slate-100 flex justify-end space-x-2.5">
+                <div className="bme-modal-footer">
                     <button
                         onClick={onClose}
-                        className="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-1.5 px-4 rounded text-xs transition-colors shadow-sm"
+                        className="bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1.5 px-4 rounded text-xs transition-colors"
                     >
                         Cancelar
                     </button>
