@@ -11,6 +11,8 @@ interface HeaderProps {
   isLocked: boolean;
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
+  residual: number;
+  tolerance: number;
 }
 
 type ConnectionStatus = 'connected' | 'disconnected' | 'checking';
@@ -47,6 +49,8 @@ export function Header({
   isLocked,
   activeTab,
   setActiveTab,
+  residual,
+  tolerance,
 }: HeaderProps) {
   const connStatus = useBackendStatus();
 
@@ -123,9 +127,21 @@ export function Header({
           </div>
         )}
 
-        {/* Iterations badge */}
+        {/* Iterations & Residual badge */}
         {iterations > 1 && activeTab === 'calculator' && (
-          <span className="badge-info">{iterations} it.</span>
+          <div className="flex items-center gap-1.5">
+            <span className="badge-info">{iterations} it.</span>
+            <span
+              className={`px-2 py-0.5 rounded-full border text-[9px] font-mono font-semibold transition-all ${
+                residual > tolerance
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                  : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
+              }`}
+              title={residual > tolerance ? `Aviso: Resíduo de reciclo (${residual.toExponential(2)}) acima do limite configurado (${tolerance.toExponential(2)}).` : `Resíduo de reciclo: ${residual.toExponential(2)}`}
+            >
+              res: {residual.toExponential(2)}
+            </span>
+          </div>
         )}
 
         {/* Calculate button */}

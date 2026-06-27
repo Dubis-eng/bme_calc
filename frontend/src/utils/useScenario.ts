@@ -29,6 +29,10 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [savingActive, setSavingActive] = useState(false);
   const [years, setYears] = useState<{ id: number; active: boolean }[]>([]);
   const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
+  const [residual, setResidual] = useState<number>(0);
+  const [tolerance, setTolerance] = useState<number>(() => {
+    return parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5');
+  });
 
   const loadLocalFallback = () => {
     fetch('/memorial_de_calculo_balanco.json')
@@ -89,20 +93,30 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     }
   };
 
-  const triggerCalculate = async (varsList: Variable[]) => {
+  const triggerCalculate = async (varsList: Variable[], tolVal?: number) => {
     setCalculating(true);
     setConvergenceError(false);
     try {
-      const response = await axios.post('http://localhost:8000/api/calculate', { variables: varsList });
+      const response = await axios.post('http://localhost:8000/api/calculate', {
+        variables: varsList,
+        tolerance: tolVal ?? tolerance
+      });
       setResults(response.data.results);
       setConvergenceError(response.data.convergence_error);
       setIterations(response.data.iterations);
+      setResidual(response.data.residual || 0);
     } catch (err) {
       console.error(err);
       alert("Erro ao calcular.");
     } finally {
       setCalculating(false);
     }
+  };
+
+  const updateTolerance = (val: number) => {
+    setTolerance(val);
+    localStorage.setItem('bme_calc_tolerance', String(val));
+    triggerCalculate(variables, val);
   };
 
   const handleCalculate = () => triggerCalculate(variables);
@@ -239,6 +253,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     isLocked,
     years,
     months,
-    fetchYearsAndMonths
+    fetchYearsAndMonths,
+    residual,
+    tolerance,
+    updateTolerance
   };
 }

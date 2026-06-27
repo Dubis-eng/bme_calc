@@ -17,6 +17,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] [task-master.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/task-master.md)** — Lista sequencial e grafo de tarefas de todas as entregas do sistema.
 * **[DONE] feat-013-harvest-settings** — Cadastro Dinâmico de Anos Safra e Meses de Referência (Épico 6, Tarefa 6.3): tabelas `harvest_years`/`harvest_months`, API CRUD, modal de Configurações do Sistema ⚙️ e seletores dinâmicos.
 * **[DONE] Tarefa 6.2 (Editor Inteligente e Auditoria)** — Implementar realce e validação de sintaxe no editor, botão de auditoria para dependências e melhorias visuais.
+* **[DONE] Tarefa 6.4 (Tolerância de Reciclo e Filtros de Tipo)** — Adicionar configuração dinâmica de tolerância do solucionador, exibição contínua do resíduo e botões rápidos para filtragem por tipo de variável.
 
 
 

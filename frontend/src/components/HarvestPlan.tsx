@@ -22,6 +22,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   const [savingConfig, setSavingConfig] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSector, setSelectedSector] = useState<string>('TODOS');
+  const [activeTypeFilter, setActiveTypeFilter] = useState<string>('ALL');
   const [focusedVarId, setFocusedVarId] = useState<string | null>(null);
   const [weightSearchQuery, setWeightSearchQuery] = useState<string>('');
 
@@ -125,12 +126,16 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
   const filteredConsolidated = consolidationData.filter(item => {
     const matchesSearch = item.variable_id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch && (selectedSector === 'TODOS' || item.setor_id === selectedSector);
+    const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
+    const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
+    return matchesSearch && matchesSector && matchesType;
   });
 
   const filteredConfigs = variablesConfig.filter(item => {
     const matchesSearch = item.id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch && (selectedSector === 'TODOS' || item.setor_id === selectedSector);
+    const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
+    const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
+    return matchesSearch && matchesSector && matchesType;
   });
 
   return (
@@ -178,7 +183,30 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center space-x-3 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* Type Filter pills */}
+          <div className="flex items-center gap-1 bg-slate-900/60 p-1 border border-slate-800/60 rounded-lg">
+            {([
+              { id: 'ALL', label: 'Todos' },
+              { id: 'INPUT', label: 'INPUT' },
+              { id: 'OUTPUT', label: 'OUTPUT' },
+              { id: 'CENARIO', label: 'Cenário' },
+              { id: 'DERIVADA', label: 'Derivada' }
+            ] as const).map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setActiveTypeFilter(opt.id)}
+                className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase transition-all ${
+                  activeTypeFilter === opt.id
+                    ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
           <div className="relative flex-1 md:flex-initial">
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]">🔍</span>
             <input type="search" placeholder="Pesquisar variável..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 pr-3 py-1 input-field w-full md:w-48 focus:outline-none" />

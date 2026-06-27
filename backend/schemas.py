@@ -6,11 +6,13 @@ from database import ScenarioStatus
 
 class CalculateRequest(BaseModel):
     variables: List[Dict[str, Any]]
+    tolerance: Optional[float] = 0.0001
 
 class CalculateResponse(BaseModel):
     results: Dict[str, Any]
     convergence_error: bool
     iterations: int
+    residual: Optional[float] = 0.0
 
 class HarvestYearCreate(BaseModel):
     id: int

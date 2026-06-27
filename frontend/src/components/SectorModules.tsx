@@ -31,10 +31,15 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   onVariableChange,
   onNavigateToVariable
 }) => {
-  const sectorVariables = variables.filter(v => v.SETOR === activeSector);
+  const [activeTypeFilter, setActiveTypeFilter] = useState<'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA'>('ALL');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
   const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
+
+  const sectorVariables = variables.filter(v => {
+    if (v.SETOR !== activeSector) return false;
+    return activeTypeFilter === 'ALL' || v.TIPO === activeTypeFilter;
+  });
 
   const stages: Record<string, Record<string, Variable[]>> = {};
   sectorVariables.forEach(v => {
@@ -60,18 +65,33 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   });
 
   const stageNames = Object.keys(stages);
-  if (stageNames.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 glass-card text-slate-500">
-        <span className="text-2xl mb-3 opacity-40">◈</span>
-        <p className="text-sm font-semibold text-slate-400 mb-1">Setor sem variáveis</p>
-        <button onClick={() => onAddVariable(activeSector, 'GERAL')} className="btn-primary px-4 py-1.5 text-xs mt-4">+ Cadastrar Primeira Variável</button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4 relative">
+      {/* Type Filter Bar */}
+      <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/40 p-2 rounded-xl border border-slate-800/60">
+        <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Tipo:</span>
+        {([
+          { id: 'ALL', label: 'Todos' },
+          { id: 'INPUT', label: 'INPUT' },
+          { id: 'OUTPUT', label: 'OUTPUT' },
+          { id: 'CENARIO', label: 'Cenário' },
+          { id: 'DERIVADA', label: 'Derivada' }
+        ] as const).map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => setActiveTypeFilter(opt.id)}
+            className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+              activeTypeFilter === opt.id
+                ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm'
+                : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       {/* Floating Audit Card */}
       {auditVarId && (
         <div className="glass-card p-4 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-3 max-w-md w-full sticky top-0 z-40 animate-fade-in-up">
@@ -109,107 +129,117 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
       )}
 
       {/* Tables list */}
-      {stageNames.map(stageName => {
-        const isCollapsed = !!collapsedGroups[stageName];
-        const pcsInStage  = stages[stageName];
-        const totalVars   = Object.values(pcsInStage).reduce((acc, curr) => acc + curr.length, 0);
+      {stageNames.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 glass-card text-slate-500">
+          <span className="text-2xl mb-3 opacity-40">◈</span>
+          <p className="text-sm font-semibold text-slate-400 mb-1">Nenhuma variável encontrada</p>
+          {activeTypeFilter === 'ALL' && (
+            <button onClick={() => onAddVariable(activeSector, 'GERAL')} className="btn-primary px-4 py-1.5 text-xs mt-4">+ Cadastrar Primeira Variável</button>
+          )}
+        </div>
+      ) : (
+        stageNames.map(stageName => {
+          const isCollapsed = !!collapsedGroups[stageName];
+          const pcsInStage  = stages[stageName];
+          const totalVars   = Object.values(pcsInStage).reduce((acc, curr) => acc + curr.length, 0);
 
-        return (
-          <div key={stageName} className="glass-card overflow-hidden animate-fade-in-up">
-            <div className="px-5 py-3 flex justify-between items-center border-b border-slate-800/60 bg-slate-900/40">
-              <div className="flex items-center gap-3">
-                <button onClick={() => setCollapsedGroups(prev => ({ ...prev, [stageName]: !prev[stageName] }))} className="btn-ghost p-1 rounded text-slate-500">
-                  <BmeIcon name={isCollapsed ? 'chevron-right' : 'chevron-down'} size={10} />
-                </button>
-                <h3 className="text-[11px] font-bold text-slate-300 tracking-widest uppercase">{stageName}</h3>
-                <span className="badge-idle">{totalVars}</span>
+          return (
+            <div key={stageName} className="glass-card overflow-hidden animate-fade-in-up">
+              <div className="px-5 py-3 flex justify-between items-center border-b border-slate-800/60 bg-slate-900/40">
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setCollapsedGroups(prev => ({ ...prev, [stageName]: !prev[stageName] }))} className="btn-ghost p-1 rounded text-slate-500">
+                    <BmeIcon name={isCollapsed ? 'chevron-right' : 'chevron-down'} size={10} />
+                  </button>
+                  <h3 className="text-[11px] font-bold text-slate-300 tracking-widest uppercase">{stageName}</h3>
+                  <span className="badge-idle">{totalVars}</span>
+                </div>
+                <button onClick={() => onAddVariable(activeSector, stageName)} disabled={isLocked} className="text-[10px] font-semibold text-teal-500 hover:text-teal-300 disabled:text-slate-700 border border-teal-600/30 hover:border-teal-500/50 disabled:border-slate-800 rounded px-2.5 py-1 transition-all">+ Nova Variável</button>
               </div>
-              <button onClick={() => onAddVariable(activeSector, stageName)} disabled={isLocked} className="text-[10px] font-semibold text-teal-500 hover:text-teal-300 disabled:text-slate-700 border border-teal-600/30 hover:border-teal-500/50 disabled:border-slate-800 rounded px-2.5 py-1 transition-all">+ Nova Variável</button>
+
+              {!isCollapsed && (
+                <div className="divide-y divide-slate-800/40">
+                  {Object.keys(pcsInStage).map(pcName => {
+                    const varsInGroup = pcsInStage[pcName];
+                    return (
+                      <div key={pcName} data-group-name={pcName} className="flex flex-col">
+                        <div className="flex items-center gap-3 px-5 py-2 bg-slate-900/60 border-b border-slate-800/30">
+                          <span className="w-[3px] h-4 rounded-full bg-teal-500/70 shrink-0" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400">{pcName}</span>
+                        </div>
+
+                        <div className="bme-table-wrapper">
+                          <table className="bme-table">
+                            <thead>
+                              <tr className="bme-table-header-row">
+                                <th className="bme-table-header-cell w-28">ID</th>
+                                <th className="bme-table-header-cell">Descrição</th>
+                                <th className="bme-table-header-cell w-20">Tipo</th>
+                                <th className="bme-table-header-cell w-20">Unidade</th>
+                                <th className="bme-table-header-cell">Fórmula</th>
+                                <th className="bme-table-header-cell w-36 text-right">Valor</th>
+                                <th className="bme-table-header-cell w-20 text-center">Ações</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-800/30">
+                              {varsInGroup.map(v => {
+                                const id = v['ID - REF'], res = results[id];
+                                const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
+                                const isHighlight = highlightedVarId === id, isAuditedOrigin = auditVarId === id;
+                                const isAuditedDep = auditVarId !== null && internalAuditDeps.includes(id);
+
+                                return (
+                                  <tr key={id} data-var-id={id} className={`bme-table-row transition-all duration-200 ${isHighlight ? 'var-row-highlight' : ''} ${isAuditedOrigin ? 'bg-cyan-950/20 border-l-2 border-cyan-500' : ''} ${isAuditedDep ? 'bg-teal-950/20 border-l-2 border-teal-500 shadow-[inset_0_0_8px_rgba(20,184,166,0.1)]' : ''}`}>
+                                    <td className="bme-table-cell font-mono font-semibold text-teal-500 truncate max-w-[120px]" title={id}>{id}</td>
+                                    <td className="bme-table-cell text-slate-300 truncate max-w-[200px]" title={v['DESCRIÇÃO']}>{v['DESCRIÇÃO']}</td>
+                                    <td className="bme-table-cell"><span className={`px-2 py-0.5 inline-flex text-[9px] font-bold leading-4 rounded-full border ${TYPE_BADGE[v.TIPO] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}>{v.TIPO}</span></td>
+                                    <td className="bme-table-cell text-slate-500">{v['UNIDADE DE MEDIDA'] || '—'}</td>
+
+                                    {/* Formula */}
+                                    <td className="bme-table-cell text-slate-600 font-mono max-w-[160px] relative group">
+                                      {isInput ? <span className="text-slate-700">—</span> : (
+                                        <div className="flex items-center gap-1.5">
+                                          <span onClick={() => setActiveFormulaPopover({ varId: id, formula: String(v['EQUAÇÕES E VALORES']) })} className="truncate max-w-[110px] hover:text-teal-400 cursor-pointer transition-colors">{v['EQUAÇÕES E VALORES']}</span>
+                                          <div className="absolute left-0 bottom-full mb-1.5 hidden group-hover:block z-50 bg-slate-950 text-slate-300 font-mono text-[10px] p-2 rounded-lg border border-slate-800 shadow-xl max-w-xs whitespace-pre-wrap break-all pointer-events-none">{v['EQUAÇÕES E VALORES']}</div>
+                                          <button onClick={() => setAuditVarId(prev => prev === id ? null : id)} className={`p-1 rounded transition-colors ${isAuditedOrigin ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-600 hover:text-teal-400 hover:bg-slate-800/40'}`} title="Auditar fluxo de variáveis"><BmeIcon name="eye" size={10} /></button>
+                                        </div>
+                                      )}
+                                    </td>
+
+                                    {/* Value / Input (aligned right) */}
+                                    <td className="bme-table-cell font-mono font-bold text-right">
+                                      {isInput ? (
+                                        <div className="flex justify-end">
+                                          <input type="text" aria-label={`Valor para ${id}`} disabled={isLocked} value={String(v['EQUAÇÕES E VALORES'])} onChange={e => onVariableChange(id, e.target.value)} className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800" />
+                                        </div>
+                                      ) : (
+                                        res !== undefined ? (
+                                          res.status === 'OK' && res.value !== null ? (
+                                            <span className="text-slate-200 tabular-nums">{res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</span>
+                                          ) : (
+                                            <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[res.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`} title={res.error_message || res.status}>⚠ {res.status}</span>
+                                          )
+                                        ) : <span className="text-slate-700">—</span>
+                                      )}
+                                    </td>
+
+                                    <td className="bme-table-cell text-center flex items-center justify-center gap-1">
+                                      <button type="button" onClick={() => onEditVariable(v)} className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 p-1.5 rounded-md transition-all focus:outline-none"><BmeIcon name="pencil" /></button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-
-            {!isCollapsed && (
-              <div className="divide-y divide-slate-800/40">
-                {Object.keys(pcsInStage).map(pcName => {
-                  const varsInGroup = pcsInStage[pcName];
-                  return (
-                    <div key={pcName} data-group-name={pcName} className="flex flex-col">
-                      <div className="flex items-center gap-3 px-5 py-2 bg-slate-900/60 border-b border-slate-800/30">
-                        <span className="w-[3px] h-4 rounded-full bg-teal-500/70 shrink-0" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400">{pcName}</span>
-                      </div>
-
-                      <div className="bme-table-wrapper">
-                        <table className="bme-table">
-                          <thead>
-                            <tr className="bme-table-header-row">
-                              <th className="bme-table-header-cell w-28">ID</th>
-                              <th className="bme-table-header-cell">Descrição</th>
-                              <th className="bme-table-header-cell w-20">Tipo</th>
-                              <th className="bme-table-header-cell w-20">Unidade</th>
-                              <th className="bme-table-header-cell">Fórmula</th>
-                              <th className="bme-table-header-cell w-36 text-right">Valor</th>
-                              <th className="bme-table-header-cell w-20 text-center">Ações</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/30">
-                            {varsInGroup.map(v => {
-                              const id = v['ID - REF'], res = results[id];
-                              const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
-                              const isHighlight = highlightedVarId === id, isAuditedOrigin = auditVarId === id;
-                              const isAuditedDep = auditVarId !== null && internalAuditDeps.includes(id);
-
-                              return (
-                                <tr key={id} data-var-id={id} className={`bme-table-row transition-all duration-200 ${isHighlight ? 'var-row-highlight' : ''} ${isAuditedOrigin ? 'bg-cyan-950/20 border-l-2 border-cyan-500' : ''} ${isAuditedDep ? 'bg-teal-950/20 border-l-2 border-teal-500 shadow-[inset_0_0_8px_rgba(20,184,166,0.1)]' : ''}`}>
-                                  <td className="bme-table-cell font-mono font-semibold text-teal-500 truncate max-w-[120px]" title={id}>{id}</td>
-                                  <td className="bme-table-cell text-slate-300 truncate max-w-[200px]" title={v['DESCRIÇÃO']}>{v['DESCRIÇÃO']}</td>
-                                  <td className="bme-table-cell"><span className={`px-2 py-0.5 inline-flex text-[9px] font-bold leading-4 rounded-full border ${TYPE_BADGE[v.TIPO] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}>{v.TIPO}</span></td>
-                                  <td className="bme-table-cell text-slate-500">{v['UNIDADE DE MEDIDA'] || '—'}</td>
-
-                                  {/* Formula */}
-                                  <td className="bme-table-cell text-slate-600 font-mono max-w-[160px] relative group">
-                                    {isInput ? <span className="text-slate-700">—</span> : (
-                                      <div className="flex items-center gap-1.5">
-                                        <span onClick={() => setActiveFormulaPopover({ varId: id, formula: String(v['EQUAÇÕES E VALORES']) })} className="truncate max-w-[110px] hover:text-teal-400 cursor-pointer transition-colors">{v['EQUAÇÕES E VALORES']}</span>
-                                        <div className="absolute left-0 bottom-full mb-1.5 hidden group-hover:block z-50 bg-slate-950 text-slate-300 font-mono text-[10px] p-2 rounded-lg border border-slate-800 shadow-xl max-w-xs whitespace-pre-wrap break-all pointer-events-none">{v['EQUAÇÕES E VALORES']}</div>
-                                        <button onClick={() => setAuditVarId(prev => prev === id ? null : id)} className={`p-1 rounded transition-colors ${isAuditedOrigin ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-600 hover:text-teal-400 hover:bg-slate-800/40'}`} title="Auditar fluxo de variáveis"><BmeIcon name="eye" size={10} /></button>
-                                      </div>
-                                    )}
-                                  </td>
-
-                                  {/* Value / Input (aligned right) */}
-                                  <td className="bme-table-cell font-mono font-bold text-right">
-                                    {isInput ? (
-                                      <div className="flex justify-end">
-                                        <input type="text" aria-label={`Valor para ${id}`} disabled={isLocked} value={String(v['EQUAÇÕES E VALORES'])} onChange={e => onVariableChange(id, e.target.value)} className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800" />
-                                      </div>
-                                    ) : (
-                                      res !== undefined ? (
-                                        res.status === 'OK' && res.value !== null ? (
-                                          <span className="text-slate-200 tabular-nums">{res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</span>
-                                        ) : (
-                                          <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[res.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`} title={res.error_message || res.status}>⚠ {res.status}</span>
-                                        )
-                                      ) : <span className="text-slate-700">—</span>
-                                    )}
-                                  </td>
-
-                                  <td className="bme-table-cell text-center flex items-center justify-center gap-1">
-                                    <button type="button" onClick={() => onEditVariable(v)} className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 p-1.5 rounded-md transition-all focus:outline-none"><BmeIcon name="pencil" /></button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })
+      )}
 
       {/* Expanded Formula Popover Modal */}
       {activeFormulaPopover && (

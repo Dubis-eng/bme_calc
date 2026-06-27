@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-06-27
+
+### Added
+- **Editor de Fórmulas Inteligente (`FormulaEditor.tsx`)**: Novo componente editor de texto com realce de sintaxe em tempo real (sobrepondo textarea transparente e div estilizada) e validação sintática (parênteses desbalanceados e identificação de variáveis inexistentes/desconhecidas).
+- **Indicador de Divergência Contínuo no Header**: Exibição em tempo real do resíduo de malha (`max_delta`) retornado pelo solucionador backend na tag de iterações do `Header` (exibido em amarelo/laranja em caso de desvio acima da tolerância).
+- **Configuração de Tolerância do Solucionador**: Adicionada a aba "Solucionador" nas Configurações do Sistema (`SystemSettingsModal.tsx`) permitindo definir a tolerância de convergência limite do simulador, salva no `localStorage` do navegador e repassada dinamicamente ao backend.
+- **Botões Rápidos de Filtro de Tipos (Pills)**: Filtros rápidos para alternar instantaneamente entre os tipos de variáveis (`Todos`, `INPUT`, `OUTPUT`, `CENÁRIO` e `DERIVADA`) na barra de ferramentas do Plano de Safra (`HarvestPlan.tsx`) e no topo do painel da Calculadora (`SectorModules.tsx`).
+
+### Changed
+- **Resolvedor do Backend Parametrizável (`engine.py` / `schemas.py` / `main.py`)**: Atualização do endpoint `/api/calculate` para aceitar um parâmetro opcional `tolerance` e aplicar esse limite como critério de parada na convergência de ciclos de reciclos, além de retornar a chave `"residual"` com o valor final de `max_delta`.
+- **Exibição de Valores Alinhados à Direita**: Alinhamento numérico (`text-right`) padronizado na coluna de Valor e nos inputs na tabela de variáveis.
+- **Visualização de Fórmula Expandida**: Inclusão de tooltip nativo no hover da fórmula e modal/popover completo no clique da célula de fórmula com botão de cópia rápida.
+
 ## [2.5.0] - 2026-06-27
 
 ### Added

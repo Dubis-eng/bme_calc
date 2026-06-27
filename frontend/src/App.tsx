@@ -47,7 +47,8 @@ function App() {
     hasUnsavedChanges, savingActive,
     handleChange, handleCalculate, onLoadScenario, handleSaveNew,
     handleSaveActive, onApplyOptimalValue, handleSaveVariable, isLocked,
-    years, months, fetchYearsAndMonths
+    years, months, fetchYearsAndMonths,
+    residual, tolerance, updateTolerance
   } = useScenario(sectors, fetchSectors);
 
   const search = useSearch(variables);
@@ -121,6 +122,8 @@ function App() {
         isLocked={isLocked}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        residual={residual}
+        tolerance={tolerance}
       />
 
       {activeTab === 'flowchart' && (
@@ -251,7 +254,7 @@ function App() {
       <GoalSeekModal isOpen={isGoalSeekOpen} onClose={() => setIsGoalSeekOpen(false)} variables={variables} onApplyOptimalValue={onApplyOptimalValue} />
       <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} />
       <SearchPanel isOpen={search.isSearchPanelOpen} query={search.searchQuery} results={searchResults} onClose={search.closeSearchPanel} onScrollTo={onScrollTo} onEdit={onSearchEdit} />
-      <SystemSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} years={years} months={months} fetchYearsAndMonths={fetchYearsAndMonths} />
+      <SystemSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} years={years} months={months} fetchYearsAndMonths={fetchYearsAndMonths} tolerance={tolerance} onUpdateTolerance={updateTolerance} />
     </div>
   );
 }

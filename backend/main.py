@@ -54,8 +54,13 @@ def on_startup():
 @app.post("/api/calculate", response_model=CalculateResponse)
 def calculate(req: CalculateRequest):
     try:
-        res_data = engine.calculate_state(req.variables)
-        return CalculateResponse(results=res_data["results"], convergence_error=res_data["convergence_error"], iterations=res_data["iterations"])
+        res_data = engine.calculate_state(req.variables, tolerance=req.tolerance)
+        return CalculateResponse(
+            results=res_data["results"],
+            convergence_error=res_data["convergence_error"],
+            iterations=res_data["iterations"],
+            residual=res_data.get("residual", 0.0)
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

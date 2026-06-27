@@ -96,7 +96,7 @@ def extract_dependencies(eq_str: str) -> set:
     except Exception:
         return set(re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*', eq_str))
 
-def calculate_state(variables_list):
+def calculate_state(variables_list, tolerance=0.0001):
     state = {}
     graph = nx.DiGraph()
     formulas = {}
@@ -133,6 +133,7 @@ def calculate_state(variables_list):
         
     convergence_error = False
     iterations = 0
+    max_delta = Decimal('0')
     
     if has_cycle:
         for i in range(100):
@@ -151,7 +152,7 @@ def calculate_state(variables_list):
                         delta = abs(new_val - old_val)
                         if delta > max_delta: max_delta = delta
                     except: pass
-            if max_delta < Decimal('0.0001'): break
+            if max_delta < Decimal(str(tolerance)): break
         else:
             convergence_error = True
     else:
@@ -175,6 +176,7 @@ def calculate_state(variables_list):
     return {
         "results": rounded_results,
         "convergence_error": convergence_error,
-        "iterations": iterations
+        "iterations": iterations,
+        "residual": float(max_delta)
     }
 

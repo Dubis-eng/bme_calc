@@ -9,6 +9,8 @@ interface SystemSettingsModalProps {
   years: { id: number; active: boolean }[];
   months: { id: number; name: string; order_index: number; enabled: boolean }[];
   fetchYearsAndMonths: () => void;
+  tolerance: number;
+  onUpdateTolerance: (val: number) => void;
 }
 
 export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
@@ -16,12 +18,15 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
   onClose,
   years,
   months,
-  fetchYearsAndMonths
+  fetchYearsAndMonths,
+  tolerance,
+  onUpdateTolerance
 }) => {
-  const [activeTab, setActiveTab] = useState<'years' | 'months' | 'cycle'>('years');
+  const [activeTab, setActiveTab] = useState<'years' | 'months' | 'cycle' | 'solver'>('years');
   const [newYear, setNewYear] = useState<number>(2029);
   const [savingYear, setSavingYear] = useState(false);
   const [savingCycle, setSavingCycle] = useState(false);
+  const [localTolerance, setLocalTolerance] = useState<string>(String(tolerance));
   const [startMonth, setStartMonth] = useState<string>(
     months.find(m => m.order_index === 0)?.name || 'Abril'
   );
@@ -127,7 +132,7 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-slate-800 bg-slate-900/40">
-          {(['years', 'months', 'cycle'] as const).map(tab => (
+          {(['years', 'months', 'cycle', 'solver'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -137,7 +142,7 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
                   : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/5'
               }`}
             >
-              {tab === 'years' ? 'Anos Safra' : tab === 'months' ? 'Meses de Referência' : 'Início do Ciclo'}
+              {tab === 'years' ? 'Anos' : tab === 'months' ? 'Meses' : tab === 'cycle' ? 'Ciclo' : 'Solucionador'}
             </button>
           ))}
         </div>
@@ -252,6 +257,23 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
                 >
                   {savingCycle ? 'Salvando...' : 'Salvar Mês de Início'}
                 </button>
+              </div>
+            </div>
+          )}
+          {activeTab === 'solver' && (
+            <div className="space-y-4">
+              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800/40 space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Tolerância de Resíduo de Reciclo</label>
+                  <input type="text" value={localTolerance} onChange={(e) => setLocalTolerance(e.target.value)} className="w-full input-field rounded-lg p-2 text-sm font-semibold font-mono text-slate-200" placeholder="Ex: 1e-5" />
+                  <p className="text-[10px] text-slate-500 mt-1">Determina o critério de convergência para o balanço de malhas fechadas. Valores menores aumentam a precisão do cálculo.</p>
+                </div>
+                <button onClick={() => {
+                  const parsed = parseFloat(localTolerance);
+                  if (isNaN(parsed) || parsed <= 0) { alert('Insira um número maior que zero (ex: 1e-5).'); return; }
+                  onUpdateTolerance(parsed);
+                  alert('Tolerância atualizada com sucesso!');
+                }} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs transition-colors shadow-sm">Salvar Tolerância</button>
               </div>
             </div>
           )}
