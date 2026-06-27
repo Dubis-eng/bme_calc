@@ -59,7 +59,7 @@ graph TD
 > Status: **PENDENTE** — Aguardando retomada na próxima sessão.
 
 * [x] **Tarefa 6.1** *(Busca de Variável)* — Implementar barra de pesquisa global para localizar variáveis por ID, Descrição ou Definição em tempo real. Indispensável para navegar rapidamente no universo de +1000 variáveis ao montar ou revisar equações.
-* [ ] **Tarefa 6.2** *(Método Padronizado de Equações)* — Criar painel ou guia embutido na interface com as regras e sintaxe padrão aceitas pelo motor AST (ex: operadores válidos, funções suportadas `SE`, `SOMA`, `PROCV`, `LN`, nomes de variáveis permitidos). Reduzir erros de digitação de fórmulas.
+* [x] **Tarefa 6.2** *(Editor Inteligente, Auditoria e Melhorias Visuais)* — Implementar realce e validação de sintaxe no editor, botão de auditoria para rastrear dependências e melhorias visuais como tooltips e alinhamento numérico.
 * [x] **Tarefa 6.3** *(Cadastro de Meses e Anos de Referência)* — Migrar o seletor estático de Ano Safra/Mês Referência para um cadastro dinâmico persistido no banco PostgreSQL, com suporte a calendário real de safra (meses de operação configuráveis por unidade). Base para o acompanhamento histórico e projeções futuras por período.
 
 ---

@@ -215,6 +215,7 @@ function App() {
                     onEditVariable={handleEditVariable}
                     onAddVariable={handleAddVariable}
                     onVariableChange={handleChange}
+                    onNavigateToVariable={onScrollTo}
                   />
                 </div>
               </div>

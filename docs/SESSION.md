@@ -3,16 +3,15 @@
 > Last updated: 2026-06-27
 
 ## Status
-- Status: COMMITTED
-- Última Sessão: Refatoração Visual e Padronização do Design System no Frontend (BME Calc Theme Overhaul)
+- Status: ACCEPTED
+- Última Sessão: Editor de Fórmulas Inteligente, Auditoria de Dependências e Melhorias Visuais (Tarefa 6.2)
 - Entregues:
-  - Criação do módulo global de design system TypeScript `src/theme/design-system.tsx` centralizando estilos de badges, cores e o componente `<BmeIcon />` para ícones SVG semânticos.
-  - Implementação de classes CSS semânticas estruturais em `index.css` via `@apply` (`.bme-table*` e `.bme-modal*`).
-  - Refatoração completa de 10 componentes e modais para usar o design system unificado, eliminando estilizações Tailwind duplicadas ou com cores claras legadas.
-  - Modularização do componente `HarvestPlan.tsx` (que tinha 625 linhas) em 3 componentes menores (`HarvestPlan.tsx`, `HarvestPlanTable.tsx` e `HarvestPlanConfigTable.tsx`) para cumprir a regra constitucional P0 de limite de 300 linhas por arquivo.
-  - Correção de erro de compilação estrita em `VariableModal` na tipagem da interface `Variable`.
-  - Validação bem-sucedida de tipos (`npx tsc --noEmit`) e compilação do build de produção otimizado (`npm run build`).
+  - Criação do componente `FormulaEditor.tsx` com realce de sintaxe em tempo real (sobrepondo textarea transparente e div estilizada) e validação sintática (parênteses desbalanceados e variáveis desconhecidas).
+  - Integração do `FormulaEditor` no `VariableModal.tsx`, exibindo avisos e impedindo envios com erros críticos.
+  - Implementação de auditoria visual de dependências (botão `eye` no fluxo de fórmulas) em `SectorModules.tsx` destacando as linhas alimentadoras do setor ativo e exibindo dependências externas com links de navegação entre setores.
+  - Alinhamento numérico à direita na coluna de valores e tooltips/popovers flutuantes no hover/clique da célula de fórmula.
+  - Refatoração de `design-system.tsx` e `SectorModules.tsx` mantendo os arquivos abaixo do limite constitucional de 300 linhas físicas.
 - Próximos Passos:
-  1. Tarefa 6.2 — Criar painel de referência de sintaxe do motor AST no frontend.
+  - Backlog geral de usabilidade do Épico 6.
 
 

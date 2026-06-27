@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Variable } from '../types';
 import { useEquationAutocomplete } from '../utils/useEquationAutocomplete';
 import { EquationDropdown } from './EquationDropdown';
+import { FormulaEditor } from './FormulaEditor';
 import { BmeIcon } from '../theme/design-system';
 
 interface VariableModalProps {
@@ -36,8 +37,10 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   const [unit, setUnit] = useState('');
   const [equationValue, setEquationValue] = useState('');
   const [error, setError] = useState('');
+  const [isFormulaValid, setIsFormulaValid] = useState(true);
+  const [formulaError, setFormulaError] = useState<string | null>(null);
 
-  const equationInputRef = useRef<HTMLInputElement>(null);
+  const equationInputRef = useRef<HTMLTextAreaElement>(null);
   const ac = useEquationAutocomplete(variables);
 
   // Initialize fields on open or change of variableToEdit
@@ -77,6 +80,11 @@ export const VariableModal: React.FC<VariableModalProps> = ({
     const formattedId = idRef.trim().toUpperCase();
     if (!formattedId) {
       setError('ID de referência é obrigatório.');
+      return;
+    }
+
+    if (!isFormulaValid) {
+      setError(formulaError || 'A fórmula possui erros críticos de validação.');
       return;
     }
 
@@ -197,21 +205,22 @@ export const VariableModal: React.FC<VariableModalProps> = ({
                 <input id="var-unit" type="text" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Ex: rpm" className="input-field p-2 text-xs font-medium" required />
               </div>
               <div className="flex flex-col col-span-1 md:col-span-3 relative">
-                <label htmlFor="var-eq" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">
+                <label className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">
                   {(type === 'INPUT' || type === 'CENARIO') ? 'Valor Estático / Equação Inicial' : 'Equação / Fórmula'}
                 </label>
-                <input
-                  id="var-eq"
-                  ref={equationInputRef}
-                  type="text"
+                <FormulaEditor
                   value={equationValue}
+                  onChange={(val) => {
+                    setEquationValue(val);
+                    const cursor = equationInputRef.current?.selectionStart ?? val.length;
+                    ac.handleInputChange(val, cursor);
+                  }}
                   placeholder={(type === 'INPUT' || type === 'CENARIO') ? 'Ex: 6' : 'Ex: =MOENDA_RPM * 1.5'}
-                  className="input-field p-2 text-xs font-mono"
-                  required
-                  onChange={(e) => {
-                    const cursor = e.target.selectionStart ?? e.target.value.length;
-                    setEquationValue(e.target.value);
-                    ac.handleInputChange(e.target.value, cursor);
+                  variables={variables}
+                  isLocked={false}
+                  onValidationChange={(isValid, errorMsg) => {
+                    setIsFormulaValid(isValid);
+                    setFormulaError(errorMsg);
                   }}
                   onKeyDown={(e) => {
                     const cursor = equationInputRef.current?.selectionStart ?? equationValue.length;
@@ -224,7 +233,7 @@ export const VariableModal: React.FC<VariableModalProps> = ({
                     }
                   }}
                   onBlur={() => setTimeout(ac.dismiss, 150)}
-                  autoComplete="off"
+                  inputRef={equationInputRef}
                 />
                 <EquationDropdown
                   isOpen={ac.isOpen}

@@ -89,7 +89,7 @@ export function useEquationAutocomplete(variables: Variable[]) {
   };
 
   const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
     formula: string,
     cursor: number,
   ): InjectionResult | null => {
