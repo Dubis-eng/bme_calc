@@ -12,6 +12,10 @@ from services_variables import (
     create_variable,
     update_variable
 )
+from services_substitution import (
+    get_substitution_preview,
+    confirm_variable_substitution
+)
 from services_harvest_plan import (
     get_ordered_months,
     get_harvest_years,

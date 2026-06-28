@@ -106,6 +106,7 @@ export function StatusDashboard({ sectors, variables, results, onSectorClick }: 
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
+              aria-label={`Filtrar por ${tab.label}`}
               className={`px-3 py-1 rounded text-[11px] font-semibold transition-all ${
                 filter === tab.id
                   ? 'bg-teal-600/20 text-teal-400 border border-teal-500/30'

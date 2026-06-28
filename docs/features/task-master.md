@@ -107,6 +107,14 @@ graph TD
 * [x] **Tarefa 12.3** *(Interface do Plano de Safra)* — Criar aba dedicada "Plano de Safra" no frontend contendo painéis para visualização multi-anual dos cenários aprovados e configuração de variáveis (com autocompletar inteligente para seleção de pesos).
 * [x] **Tarefa 12.4** *(Testes e Homologação)* — Implementar testes unitários e de integração abrangentes em `backend/test_harvest_plan.py` validando os operadores de agregação (`SUM`, `AVERAGE`, `WEIGHTED_AVERAGE`, `CALCULATE`) e o fluxo de alteração de mês inicial.
 
+### Épico 14: Substituição Inteligente de Variáveis (CONCLUÍDO)
+
+* [x] **Tarefa 14.1** *(Motor de Substituição Baseado em Regex e Parênteses de Precedência)* — Implementar rotina de substituição de variáveis com regex resiliente que preserva a formatação Excel (vírgula decimal e ponto-e-vírgula).
+* [x] **Tarefa 14.2** *(Endpoints de API)* — Criar `/replace-preview` e `/replace-confirm` com suporte a `replacement_expr` customizado e detecção de variáveis órfãs.
+* [x] **Tarefa 14.3** *(Interface e UX do Modal)* — Desenvolver `<SubstitutionModal />` com árvore de dependências e overlay de checklist animado de 4 etapas para processamentos demorados.
+* [x] **Tarefa 14.4** *(Otimização de Performance)* — Implementar cache em memória e resolução antecipada de dependências para modelos de grande escala (+1000 variáveis).
+* [x] **Tarefa 14.5** *(Qualidade e Validação)* — Suite de testes pytest completa de substituição com 100% de cobertura nos cenários críticos.
+
 ---
 
 ## 🛠️ Infraestrutura & DevOps

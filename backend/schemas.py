@@ -146,3 +146,28 @@ class HarvestPlanSelectionsResponse(BaseModel):
     selections: List[Dict[str, Any]]
     available_scenarios: Dict[str, List[AvailableScenarioInfo]]
 
+class SubstitutionPreviewRequest(BaseModel):
+    recursive: bool
+    replacement_expr: Optional[str] = None
+
+class SubstitutionAffectedItem(BaseModel):
+    variable_id: str
+    nome: str
+    setor_id: str
+    expression_before: str
+    expression_after: str
+
+class SubstitutionPreviewResponse(BaseModel):
+    affected: List[SubstitutionAffectedItem]
+    becomes_unused: bool
+
+class SubstitutionConfirmRequest(BaseModel):
+    recursive: bool
+    action_unused: Optional[str] = None # 'archive', 'delete', or null/None
+    replacement_expr: Optional[str] = None
+
+class SubstitutionConfirmResponse(BaseModel):
+    affected_count: int
+    becomes_unused: bool
+
+

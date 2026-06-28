@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-06-27
+
+### Added
+- **Substituição Inteligente de Variáveis nas Equações (Épico 14)**:
+  - Motor de substituição baseado em Regex e parênteses de precedência para propagar a fórmula de uma variável nas equações que dependem dela com máxima fidelidade matemática.
+  - Suporte a substituição recursiva (em cascata) ao longo de todo o grafo topológico descendente de dependências.
+  - Endpoints de API `/api/variables/{id}/replace-preview` e `/api/variables/{id}/replace-confirm` para simulação e confirmação das substituições.
+  - Modal do Frontend `<SubstitutionModal />` para visualização "Antes e Depois" do impacto em fórmulas ativas e ações para lidar com variáveis órfãs (Arquivamento lógico/descontinuação ou Exclusão física).
+  - **Otimização de Performance em Larga Escala (>1000 variáveis)**: Cache em memória e pré-resolução de dependências para evitar queries N+1, reduzindo a latência de ~1.5 minuto para milissegundos.
+  - **Visual de Espera e Feedback (UI/UX)**: Overlay bloqueante de confirmação com pipeline de 4 etapas animado e carregamento em pulse skeletons na tabela de preview de impactos.
+  - **Suporte a Fórmulas Customizadas e Prevenção de Bad Request (400)**: Passagem de `replacement_expr` na requisição para permitir a simulação e substituição de expressões em digitação na UI antes de salvar no banco, corrigindo erros de variáveis sem equações cadastradas (entradas ou descontinuadas).
+
+### Fixed
+- **Substituição Segura de Expressões Excel**: Alterado o motor para regex para preservar formatações locais do Excel (como vírgulas de decimais e ponto-e-vírgulas), evitando que o compilador Python gerasse espaços indevidos (ex: `0, 998` em vez de `0,998` interpretado como tupla).
+- **Normalização de Espaço Inicial nas Equações**: Adicionado `.strip()` no tratamento de fórmulas para prevenir erros de indentação inesperada (`unexpected indent`) ao processar equações salvas com espaço inicial (ex: `= J786`).
+- **Memorial de Cálculo Original**: Corrigidas as 21 equações no arquivo JSON de sementes (`memorial_de_calculo_balanco.json`) que possuíam espaços após o sinal de igual, eliminando erros de compilação AST logo no startup do banco.
+
 ## [2.6.0] - 2026-06-27
 
 ### Added

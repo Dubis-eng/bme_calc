@@ -40,6 +40,7 @@ function App() {
   useEffect(() => { fetchSectors(); }, []);
 
   const {
+    reloadCurrentScenario,
     variables, results, loading, calculating, convergenceError, iterations,
     activeSector, setActiveSector,
     currentScenario, setCurrentScenario,
@@ -252,7 +253,7 @@ function App() {
       )}
 
       <GoalSeekModal isOpen={isGoalSeekOpen} onClose={() => setIsGoalSeekOpen(false)} variables={variables} onApplyOptimalValue={onApplyOptimalValue} />
-      <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} />
+      <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} onSubstitutionSuccess={reloadCurrentScenario} />
       <SearchPanel isOpen={search.isSearchPanelOpen} query={search.searchQuery} results={searchResults} onClose={search.closeSearchPanel} onScrollTo={onScrollTo} onEdit={onSearchEdit} />
       <SystemSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} years={years} months={months} fetchYearsAndMonths={fetchYearsAndMonths} tolerance={tolerance} onUpdateTolerance={updateTolerance} />
     </div>
