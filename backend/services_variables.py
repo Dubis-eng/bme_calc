@@ -111,7 +111,7 @@ def _update_variable_equation(var_id: str, new_eq_val: str, db_var: Variable, db
         db.add(db_dep)
 
 def list_variables(db: Session) -> List[Dict[str, Any]]:
-    db_vars = db.exec(select(Variable)).all()
+    db_vars = db.exec(select(Variable).where(Variable.status != VariableStatus.INATIVA)).all()
     eqs = db.exec(select(Equation).where(Equation.status == "ativa")).all()
     eq_map = {eq.variable_id: eq.expression_original for eq in eqs}
     

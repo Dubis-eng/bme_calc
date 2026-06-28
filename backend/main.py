@@ -26,6 +26,7 @@ from schemas import (
     VariableDetail,
     HarvestPlanSettingUpdate,
     BulkHarvestPlanConfigUpdate,
+    VariableHarvestPlanConfig,
     HarvestYearCreate,
     HarvestYearRead,
     HarvestMonthRead,
@@ -217,6 +218,16 @@ def update_harvest_plan_config_endpoint(req: BulkHarvestPlanConfigUpdate, db=Dep
     try:
         # Convert configs to list of dicts for service
         configs_list = [c.dict() for c in req.configs]
+        services.update_variables_harvest_config(configs_list, db)
+        return {"success": True, "message": "Configurações atualizadas com sucesso."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/harvest-plan/config")
+def update_harvest_plan_config_direct_endpoint(req: List[VariableHarvestPlanConfig], db=Depends(get_session)):
+    try:
+        # Convert configs to list of dicts for service
+        configs_list = [c.dict() for c in req]
         services.update_variables_harvest_config(configs_list, db)
         return {"success": True, "message": "Configurações atualizadas com sucesso."}
     except Exception as e:

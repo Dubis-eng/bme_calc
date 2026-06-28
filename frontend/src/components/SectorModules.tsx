@@ -33,11 +33,13 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
 }) => {
   const [activeTypeFilter, setActiveTypeFilter] = useState<'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA'>('ALL');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [showInactive, setShowInactive] = useState(false);
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
   const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
 
   const sectorVariables = variables.filter(v => {
     if (v.SETOR !== activeSector) return false;
+    if (v.STATUS === 'inativa' && !showInactive) return false;
     return activeTypeFilter === 'ALL' || v.TIPO === activeTypeFilter;
   });
 
@@ -90,6 +92,17 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
             {opt.label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setShowInactive(prev => !prev)}
+          className={`ml-auto px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+            showInactive
+              ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30 shadow-sm'
+              : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
+          }`}
+        >
+          {showInactive ? 'Ocultar Inativas' : 'Mostrar Inativas'}
+        </button>
       </div>
 
       {/* Floating Audit Card */}
@@ -186,12 +199,16 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                 const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
                                 const isHighlight = highlightedVarId === id, isAuditedOrigin = auditVarId === id;
                                 const isAuditedDep = auditVarId !== null && internalAuditDeps.includes(id);
+                                const isInactive = v.STATUS === 'inativa';
 
                                 return (
-                                  <tr key={id} data-var-id={id} className={`bme-table-row transition-all duration-200 ${isHighlight ? 'var-row-highlight' : ''} ${isAuditedOrigin ? 'bg-cyan-950/20 border-l-2 border-cyan-500' : ''} ${isAuditedDep ? 'bg-teal-950/20 border-l-2 border-teal-500 shadow-[inset_0_0_8px_rgba(20,184,166,0.1)]' : ''}`}>
+                                  <tr key={id} data-var-id={id} className={`bme-table-row transition-all duration-200 ${isHighlight ? 'var-row-highlight' : ''} ${isAuditedOrigin ? 'bg-cyan-950/20 border-l-2 border-cyan-500' : ''} ${isAuditedDep ? 'bg-teal-950/20 border-l-2 border-teal-500 shadow-[inset_0_0_8px_rgba(20,184,166,0.1)]' : ''} ${isInactive ? 'opacity-40 italic bg-slate-950/20' : ''}`}>
                                     <td className="bme-table-cell font-mono font-semibold text-teal-500 truncate max-w-[120px]" title={id}>{id}</td>
                                     <td className="bme-table-cell text-slate-300 truncate max-w-[200px]" title={v['DESCRIÇÃO']}>{v['DESCRIÇÃO']}</td>
-                                    <td className="bme-table-cell"><span className={`px-2 py-0.5 inline-flex text-[9px] font-bold leading-4 rounded-full border ${TYPE_BADGE[v.TIPO] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}>{v.TIPO}</span></td>
+                                    <td className="bme-table-cell">
+                                      <span className={`px-2 py-0.5 inline-flex text-[9px] font-bold leading-4 rounded-full border ${TYPE_BADGE[v.TIPO] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`}>{v.TIPO}</span>
+                                      {isInactive && <span className="ml-1 px-1.5 py-0.5 inline-flex text-[8px] font-semibold leading-3 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">Inativa</span>}
+                                    </td>
                                     <td className="bme-table-cell text-slate-500">{v['UNIDADE DE MEDIDA'] || '—'}</td>
 
                                     {/* Formula */}
@@ -209,7 +226,7 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                     <td className="bme-table-cell font-mono font-bold text-right">
                                       {isInput ? (
                                         <div className="flex justify-end">
-                                          <input type="text" aria-label={`Valor para ${id}`} disabled={isLocked} value={String(v['EQUAÇÕES E VALORES'])} onChange={e => onVariableChange(id, e.target.value)} className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800" />
+                                          <input type="text" aria-label={`Valor para ${id}`} disabled={isLocked || isInactive} value={String(v['EQUAÇÕES E VALORES'])} onChange={e => onVariableChange(id, e.target.value)} className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800" />
                                         </div>
                                       ) : (
                                         res !== undefined ? (
@@ -223,7 +240,7 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                     </td>
 
                                     <td className="bme-table-cell text-center flex items-center justify-center gap-1">
-                                      <button type="button" onClick={() => onEditVariable(v)} className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 p-1.5 rounded-md transition-all focus:outline-none"><BmeIcon name="pencil" /></button>
+                                      <button type="button" disabled={isLocked || isInactive} onClick={() => onEditVariable(v)} className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 disabled:opacity-35 disabled:hover:bg-transparent p-1.5 rounded-md transition-all focus:outline-none"><BmeIcon name="pencil" /></button>
                                     </td>
                                   </tr>
                                 );

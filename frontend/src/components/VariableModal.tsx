@@ -33,7 +33,7 @@ export const VariableModal: React.FC<VariableModalProps> = ({
 
   const [idRef, setIdRef] = useState('');
   const [type, setType] = useState<'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO'>('INPUT');
-  const [status, setStatus] = useState<'ativa' | 'pendente' | 'inválida' | 'descontinuada'>('ativa');
+  const [status, setStatus] = useState<'ativa' | 'pendente' | 'inválida' | 'inativa'>('ativa');
   const [sector, setSector] = useState('');
   const [etapa, setEtapa] = useState('');
   const [pontoControle, setPontoControle] = useState('');
@@ -171,11 +171,11 @@ export const VariableModal: React.FC<VariableModalProps> = ({
               </div>
               <div className="flex flex-col">
                 <label htmlFor="var-status" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Status</label>
-                <select id="var-status" value={status} onChange={(e) => setStatus(e.target.value as 'ativa' | 'pendente' | 'inválida' | 'descontinuada')} className="input-field p-2 text-xs font-semibold">
+                <select id="var-status" value={status} onChange={(e) => setStatus(e.target.value as 'ativa' | 'pendente' | 'inválida' | 'inativa')} className="input-field p-2 text-xs font-semibold">
                   <option value="ativa">Ativa</option>
                   <option value="pendente">Pendente</option>
                   <option value="inválida">Inválida</option>
-                  <option value="descontinuada">Descontinuada</option>
+                  <option value="inativa">Inativa</option>
                 </select>
               </div>
             </div>

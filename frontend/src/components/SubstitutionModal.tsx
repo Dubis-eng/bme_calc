@@ -246,7 +246,7 @@ export const SubstitutionModal: React.FC<SubstitutionModalProps> = ({
                 {(['archive', 'delete', 'none'] as const).map((val) => (
                   <label key={val} className="flex items-center gap-2 cursor-pointer text-slate-300">
                     <input type="radio" name="actionUnused" checked={actionUnused === val} onChange={() => setActionUnused(val)} className="text-teal-600 focus:ring-teal-600 bg-slate-950 border-slate-800" />
-                    {val === 'archive' && "Arquivar Variável (Muda status para 'descontinuada' e desativa sua fórmula)"}
+                    {val === 'archive' && "Arquivar Variável (Muda status para 'inativa' e desativa sua fórmula)"}
                     {val === 'delete' && 'Excluir permanentemente (Remove do banco de dados, histórico de resultados e tabelas associadas)'}
                     {val === 'none' && "Manter Ativa (Será mantida como variável de entrada 'INPUT')"}
                   </label>

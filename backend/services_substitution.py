@@ -181,7 +181,10 @@ def confirm_variable_substitution(target_var_id: str, recursive: bool, action_un
         if action == "archive":
             db_var = variables_map.get(target_var_id)
             if db_var:
-                db_var.status = VariableStatus.DESCONTINUADA
+                db_var.status = VariableStatus.INATIVA
+                db_var.in_harvest_plan = False
+                db_var.harvest_plan_op = None
+                db_var.harvest_plan_weight_var_id = None
                 db.add(db_var)
                 active_eqs = db.exec(select(Equation).where(Equation.variable_id == target_var_id, Equation.status == "ativa")).all()
                 for eq in active_eqs:
