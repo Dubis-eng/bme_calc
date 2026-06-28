@@ -115,6 +115,13 @@ graph TD
 * [x] **Tarefa 14.4** *(Otimização de Performance)* — Implementar cache em memória e resolução antecipada de dependências para modelos de grande escala (+1000 variáveis).
 * [x] **Tarefa 14.5** *(Qualidade e Validação)* — Suite de testes pytest completa de substituição com 100% de cobertura nos cenários críticos.
 
+### Épico 15: Segregação de Variáveis Inativas (CONCLUÍDO)
+
+* [x] **Tarefa 15.1** *(Terminologia de Inativa)* — Renomear o status de `DESCONTINUADA` para `INATIVA` em todas as camadas (banco de dados, serviços backend, testes e frontend).
+* [x] **Tarefa 15.2** *(Filtro no Backend)* — Filtrar variáveis inativas nas APIs de listagem geral e de configuração do plano de safra, mas mantendo o retorno no carregamento de cenários com o campo `"STATUS"`.
+* [x] **Tarefa 15.3** *(Exibição e Controle)* — Criar toggle "Mostrar Inativas" no frontend, filtrar variáveis inativas no setor e renderizar inativas visíveis com estilo desbotado/itálico e inputs desabilitados.
+* [x] **Tarefa 15.4** *(Ajustes no Plano de Safra)* — Resetar automaticamente a participação no Plano de Safra (`in_harvest_plan = False` e configurações associadas) no momento em que a variável é inativada (arquivada).
+
 ---
 
 ## 🛠️ Infraestrutura & DevOps
