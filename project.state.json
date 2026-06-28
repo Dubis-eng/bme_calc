@@ -1,7 +1,7 @@
 {
   "$schema": "antigravity_sdd_v2",
   "project_status": {
-    "current_phase": "5_INTEGRATION_GATE",
+    "current_phase": "4_SURGICAL_EXECUTION",
     "execution_locked": false
   },
   "phase_gates": {
@@ -17,45 +17,33 @@
   },
   "atomic_tasks": [
     {
-      "id": "TASK-1101",
-      "description": "Sincronizar arquivos json nas pastas do projeto",
-      "scope": "backend/seeding.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1102",
-      "description": "Purga de dados legados do banco de dados no startup",
-      "scope": "backend/seeding.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1103",
-      "description": "Ajustar interpretador engine.py para o prefixo J de variáveis e densidade J270",
+      "id": "TASK-1401",
+      "description": "Implementar rotina de substituição de variáveis com preservação de precedência matemática utilizando o módulo ast do Python em backend/engine.py.",
       "scope": "backend/engine.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-1104",
-      "description": "Implementar as funções termodinâmicas no evaluator.py usando iapws",
-      "scope": "backend/evaluator.py",
+      "id": "TASK-1402",
+      "description": "Implementar endpoints /api/variables/{id}/replace-preview e /api/variables/{id}/replace-confirm no backend.",
+      "scope": "backend/main.py, backend/services_variables.py",
       "status": "DONE"
     },
     {
-      "id": "TASK-1105",
-      "description": "Substituir valores fixos de turbinas por fórmulas de vapor no memorial",
-      "scope": "docs/memorial_de_calculo_balanco.json",
+      "id": "TASK-1403",
+      "description": "Desenvolver modal de substituição de variáveis no frontend com seleção, chave de recursividade e visualização de impacto.",
+      "scope": "frontend/src/components/VariableModal.tsx, frontend/App.tsx",
       "status": "DONE"
     },
     {
-      "id": "TASK-1106",
-      "description": "Adicionar tooltips e guias das funções de vapor no frontend",
-      "scope": "frontend/src/components/SectorConfig.tsx",
+      "id": "TASK-1404",
+      "description": "Integrar a lógica de descontinuação (soft-delete) ou remoção física de variáveis órfãs na UI.",
+      "scope": "frontend/src/components/VariableModal.tsx",
       "status": "DONE"
     },
     {
-      "id": "TASK-1107",
-      "description": "Auditoria de checklists e testes de convergência",
-      "scope": "project",
+      "id": "TASK-1405",
+      "description": "Criar suíte de testes unitários e de integração para o algoritmo de substituição e os novos endpoints.",
+      "scope": "backend/test_engine.py",
       "status": "DONE"
     }
   ]

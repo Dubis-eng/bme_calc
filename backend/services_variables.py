@@ -232,3 +232,4 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
         "ponto_controle": db_var.ponto_controle,
         "equation_value": eq_val
     }
+

@@ -270,37 +270,29 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
                 "EQUAÇÕES E VALORES": expr if expr else "0"
             })
             
-    # Run the calculation engine on the engine_vars
     calc_results = engine.calculate_state(engine_vars)
-    accumulated_results = calc_results["results"] # {var_id: {"value": ..., "status": ...}}
+    accumulated_results = calc_results["results"]
     
-    # Construct final data only for variables in the harvest plan
     data_list = []
     for var_id, var in vars_map.items():
-        if not var.in_harvest_plan:
-            continue
+        if var.in_harvest_plan:
+            month_vals_dict = {m: monthly_results[m].get(var_id) for m in active_months}
+            month_statuses_dict = {m: monthly_statuses[m].get(var_id, "PENDING") for m in active_months}
+            accum_res = accumulated_results.get(var_id, {"value": None, "status": "PENDING", "error_message": ""})
             
-        month_vals_dict = {}
-        month_statuses_dict = {}
-        for m in active_months:
-            month_vals_dict[m] = monthly_results[m].get(var_id)
-            month_statuses_dict[m] = monthly_statuses[m].get(var_id, "PENDING")
-                
-        accum_res = accumulated_results.get(var_id, {"value": None, "status": "PENDING", "error_message": ""})
-        
-        data_list.append({
-            "variable_id": var_id,
-            "nome": var.nome,
-            "descricao": var.descricao,
-            "setor_id": var.setor_id,
-            "unidade": var.unidade,
-            "tipo": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
-            "harvest_plan_op": var.harvest_plan_op,
-            "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
-            "monthly_values": month_vals_dict,
-            "monthly_statuses": month_statuses_dict,
-            "accumulated": accum_res
-        })
+            data_list.append({
+                "variable_id": var_id,
+                "nome": var.nome,
+                "descricao": var.descricao,
+                "setor_id": var.setor_id,
+                "unidade": var.unidade,
+                "tipo": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
+                "harvest_plan_op": var.harvest_plan_op,
+                "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
+                "monthly_values": month_vals_dict,
+                "monthly_statuses": month_statuses_dict,
+                "accumulated": accum_res
+            })
         
     return {
         "months": active_months,

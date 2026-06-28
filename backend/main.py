@@ -31,7 +31,11 @@ from schemas import (
     HarvestMonthRead,
     HarvestMonthUpdate,
     HarvestPlanSelectionUpdate,
-    HarvestPlanSelectionsResponse
+    HarvestPlanSelectionsResponse,
+    SubstitutionPreviewRequest,
+    SubstitutionPreviewResponse,
+    SubstitutionConfirmRequest,
+    SubstitutionConfirmResponse
 )
 
 app = FastAPI()
@@ -43,6 +47,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from router_variables import router as variables_router
+app.include_router(variables_router)
+
+from router_settings import router as settings_router
+app.include_router(settings_router)
 
 @app.on_event("startup")
 def on_startup():
@@ -170,31 +180,6 @@ def delete_sector(id: str, db=Depends(get_session)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Global Variables CRUD Endpoints
-@app.get("/api/variables", response_model=List[VariableDetail])
-def list_variables_endpoint(db=Depends(get_session)):
-    try:
-        return services.list_variables(db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/variables", response_model=VariableDetail)
-def create_variable_endpoint(req: VariableCreate, db=Depends(get_session)):
-    try:
-        return services.create_variable(req, db)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.put("/api/variables/{id}", response_model=VariableDetail)
-def update_variable_endpoint(id: str, req: VariableUpdate, db=Depends(get_session)):
-    try:
-        return services.update_variable(id, req, db)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 # Harvest Plan Endpoints
 @app.get("/api/harvest-plan/years", response_model=List[int])
@@ -258,84 +243,5 @@ def update_harvest_plan_selection_endpoint(req: HarvestPlanSelectionUpdate, year
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/harvest-years", response_model=List[HarvestYearRead])
-def list_harvest_years_endpoint(db=Depends(get_session)):
-    try:
-        from sqlmodel import select
-        stmt = select(HarvestYear).order_by(HarvestYear.id.desc())
-        return db.exec(stmt).all()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/harvest-years", response_model=HarvestYearRead)
-def create_harvest_year_endpoint(req: HarvestYearCreate, db=Depends(get_session)):
-    try:
-        db_year = db.get(HarvestYear, req.id)
-        if not db_year:
-            db_year = HarvestYear(id=req.id, active=True)
-            db.add(db_year)
-            db.commit()
-            db.refresh(db_year)
-        else:
-            if not db_year.active:
-                db_year.active = True
-                db.add(db_year)
-                db.commit()
-                db.refresh(db_year)
-        return db_year
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.delete("/api/harvest-years/{year_start}")
-def delete_harvest_year_endpoint(year_start: int, db=Depends(get_session)):
-    try:
-        from sqlmodel import select, text
-        db_year = db.get(HarvestYear, year_start)
-        if not db_year:
-            raise HTTPException(status_code=404, detail="Ano Safra não encontrado")
-        
-        scenarios_to_delete = db.exec(select(Scenario).where(Scenario.year_harvest == year_start)).all()
-        for sc in scenarios_to_delete:
-            db.execute(text("DELETE FROM results WHERE scenario_id = :sid"), {"sid": str(sc.id)})
-            db.delete(sc)
-            
-        db.flush()  # Force deletion of child scenarios first to satisfy PostgreSQL FK constraint
-        db.delete(db_year)
-        db.commit()
-        return {"success": True, "message": f"Ano Safra {year_start} e seus cenários excluídos com sucesso."}
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/harvest-months", response_model=List[HarvestMonthRead])
-def list_harvest_months_endpoint(enabled_only: Optional[bool] = None, db=Depends(get_session)):
-    try:
-        from sqlmodel import select
-        stmt = select(HarvestMonth)
-        if enabled_only:
-            stmt = stmt.where(HarvestMonth.enabled == True)
-        stmt = stmt.order_by(HarvestMonth.order_index.asc())
-        return db.exec(stmt).all()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.patch("/api/harvest-months/{month_id}", response_model=HarvestMonthRead)
-def update_harvest_month_endpoint(month_id: int, req: HarvestMonthUpdate, db=Depends(get_session)):
-    try:
-        db_month = db.get(HarvestMonth, month_id)
-        if not db_month:
-            raise HTTPException(status_code=404, detail="Mês não encontrado")
-        
-        if req.enabled is not None:
-            db_month.enabled = req.enabled
-        if req.order_index is not None:
-            db_month.order_index = req.order_index
-            
-        db.add(db_month)
-        db.commit()
-        db.refresh(db_month)
-        return db_month
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
 

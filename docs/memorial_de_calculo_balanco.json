@@ -587,7 +587,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J79/J$77*100"
+        "EQUAÇÕES E VALORES": "=J79/J77*100"
     },
     {
         "ID - REF": "J66",
@@ -597,7 +597,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J80/J$77*100"
+        "EQUAÇÕES E VALORES": "=J80/J77*100"
     },
     {
         "ID - REF": "J67",
@@ -607,7 +607,7 @@
         "DESCRIÇÃO": "Fibra",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J81/J$77*100"
+        "EQUAÇÕES E VALORES": "=J81/J77*100"
     },
     {
         "ID - REF": "J68",
@@ -617,7 +617,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J82/J$77*100"
+        "EQUAÇÕES E VALORES": "=J82/J77*100"
     },
     {
         "ID - REF": "J69",
@@ -627,7 +627,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J83/J$77*100"
+        "EQUAÇÕES E VALORES": "=J83/J77*100"
     },
     {
         "ID - REF": "J70",
@@ -637,7 +637,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J84/J$77*100"
+        "EQUAÇÕES E VALORES": "=J84/J77*100"
     },
     {
         "ID - REF": "J71",
@@ -887,7 +887,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J111/J$109*100"
+        "EQUAÇÕES E VALORES": "=J111/J109*100"
     },
     {
         "ID - REF": "J100",
@@ -897,7 +897,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J112/J$109*100"
+        "EQUAÇÕES E VALORES": "=J112/J109*100"
     },
     {
         "ID - REF": "J101",
@@ -907,7 +907,7 @@
         "DESCRIÇÃO": "Fibra",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J113/J$109*100"
+        "EQUAÇÕES E VALORES": "=J113/J109*100"
     },
     {
         "ID - REF": "J102",
@@ -917,7 +917,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J114/J$109*100"
+        "EQUAÇÕES E VALORES": "=J114/J109*100"
     },
     {
         "ID - REF": "J103",
@@ -927,7 +927,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J115/J$109*100"
+        "EQUAÇÕES E VALORES": "=J115/J109*100"
     },
     {
         "ID - REF": "J104",
@@ -937,7 +937,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J116/J$109*100"
+        "EQUAÇÕES E VALORES": "=J116/J109*100"
     },
     {
         "ID - REF": "J105",
@@ -1067,7 +1067,7 @@
         "DESCRIÇÃO": "Fibra",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J129/J$127*100"
+        "EQUAÇÕES E VALORES": "=J129/J127*100"
     },
     {
         "ID - REF": "J120",
@@ -1077,7 +1077,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J130/J$127*100"
+        "EQUAÇÕES E VALORES": "=J130/J127*100"
     },
     {
         "ID - REF": "J121",
@@ -1087,7 +1087,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J131/J$127*100"
+        "EQUAÇÕES E VALORES": "=J131/J127*100"
     },
     {
         "ID - REF": "J122",
@@ -1097,7 +1097,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J132/J$127*100"
+        "EQUAÇÕES E VALORES": "=J132/J127*100"
     },
     {
         "ID - REF": "J123",
@@ -1107,7 +1107,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J133/J$127*100"
+        "EQUAÇÕES E VALORES": "=J133/J127*100"
     },
     {
         "ID - REF": "J124",
@@ -1207,7 +1207,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J151/J$149*100"
+        "EQUAÇÕES E VALORES": "=J151/J149*100"
     },
     {
         "ID - REF": "J136",
@@ -1217,7 +1217,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J152/J$149*100"
+        "EQUAÇÕES E VALORES": "=J152/J149*100"
     },
     {
         "ID - REF": "J137",
@@ -1227,7 +1227,7 @@
         "DESCRIÇÃO": "Fibra",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J153/J$149*100"
+        "EQUAÇÕES E VALORES": "=J153/J149*100"
     },
     {
         "ID - REF": "J138",
@@ -1237,7 +1237,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J154/J$149*100"
+        "EQUAÇÕES E VALORES": "=J154/J149*100"
     },
     {
         "ID - REF": "J139",
@@ -1247,7 +1247,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J155/J$149*100"
+        "EQUAÇÕES E VALORES": "=J155/J149*100"
     },
     {
         "ID - REF": "J140",
@@ -1257,7 +1257,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J156/J$149*100"
+        "EQUAÇÕES E VALORES": "=J156/J149*100"
     },
     {
         "ID - REF": "J141",
@@ -1457,7 +1457,7 @@
         "DESCRIÇÃO": "Aproveitamento Op. Agrícola",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=((J$17*J22/100)+(J$18*J22/100))/(J$16*SE(J$17>0;1;0)+J$16*SE(J$18>0;1;0))"
+        "EQUAÇÕES E VALORES": "=((J17*J22/100)+(J18*J22/100))/(J16*SE(J17>0;1;0)+J16*SE(J18>0;1;0))"
     },
     {
         "ID - REF": "J164",
@@ -1467,7 +1467,7 @@
         "DESCRIÇÃO": "Aproveitamento Climático",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=((J$17*J24/100)+(J$18*J24/100))/(J$16*SE(J$17>0;1;0)+J$16*SE(J$18>0;1;0))"
+        "EQUAÇÕES E VALORES": "=((J17*J24/100)+(J18*J24/100))/(J16*SE(J17>0;1;0)+J16*SE(J18>0;1;0))"
     },
     {
         "ID - REF": "J165",
@@ -1767,7 +1767,7 @@
         "DESCRIÇÃO": "Açúcar Refinado - Cor ≤ 60",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J183*J$197"
+        "EQUAÇÕES E VALORES": "=J183*J197"
     },
     {
         "ID - REF": "J199",
@@ -1777,7 +1777,7 @@
         "DESCRIÇÃO": "Açúcar Crist. EX A - Cor 61 a 100",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J184*J$197"
+        "EQUAÇÕES E VALORES": "=J184*J197"
     },
     {
         "ID - REF": "J200",
@@ -1787,7 +1787,7 @@
         "DESCRIÇÃO": "Açúcar Crist. A1 - Cor 101 a 150",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J185*J$197"
+        "EQUAÇÕES E VALORES": "=J185*J197"
     },
     {
         "ID - REF": "J201",
@@ -1797,7 +1797,7 @@
         "DESCRIÇÃO": "Açúcar Crist. A2 - Cor 101 a 150",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J186*J$197"
+        "EQUAÇÕES E VALORES": "=J186*J197"
     },
     {
         "ID - REF": "J202",
@@ -1817,7 +1817,7 @@
         "DESCRIÇÃO": "Açúcar Crist. B - Cor 151 a 180",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J187*J$197"
+        "EQUAÇÕES E VALORES": "=J187*J197"
     },
     {
         "ID - REF": "J204",
@@ -1827,7 +1827,7 @@
         "DESCRIÇÃO": "Açúcar Crist. B - Cor 181 a 230",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J188*J$197"
+        "EQUAÇÕES E VALORES": "=J188*J197"
     },
     {
         "ID - REF": "J205",
@@ -1837,7 +1837,7 @@
         "DESCRIÇÃO": "Açúcar Crist. C - Cor 231 a 300",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J189*J$197"
+        "EQUAÇÕES E VALORES": "=J189*J197"
     },
     {
         "ID - REF": "J206",
@@ -1847,7 +1847,7 @@
         "DESCRIÇÃO": "Açúcar Crist. C1 - Cor 301 a 999",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J190*J$197"
+        "EQUAÇÕES E VALORES": "=J190*J197"
     },
     {
         "ID - REF": "J207",
@@ -1857,7 +1857,7 @@
         "DESCRIÇÃO": "Demerara - Cor 1.000 a 5.000",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J191*J$197"
+        "EQUAÇÕES E VALORES": "=J191*J197"
     },
     {
         "ID - REF": "J208",
@@ -1867,7 +1867,7 @@
         "DESCRIÇÃO": "Demerara 1 - Cor <1000 e >5000",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J192*J$197"
+        "EQUAÇÕES E VALORES": "=J192*J197"
     },
     {
         "ID - REF": "J209",
@@ -1877,7 +1877,7 @@
         "DESCRIÇÃO": "VHP",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
-        "EQUAÇÕES E VALORES": "=J193*J$197"
+        "EQUAÇÕES E VALORES": "=J193*J197"
     },
     {
         "ID - REF": "J210",
@@ -2417,7 +2417,7 @@
         "DESCRIÇÃO": "Vinho",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/dia",
-        "EQUAÇÕES E VALORES": "=((J$218*J$262)/J$286)*J$261/(J$269/100)"
+        "EQUAÇÕES E VALORES": "=((J218*J262)/J286)*J261/(J269/100)"
     },
     {
         "ID - REF": "J272",
@@ -2437,7 +2437,7 @@
         "DESCRIÇÃO": "Gl°Vinho",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "GL° %",
-        "EQUAÇÕES E VALORES": "=(J271*(J269/100))/J$260/J272"
+        "EQUAÇÕES E VALORES": "=(J271*(J269/100))/J260/J272"
     },
     {
         "ID - REF": "J275",
@@ -2467,7 +2467,7 @@
         "DESCRIÇÃO": "Vinho",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/dia",
-        "EQUAÇÕES E VALORES": "=((J$218*J$267)/J$286)*J$266/(J$269/100)"
+        "EQUAÇÕES E VALORES": "=((J218*J267)/J286)*J266/(J269/100)"
     },
     {
         "ID - REF": "J278",
@@ -2487,7 +2487,7 @@
         "DESCRIÇÃO": "Gl°Vinho",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "GL° %",
-        "EQUAÇÕES E VALORES": "=(J277*(J275/100))/J$265/J278"
+        "EQUAÇÕES E VALORES": "=(J277*(J275/100))/J265/J278"
     },
     {
         "ID - REF": "J281",
@@ -2677,7 +2677,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J309/J$308"
+        "EQUAÇÕES E VALORES": "=J309/J308"
     },
     {
         "ID - REF": "J302",
@@ -2687,7 +2687,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J310/J$308"
+        "EQUAÇÕES E VALORES": "=J310/J308"
     },
     {
         "ID - REF": "J303",
@@ -2697,7 +2697,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J311/J$308"
+        "EQUAÇÕES E VALORES": "=J311/J308"
     },
     {
         "ID - REF": "J304",
@@ -2707,7 +2707,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J312/J$308"
+        "EQUAÇÕES E VALORES": "=J312/J308"
     },
     {
         "ID - REF": "J305",
@@ -2717,7 +2717,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J313/J$308"
+        "EQUAÇÕES E VALORES": "=J313/J308"
     },
     {
         "ID - REF": "J307",
@@ -2747,7 +2747,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;J79+((J$307-J$78)/J$110)*J111;((J$307)/J$78)*J79)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;J79+((J307-J78)/J110)*J111;((J307)/J78)*J79)"
     },
     {
         "ID - REF": "J310",
@@ -2757,7 +2757,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;J80+((J$307-J$78)/J$110)*J112;((J$307)/J$78)*J80)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;J80+((J307-J78)/J110)*J112;((J307)/J78)*J80)"
     },
     {
         "ID - REF": "J311",
@@ -2767,7 +2767,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;J82+((J$307-J$78)/J$110)*J114;((J$307)/J$78)*J82)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;J82+((J307-J78)/J110)*J114;((J307)/J78)*J82)"
     },
     {
         "ID - REF": "J312",
@@ -2777,7 +2777,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;J83+((J$307-J$78)/J$110)*J115;((J$307)/J$78)*J83)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;J83+((J307-J78)/J110)*J115;((J307)/J78)*J83)"
     },
     {
         "ID - REF": "J313",
@@ -2787,7 +2787,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;J84+((J$307-J$78)/J$110)*J116;((J$307)/J$78)*J84)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;J84+((J307-J78)/J110)*J116;((J307)/J78)*J84)"
     },
     {
         "ID - REF": "J314",
@@ -2797,7 +2797,7 @@
         "DESCRIÇÃO": "Temperatura",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;((J77*J73)+(((J$307-J$78)/J110)*J109*J107))/J308;(((J$307)/J$78)*J77*J73)/J308)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;((J77*J73)+(((J307-J78)/J110)*J109*J107))/J308;(((J307)/J78)*J77*J73)/J308)"
     },
     {
         "ID - REF": "J316",
@@ -2807,7 +2807,7 @@
         "DESCRIÇÃO": "Água",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J324/J$323"
+        "EQUAÇÕES E VALORES": "=J324/J323"
     },
     {
         "ID - REF": "J317",
@@ -2817,7 +2817,7 @@
         "DESCRIÇÃO": "BRIX (Sólidos)",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J325/J$323"
+        "EQUAÇÕES E VALORES": "=J325/J323"
     },
     {
         "ID - REF": "J318",
@@ -2827,7 +2827,7 @@
         "DESCRIÇÃO": "ART",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J326/J$323"
+        "EQUAÇÕES E VALORES": "=J326/J323"
     },
     {
         "ID - REF": "J319",
@@ -2837,7 +2837,7 @@
         "DESCRIÇÃO": "POL",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J327/J$323"
+        "EQUAÇÕES E VALORES": "=J327/J323"
     },
     {
         "ID - REF": "J320",
@@ -2847,7 +2847,7 @@
         "DESCRIÇÃO": "AR",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=J328/J$323"
+        "EQUAÇÕES E VALORES": "=J328/J323"
     },
     {
         "ID - REF": "J322",
@@ -2927,7 +2927,7 @@
         "DESCRIÇÃO": "Temperatura",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J$307>J$78;(((1-((J$307-J$78)/J110))*J109*J107))/J323;((J323-J109)*J73+J109*J107)/J323)"
+        "EQUAÇÕES E VALORES": "=SE(J307>J78;(((1-((J307-J78)/J110))*J109*J107))/J323;((J323-J109)*J73+J109*J107)/J323)"
     },
     {
         "ID - REF": "J331",
@@ -3327,7 +3327,7 @@
         "DESCRIÇÃO": "Aquecimento p/ Sulfitação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J360>0;PROCV(J360;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J360>0;PROCV(J360;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J375",
@@ -3337,7 +3337,7 @@
         "DESCRIÇÃO": "Caldo 1º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J361>0;PROCV(J361;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J361>0;PROCV(J361;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J376",
@@ -3347,7 +3347,7 @@
         "DESCRIÇÃO": "Caldo 2º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J362>0;PROCV(J362;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J362>0;PROCV(J362;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J377",
@@ -3357,7 +3357,7 @@
         "DESCRIÇÃO": "Caldo 3º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J363>0;PROCV(J363;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J363>0;PROCV(J363;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J378",
@@ -3367,7 +3367,7 @@
         "DESCRIÇÃO": "Caldo Açúcar Evaporação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J364>0;PROCV(J364;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J364>0;PROCV(J364;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J379",
@@ -3377,7 +3377,7 @@
         "DESCRIÇÃO": "Calor sensível do pré",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J365>0;PROCV(J365;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J365>0;PROCV(J365;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J380",
@@ -3387,7 +3387,7 @@
         "DESCRIÇÃO": "Aquecimento do Xarope",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J366>0;PROCV(J366;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J366>0;PROCV(J366;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J381",
@@ -3407,7 +3407,7 @@
         "DESCRIÇÃO": "Caldo 1° Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J368>0;PROCV(J368;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J368>0;PROCV(J368;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J383",
@@ -3417,7 +3417,7 @@
         "DESCRIÇÃO": "Caldo 2° Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J369>0;PROCV(J369;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J369>0;PROCV(J369;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J384",
@@ -3427,7 +3427,7 @@
         "DESCRIÇÃO": "Caldo Etanol Evaporação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J370>0;PROCV(J370;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J370>0;PROCV(J370;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J385",
@@ -3437,7 +3437,7 @@
         "DESCRIÇÃO": "Calor sensível do pré",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "=SE(J371>0;PROCV(J371;Vapor!$A$8:$I$61;2;FALSO);0)"
+        "EQUAÇÕES E VALORES": "=SE(J371>0;PROCV(J371;Vapor!A8:I61;2;FALSO);0)"
     },
     {
         "ID - REF": "J387",
@@ -3457,7 +3457,7 @@
         "DESCRIÇÃO": "Aquecimento p/ Sulfitação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$345=\"Açúcar\";J308;J332)"
+        "EQUAÇÕES E VALORES": "=SE(J345=\"Açúcar\";J308;J332)"
     },
     {
         "ID - REF": "J389",
@@ -3537,7 +3537,7 @@
         "DESCRIÇÃO": "Caldo 1° Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "t/h",
-        "EQUAÇÕES E VALORES": "=SE(J$353=\"Açúcar\";J308;J332)"
+        "EQUAÇÕES E VALORES": "=SE(J353=\"Açúcar\";J308;J332)"
     },
     {
         "ID - REF": "J397",
@@ -4107,7 +4107,7 @@
         "DESCRIÇÃO": "Aquecimento p/ Sulfitação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J360;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J360;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J459",
@@ -4117,7 +4117,7 @@
         "DESCRIÇÃO": "Caldo 1º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J361;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J361;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J460",
@@ -4127,7 +4127,7 @@
         "DESCRIÇÃO": "Caldo 2º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J362;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J362;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J461",
@@ -4137,7 +4137,7 @@
         "DESCRIÇÃO": "Caldo 3º Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J363;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J363;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J462",
@@ -4147,7 +4147,7 @@
         "DESCRIÇÃO": "Caldo Açúcar Evaporação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J364;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J364;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J463",
@@ -4157,7 +4157,7 @@
         "DESCRIÇÃO": "Calor sensível do pré",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J365;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J365;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J464",
@@ -4167,7 +4167,7 @@
         "DESCRIÇÃO": "Aquecimento do Xarope",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J366;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J366;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J465",
@@ -4187,7 +4187,7 @@
         "DESCRIÇÃO": "Caldo 1° Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J368;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J368;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J467",
@@ -4197,7 +4197,7 @@
         "DESCRIÇÃO": "Caldo 2° Aquecimento",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J369;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J369;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J468",
@@ -4207,7 +4207,7 @@
         "DESCRIÇÃO": "Caldo Etanol Evaporação",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J370;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J370;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J469",
@@ -4217,7 +4217,7 @@
         "DESCRIÇÃO": "Calor sensível do pré",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kj/kcal",
-        "EQUAÇÕES E VALORES": "=PROCV(J371;Vapor!$A$8:$I$61;6;FALSO)*4,18"
+        "EQUAÇÕES E VALORES": "=PROCV(J371;Vapor!A8:I61;6;FALSO)*4,18"
     },
     {
         "ID - REF": "J471",
@@ -4857,7 +4857,7 @@
         "DESCRIÇÃO": "Consumo Bagaço p/ paradas e partidas",
         "TIPO": "INPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "=I540"
+        "EQUAÇÕES E VALORES": "0.003"
     },
     {
         "ID - REF": "J541",
@@ -5267,7 +5267,7 @@
         "DESCRIÇÃO": "Cons.VE Desaerador",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "tV/h",
-        "EQUAÇÕES E VALORES": "=(J547*(J552-J553)/PROCV(1,7;Vapor!$A$8:$I$61;6;FALSO))+(J556*(J561-J562)/PROCV(1,7;Vapor!$A$8:$I$61;6;FALSO))"
+        "EQUAÇÕES E VALORES": "=(J547*(J552-J553)/PROCV(1,7;Vapor!A8:I61;6;FALSO))+(J556*(J561-J562)/PROCV(1,7;Vapor!A8:I61;6;FALSO))"
     },
     {
         "ID - REF": "J584",
@@ -6207,7 +6207,7 @@
         "DESCRIÇÃO": "Picador",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J679*(J$531*J$10))*J686"
+        "EQUAÇÕES E VALORES": "=(J679*(J531*J10))*J686"
     },
     {
         "ID - REF": "J694",
@@ -6217,7 +6217,7 @@
         "DESCRIÇÃO": "1°Terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J680*(J$531*J$10))*J687"
+        "EQUAÇÕES E VALORES": "=(J680*(J531*J10))*J687"
     },
     {
         "ID - REF": "J695",
@@ -6227,7 +6227,7 @@
         "DESCRIÇÃO": "2° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J681*(J$531*J$10))*J688"
+        "EQUAÇÕES E VALORES": "=(J681*(J531*J10))*J688"
     },
     {
         "ID - REF": "J696",
@@ -6237,7 +6237,7 @@
         "DESCRIÇÃO": "3° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J682*(J$531*J$10))*J689"
+        "EQUAÇÕES E VALORES": "=(J682*(J531*J10))*J689"
     },
     {
         "ID - REF": "J697",
@@ -6247,7 +6247,7 @@
         "DESCRIÇÃO": "4° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J683*(J$531*J$10))*J690"
+        "EQUAÇÕES E VALORES": "=(J683*(J531*J10))*J690"
     },
     {
         "ID - REF": "J698",
@@ -6257,7 +6257,7 @@
         "DESCRIÇÃO": "5° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J684*(J$531*J$10))*J691"
+        "EQUAÇÕES E VALORES": "=(J684*(J531*J10))*J691"
     },
     {
         "ID - REF": "J699",
@@ -6267,7 +6267,7 @@
         "DESCRIÇÃO": "6° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J685*(J$531*J$10))*J692"
+        "EQUAÇÕES E VALORES": "=(J685*(J531*J10))*J692"
     },
     {
         "ID - REF": "J701",
@@ -6437,7 +6437,7 @@
         "DESCRIÇÃO": "Desfibrador 1",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J701*(J$532*J$10))*J709"
+        "EQUAÇÕES E VALORES": "=(J701*(J532*J10))*J709"
     },
     {
         "ID - REF": "J718",
@@ -6447,7 +6447,7 @@
         "DESCRIÇÃO": "Desfibrador 2",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J702*(J$532*J$10))*J710"
+        "EQUAÇÕES E VALORES": "=(J702*(J532*J10))*J710"
     },
     {
         "ID - REF": "J719",
@@ -6457,7 +6457,7 @@
         "DESCRIÇÃO": "1°Terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J703*(J$532*J$10))*J711"
+        "EQUAÇÕES E VALORES": "=(J703*(J532*J10))*J711"
     },
     {
         "ID - REF": "J720",
@@ -6467,7 +6467,7 @@
         "DESCRIÇÃO": "2° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J704*(J$532*J$10))*J712"
+        "EQUAÇÕES E VALORES": "=(J704*(J532*J10))*J712"
     },
     {
         "ID - REF": "J721",
@@ -6477,7 +6477,7 @@
         "DESCRIÇÃO": "3° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J705*(J$532*J$10))*J713"
+        "EQUAÇÕES E VALORES": "=(J705*(J532*J10))*J713"
     },
     {
         "ID - REF": "J722",
@@ -6487,7 +6487,7 @@
         "DESCRIÇÃO": "4° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J706*(J$532*J$10))*J714"
+        "EQUAÇÕES E VALORES": "=(J706*(J532*J10))*J714"
     },
     {
         "ID - REF": "J723",
@@ -6497,7 +6497,7 @@
         "DESCRIÇÃO": "5° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J707*(J$532*J$10))*J715"
+        "EQUAÇÕES E VALORES": "=(J707*(J532*J10))*J715"
     },
     {
         "ID - REF": "J724",
@@ -6507,7 +6507,7 @@
         "DESCRIÇÃO": "6° terno",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "KGv/h",
-        "EQUAÇÕES E VALORES": "=(J708*(J$532*J$10))*J716"
+        "EQUAÇÕES E VALORES": "=(J708*(J532*J10))*J716"
     },
     {
         "ID - REF": "J726",
@@ -6674,10 +6674,10 @@
         "SETOR": "LEVEDURA",
         "ETAPA": "PLANEJAMENTO",
         "PONTO DE CONTROLE": "PREMISSAS",
-        "DESCRIÇÃO": "Alterar Tipo →",
+        "DESCRIÇÃO": "Alterar Tipo → 1=Lev.Normal/2=Lev.Autolisada/3=Lev.Hidrolisada/4=Parede Celular",
         "TIPO": "INPUT",
         "UNIDADE DE MEDIDA": "0",
-        "EQUAÇÕES E VALORES": "Parede Celular"
+        "EQUAÇÕES E VALORES": "1"
     },
     {
         "ID - REF": "J747",
@@ -7027,7 +7027,7 @@
         "DESCRIÇÃO": "Creme sangrado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/h",
-        "EQUAÇÕES E VALORES": "= J786 * 100 / (J771/100 * J766)"
+        "EQUAÇÕES E VALORES": "=J786 * 100 / (J771/100 * J766)"
     },
     {
         "ID - REF": "J783",
@@ -7037,7 +7037,7 @@
         "DESCRIÇÃO": "Massa de célula nas Dornas",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J778 * J765 * J771 / 10000"
+        "EQUAÇÕES E VALORES": "=J778 * J765 * J771 / 10000"
     },
     {
         "ID - REF": "J784",
@@ -7067,7 +7067,7 @@
         "DESCRIÇÃO": "Massa de célula sangrada",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J784 - J785"
+        "EQUAÇÕES E VALORES": "=J784 - J785"
     },
     {
         "ID - REF": "J787",
@@ -7087,7 +7087,7 @@
         "DESCRIÇÃO": "Massa de Etanol Fermento Tratado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J787 - J763"
+        "EQUAÇÕES E VALORES": "=J787 - J763"
     },
     {
         "ID - REF": "J789",
@@ -7137,7 +7137,7 @@
         "DESCRIÇÃO": "Número dornas processadas",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "und",
-        "EQUAÇÕES E VALORES": "= 24 * J790 / J800"
+        "EQUAÇÕES E VALORES": "=24 * J790 / J800"
     },
     {
         "ID - REF": "J794",
@@ -7237,7 +7237,7 @@
         "DESCRIÇÃO": "Vol. creme sangrado por ciclo",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/ciclo",
-        "EQUAÇÕES E VALORES": "= J782 * 24 / J793"
+        "EQUAÇÕES E VALORES": "=J782 * 24 / J793"
     },
     {
         "ID - REF": "J804",
@@ -7257,7 +7257,7 @@
         "DESCRIÇÃO": "Massa célula sangrada",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/dia",
-        "EQUAÇÕES E VALORES": "= J786 * 24"
+        "EQUAÇÕES E VALORES": "=J786 * 24"
     },
     {
         "ID - REF": "J807",
@@ -7317,7 +7317,7 @@
         "DESCRIÇÃO": "Volume útil do tq de fermentação endógena",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l",
-        "EQUAÇÕES E VALORES": "= J782 * J807"
+        "EQUAÇÕES E VALORES": "=J782 * J807"
     },
     {
         "ID - REF": "J813",
@@ -7327,7 +7327,7 @@
         "DESCRIÇÃO": "Calor necessário p/ aquecimento do creme",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kcal/h",
-        "EQUAÇÕES E VALORES": "= J782 * 1,05 * 0,9 * (J809 - J808)"
+        "EQUAÇÕES E VALORES": "=J782 * 1,05 * 0,9 * (J809 - J808)"
     },
     {
         "ID - REF": "J814",
@@ -7337,7 +7337,7 @@
         "DESCRIÇÃO": "Temperatura saída condensado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "= J810 - (J813 / J811)"
+        "EQUAÇÕES E VALORES": "=J810 - (J813 / J811)"
     },
     {
         "ID - REF": "J816",
@@ -7397,7 +7397,7 @@
         "DESCRIÇÃO": "Massa de célula entrada",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J782 * J766 * J771 / 10000"
+        "EQUAÇÕES E VALORES": "=J782 * J766 * J771 / 10000"
     },
     {
         "ID - REF": "J822",
@@ -7417,7 +7417,7 @@
         "DESCRIÇÃO": "Massa de célula perdida água alcoólica",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J819 * J829 * J771 / 10000"
+        "EQUAÇÕES E VALORES": "=J819 * J829 * J771 / 10000"
     },
     {
         "ID - REF": "J824",
@@ -7437,7 +7437,7 @@
         "DESCRIÇÃO": "Temperatura do creme lavado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "°C",
-        "EQUAÇÕES E VALORES": "= (J827 * J817 + J782 * J809) / J816"
+        "EQUAÇÕES E VALORES": "=(J827 * J817 + J782 * J809) / J816"
     },
     {
         "ID - REF": "J826",
@@ -7467,7 +7467,7 @@
         "DESCRIÇÃO": "Vazão de creme lavado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/h",
-        "EQUAÇÕES E VALORES": "= J816 - J829"
+        "EQUAÇÕES E VALORES": "=J816 - J829"
     },
     {
         "ID - REF": "J829",
@@ -7487,7 +7487,7 @@
         "DESCRIÇÃO": "Concentração etanol água álcoólica",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "%(v/v)",
-        "EQUAÇÕES E VALORES": "= J782 * J768 / J816"
+        "EQUAÇÕES E VALORES": "=J782 * J768 / J816"
     },
     {
         "ID - REF": "J831",
@@ -7497,7 +7497,7 @@
         "DESCRIÇÃO": "Massa etanol entrado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J782 * J768 * J759 / 100"
+        "EQUAÇÕES E VALORES": "=J782 * J768 * J759 / 100"
     },
     {
         "ID - REF": "J832",
@@ -7607,7 +7607,7 @@
         "DESCRIÇÃO": "Volume de água adicionado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/h",
-        "EQUAÇÕES E VALORES": "= J842 - J828"
+        "EQUAÇÕES E VALORES": "=J842 - J828"
     },
     {
         "ID - REF": "J844",
@@ -7727,7 +7727,7 @@
         "DESCRIÇÃO": "Massa de fermento com ruptura",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J855 * ((J848 / 100))"
+        "EQUAÇÕES E VALORES": "=J855 * ((J848 / 100))"
     },
     {
         "ID - REF": "J857",
@@ -7757,7 +7757,7 @@
         "DESCRIÇÃO": "Vazão de creme autolisado diluído",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/h",
-        "EQUAÇÕES E VALORES": "= J842 * J854 / J852"
+        "EQUAÇÕES E VALORES": "=J842 * J854 / J852"
     },
     {
         "ID - REF": "J861",
@@ -7937,7 +7937,7 @@
         "DESCRIÇÃO": "Massa de água evaporada",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J862 - J878"
+        "EQUAÇÕES E VALORES": "=J862 - J878"
     },
     {
         "ID - REF": "J880",
@@ -8017,7 +8017,7 @@
         "DESCRIÇÃO": "Conc Células inicial do creme autolisado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "gMS/L",
-        "EQUAÇÕES E VALORES": "=SE(J744=1;J818*J771/100;SE(J744=2;J838*J771/100;J850 * J771/100))"
+        "EQUAÇÕES E VALORES": "=SE(J746=1;J818*J771/100;SE(J746=2;J838*J771/100;J850 * J771/100))"
     },
     {
         "ID - REF": "J889",
@@ -8027,7 +8027,7 @@
         "DESCRIÇÃO": "Vazão final de creme evaporado",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "l/h",
-        "EQUAÇÕES E VALORES": "=SE(J744=1;J828* J888 / J884;SE(J744=2;J842* J888 / J884;J863 * J888 / J884))"
+        "EQUAÇÕES E VALORES": "=SE(J746=1;J828* J888 / J884;SE(J746=2;J842* J888 / J884;J863 * J888 / J884))"
     },
     {
         "ID - REF": "J890",
@@ -8037,7 +8037,7 @@
         "DESCRIÇÃO": "Consumo de vapor no evaporador",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "= J891 * J887"
+        "EQUAÇÕES E VALORES": "=J891 * J887"
     },
     {
         "ID - REF": "J891",
@@ -8047,7 +8047,7 @@
         "DESCRIÇÃO": "Massa de água evaparoda",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "kg/h",
-        "EQUAÇÕES E VALORES": "=SE(J744=1;J828 - J889;SE(J744=2;J842 - J889;J863 - J889))"
+        "EQUAÇÕES E VALORES": "=SE(J746=1;J828 - J889;SE(J746=2;J842 - J889;J863 - J889))"
     },
     {
         "ID - REF": "J892",

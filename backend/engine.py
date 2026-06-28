@@ -29,7 +29,7 @@ def expand_ranges(eq_str):
 
 def normalize_formula(eq_str):
     if not isinstance(eq_str, str) or not eq_str.startswith('='): return eq_str
-    eq = eq_str[1:]
+    eq = eq_str[1:].strip()  # strip() handles formulas saved as "= expr" (space after =)
     eq = re.sub(r'Vapor!\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+', '"Vapor"', eq, flags=re.IGNORECASE)
     eq = re.sub(r'[a-zA-Z0-9_]+!', '', eq).replace('$', '')
     eq = re.sub(r'@([A-Z])(\d+):[A-Z]\d+', r'\1\2', eq).replace('@', '').replace('<>', '!=')
@@ -180,3 +180,34 @@ def calculate_state(variables_list, tolerance=0.0001):
         "residual": float(max_delta)
     }
 
+class VariableReplacer(ast.NodeTransformer):
+    def __init__(self, target_name: str, replacement_expr: str):
+        self.target_name = target_name
+        expr_str = replacement_expr.lstrip('=').strip()
+        parsed = ast.parse(expr_str, mode='eval')
+        self.replacement_node = parsed.body
+
+    def visit_Name(self, node):
+        if node.id == self.target_name:
+            import copy
+            return copy.deepcopy(self.replacement_node)
+        return self.generic_visit(node)
+def substitute_variable_in_formula(formula: str, target_var: str, replacement_expr: str) -> str:
+    if not isinstance(formula, str) or not formula.startswith('='):
+        return formula
+    
+    expr_str = formula[1:].strip()  # strip handles "= expr" (space after =)
+    
+    # Clean the replacement expression
+    replacement_clean = replacement_expr.lstrip('=').strip()
+    
+    # Determine if we need parentheses to protect mathematical precedence
+    # We need parentheses if the replacement expression contains binary operators or spaces
+    if any(c in replacement_clean for c in ['+', '-', '*', '/', ' ', '>', '<', '=', ';']):
+        repl_str = f"({replacement_clean})"
+    else:
+        repl_str = replacement_clean
+        
+    pattern = r'\b' + re.escape(target_var) + r'\b'
+    new_expr = re.sub(pattern, repl_str, expr_str)
+    return f"={new_expr}"

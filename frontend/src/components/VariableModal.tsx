@@ -5,6 +5,7 @@ import { useEquationAutocomplete } from '../utils/useEquationAutocomplete';
 import { EquationDropdown } from './EquationDropdown';
 import { FormulaEditor } from './FormulaEditor';
 import { BmeIcon } from '../theme/design-system';
+import { SubstitutionModal } from './SubstitutionModal';
 
 interface VariableModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface VariableModalProps {
   variables: Variable[];
   prefilledSector?: string;
   prefilledEtapa?: string;
+  onSubstitutionSuccess: () => void;
 }
 
 export const VariableModal: React.FC<VariableModalProps> = ({
@@ -23,9 +25,11 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   variableToEdit,
   variables,
   prefilledSector = '',
-  prefilledEtapa = ''
+  prefilledEtapa = '',
+  onSubstitutionSuccess
 }) => {
   const isEdit = !!variableToEdit;
+  const [isSubstitutionOpen, setIsSubstitutionOpen] = useState(false);
 
   const [idRef, setIdRef] = useState('');
   const [type, setType] = useState<'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO'>('INPUT');
@@ -260,6 +264,15 @@ export const VariableModal: React.FC<VariableModalProps> = ({
           </div>
 
           <div className="bme-modal-footer">
+            {isEdit && equationValue.trim().startsWith('=') && (
+              <button
+                type="button"
+                onClick={() => setIsSubstitutionOpen(true)}
+                className="mr-auto bg-amber-600/20 hover:bg-amber-600/35 border border-amber-600/30 text-amber-300 font-bold py-1.5 px-4 rounded text-xs transition-colors"
+              >
+                Substituir esta Variável
+              </button>
+            )}
             <button type="button" onClick={onClose} className="bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1.5 px-4 rounded text-xs transition-colors">
               Cancelar
             </button>
@@ -269,6 +282,17 @@ export const VariableModal: React.FC<VariableModalProps> = ({
           </div>
         </form>
       </div>
+
+      <SubstitutionModal
+        isOpen={isSubstitutionOpen}
+        onClose={() => setIsSubstitutionOpen(false)}
+        targetVarId={idRef}
+        targetExpression={equationValue}
+        onSuccess={() => {
+          onSubstitutionSuccess();
+          onClose();
+        }}
+      />
     </div>
   );
 };

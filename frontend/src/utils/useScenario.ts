@@ -3,15 +3,12 @@ import axios from 'axios';
 import { Variable, Sector } from '../types';
 import { ScenarioMetadata } from '../components/ScenarioManager';
 
-export function formatHarvestYear(year: number | string): string {
+export const formatHarvestYear = (year: number | string): string => {
   const y = typeof year === 'string' ? parseInt(year, 10) : year;
   return isNaN(y) ? String(year) : `${y}/${y + 1}`;
-}
+};
 
-export function parseHarvestYear(yearStr: string): number {
-  const match = yearStr.match(/\d{4}/);
-  return match ? parseInt(match[0], 10) : 2026;
-}
+export const parseHarvestYear = (yearStr: string): number => parseInt(yearStr.match(/\d{4}/)?.[0] || '2026', 10);
 
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [variables, setVariables] = useState<Variable[]>([]);
@@ -220,42 +217,55 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     }
   };
 
+  const reloadCurrentScenario = async () => {
+    if (currentScenario) {
+      setLoading(true);
+      try {
+        const detailRes = await axios.get(`http://localhost:8000/api/scenarios/${currentScenario.id}`);
+        onLoadScenario(detailRes.data.variables, currentScenario);
+      } catch (err) {
+        console.error("Erro ao recarregar cenário:", err);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      try {
+        const res = await axios.get('http://localhost:8000/api/variables');
+        const mapped: Variable[] = res.data.map((v: {
+          id: string;
+          tipo: 'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO';
+          status: string;
+          setor_id: string;
+          etapa: string;
+          ponto_controle: string;
+          descricao: string;
+          unidade: string;
+          equation_value: string;
+        }) => ({
+          'ID - REF': v.id,
+          TIPO: v.tipo,
+          STATUS: v.status as 'ativa' | 'pendente' | 'inválida' | 'descontinuada',
+          SETOR: v.setor_id,
+          ETAPA: v.etapa,
+          'PONTO DE CONTROLE': v.ponto_controle,
+          'DESCRIÇÃO': v.descricao,
+          'UNIDADE DE MEDIDA': v.unidade,
+          'EQUAÇÕES E VALORES': v.equation_value
+        }));
+        setVariables(mapped);
+        triggerCalculate(mapped);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
 
   return {
-    variables,
-    setVariables,
-    results,
-    setResults,
-    loading,
-    setLoading,
-    calculating,
-    convergenceError,
-    iterations,
-    activeSector,
-    setActiveSector,
-    currentScenario,
-    setCurrentScenario,
-    saving,
-    anoSafra,
-    setAnoSafra,
-    mesReferencia,
-    setMesReferencia,
-    hasUnsavedChanges,
-    setHasUnsavedChanges,
-    savingActive,
-    handleChange,
-    handleCalculate,
-    onLoadScenario,
-    handleSaveNew,
-    handleSaveActive,
-    onApplyOptimalValue,
-    handleSaveVariable,
-    isLocked,
-    years,
-    months,
-    fetchYearsAndMonths,
-    residual,
-    tolerance,
-    updateTolerance
+    reloadCurrentScenario, variables, setVariables, results, setResults, loading, setLoading,
+    calculating, convergenceError, iterations, activeSector, setActiveSector, currentScenario,
+    setCurrentScenario, saving, anoSafra, setAnoSafra, mesReferencia, setMesReferencia,
+    hasUnsavedChanges, setHasUnsavedChanges, savingActive, handleChange, handleCalculate,
+    onLoadScenario, handleSaveNew, handleSaveActive, onApplyOptimalValue, handleSaveVariable,
+    isLocked, years, months, fetchYearsAndMonths, residual, tolerance, updateTolerance
   };
 }
