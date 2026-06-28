@@ -45,6 +45,12 @@
       "description": "Criar suíte de testes unitários e de integração para o algoritmo de substituição e os novos endpoints.",
       "scope": "backend/test_engine.py",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-1501",
+      "description": "Implementar a segregação e renomeação de variáveis inativas em todo o ecossistema (backend, banco de dados, testes e frontend).",
+      "scope": "backend/database.py, backend/services_variables.py, backend/services_harvest_plan.py, backend/services_scenarios.py, frontend/src/components/SectorModules.tsx, frontend/src/types/index.ts",
+      "status": "DONE"
     }
   ]
 }

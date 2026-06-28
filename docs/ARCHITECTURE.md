@@ -42,7 +42,7 @@ Utiliza `scipy.optimize.root_scalar` para encontrar o valor de um input que zera
 
 ### 3. Persistência e Governança (`backend/database.py`)
 Persiste os dados de maneira estruturada e relacional através do PostgreSQL normalizado em tabelas:
-* **Tabelas do Sistema**: `scenarios` (cenários de safra/mês), `variables` (propriedades de variáveis globais), `equations` (fórmulas das variáveis), `dependencies` (grafo de dependências de cálculo), `results` (valores resultantes por cenário/versão), `sectors` (cadastro e ordenação de setores de processo) e `harvest_plan_settings` (configurações do plano de safra).
+* **Tabelas do Sistema**: `scenarios` (cenários de safra/mês), `variables` (propriedades de variáveis globais com status `ATIVA`, `PENDENTE`, `INVALIDA`, `INATIVA`), `equations` (fórmulas das variáveis), `dependencies` (grafo de dependências de cálculo), `results` (valores resultantes por cenário/versão), `sectors` (cadastro e ordenação de setores de processo) e `harvest_plan_settings` (configurações do plano de safra).
 * **Versionamento Incremental**: O backend localiza automaticamente a versão máxima para aquele período e incrementa (`version + 1`).
 * **Bloqueio de Edição**: Caso o status do cenário no banco mude para `Aprovado` ou `Final`, o frontend desabilita todas as caixas de texto de entrada e o botão "Calcular", impedindo alterações acidentais.
 

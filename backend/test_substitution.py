@@ -98,7 +98,7 @@ def test_substitution_preview_and_confirm():
 
         # Verify target is archived
         db_j168 = session.get(Variable, "T_J168")
-        assert db_j168.status == VariableStatus.DESCONTINUADA
+        assert db_j168.status == VariableStatus.INATIVA
 
         # Clear test entities
         session.exec(select(Dependency).where(Dependency.dependency_var_id == "T_J34")).all()
@@ -181,7 +181,7 @@ def test_substitution_custom_expression():
         session.flush()
 
         v_j34 = Variable(id="TC_J34", nome="J34", setor_id="TEST_SEC_CUST", tipo=VariableType.INPUT, status=VariableStatus.ATIVA)
-        v_j168 = Variable(id="TC_J168", nome="J168", setor_id="TEST_SEC_CUST", tipo=VariableType.OUTPUT, status=VariableStatus.DESCONTINUADA)
+        v_j168 = Variable(id="TC_J168", nome="J168", setor_id="TEST_SEC_CUST", tipo=VariableType.OUTPUT, status=VariableStatus.INATIVA)
         v_j167 = Variable(id="TC_J167", nome="J167", setor_id="TEST_SEC_CUST", tipo=VariableType.OUTPUT, status=VariableStatus.ATIVA)
 
         session.add_all([v_j34, v_j168, v_j167])

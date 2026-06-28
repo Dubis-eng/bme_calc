@@ -7,7 +7,7 @@ export interface Variable {
     "TIPO": "INPUT" | "OUTPUT" | "DERIVADA" | "CENARIO";
     "UNIDADE DE MEDIDA": string;
     "EQUAÇÕES E VALORES": string | number;
-    "STATUS"?: "ativa" | "pendente" | "inválida" | "descontinuada";
+    "STATUS"?: "ativa" | "pendente" | "inválida" | "inativa";
 }
 
 export interface Result {

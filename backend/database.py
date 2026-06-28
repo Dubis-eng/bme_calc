@@ -20,7 +20,7 @@ class VariableStatus(str, Enum):
     ATIVA = "ativa"
     PENDENTE = "pendente"
     INVALIDA = "inválida"
-    DESCONTINUADA = "descontinuada"
+    INATIVA = "inativa"
 class ResultStatus(str, Enum):
     OK = "OK"
     DIV_BY_ZERO = "DIV_BY_ZERO"

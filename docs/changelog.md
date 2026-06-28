@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-06-28
+
+### Added
+- **Segregação de Variáveis Inativas**:
+  - Filtro no backend nas listagens gerais (`/api/variables`) e de configuração de plano de safra (`/api/harvest-plan/config`) para omitir variáveis com status `inativa`, impedindo que apareçam nessas tabelas.
+  - Propagação do campo `"STATUS"` no retorno do endpoint de variáveis de cenários (`get_scenario_variables` / `/api/scenarios/{id}`), permitindo a identificação do estado de arquivamento no frontend.
+  - Filtro e visualização controlada no frontend (`SectorModules.tsx`): variáveis inativas são ocultadas por padrão e exibidas somente ao ativar o novo toggle "Mostrar Inativas" na barra de tipo.
+  - Estilização diferenciada para linhas inativas no frontend (opacidade reduzida, texto em itálico, badge pastel "INATIVA") com inputs e botão de edição desabilitados.
+  - Reset automático das propriedades de participação no Plano de Safra (`in_harvest_plan = False`, `harvest_plan_op = None`, `harvest_plan_weight_var_id = None`) para variáveis arquivadas no momento do seu inlining/substituição.
+  - Migração de terminologia de "descontinuada" para "inativa" em todo o sistema (enums de banco de dados, serviços de substituição, testes e componentes do frontend).
+
 ## [2.7.0] - 2026-06-27
 
 ### Added

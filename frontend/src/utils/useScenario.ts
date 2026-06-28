@@ -225,6 +225,20 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         onLoadScenario(detailRes.data.variables, currentScenario);
       } catch (err) {
         console.error("Erro ao recarregar cenário:", err);
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          try {
+            const listRes = await axios.get('http://localhost:8000/api/scenarios');
+            if (listRes.data?.length > 0) {
+              const latest = listRes.data[0];
+              const fallbackRes = await axios.get(`http://localhost:8000/api/scenarios/${latest.id}`);
+              onLoadScenario(fallbackRes.data.variables, latest);
+            } else {
+              loadLocalFallback();
+            }
+          } catch (fallbackErr) {
+            loadLocalFallback();
+          }
+        }
       } finally {
         setLoading(false);
       }
@@ -244,7 +258,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         }) => ({
           'ID - REF': v.id,
           TIPO: v.tipo,
-          STATUS: v.status as 'ativa' | 'pendente' | 'inválida' | 'descontinuada',
+          STATUS: v.status as 'ativa' | 'pendente' | 'inválida' | 'inativa',
           SETOR: v.setor_id,
           ETAPA: v.etapa,
           'PONTO DE CONTROLE': v.ponto_controle,

@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
 from database import (
     Variable, Equation, Dependency, Scenario, Result, HarvestPlanSetting,
-    ScenarioStatus, VariableType, ResultStatus
+    ScenarioStatus, VariableType, ResultStatus, VariableStatus
 )
 import engine
 
@@ -45,7 +45,7 @@ def update_harvest_plan_settings(start_month: str, db: Session) -> HarvestPlanSe
     return setting
 
 def get_variables_harvest_config(db: Session) -> List[Dict[str, Any]]:
-    stmt = select(Variable).order_by(Variable.setor_id, Variable.id)
+    stmt = select(Variable).where(Variable.status != VariableStatus.INATIVA).order_by(Variable.setor_id, Variable.id)
     db_vars = db.exec(stmt).all()
     configs = []
     for var in db_vars:

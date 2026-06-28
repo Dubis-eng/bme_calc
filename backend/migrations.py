@@ -258,3 +258,22 @@ def migrate_database_schema(session: Session):
                 session.commit()
             except Exception as e:
                 print(f"Error migrating harvest_plan_weight_var_id: {e}")
+
+    # Migrate 'DESCONTINUADA' to 'INATIVA'
+    if "variables" in tables:
+        if session.bind.dialect.name == "postgresql":
+            try:
+                session.commit()
+                connection = session.connection()
+                connection = connection.execution_options(isolation_level="AUTOCOMMIT")
+                connection.execute(text("ALTER TYPE variablestatus ADD VALUE 'INATIVA'"))
+            except Exception:
+                pass
+        try:
+            if session.bind.dialect.name == "postgresql":
+                session.execute(text("UPDATE variables SET status = 'INATIVA' WHERE status::text IN ('DESCONTINUADA', 'descontinuada')"))
+            else:
+                session.execute(text("UPDATE variables SET status = 'INATIVA' WHERE status IN ('DESCONTINUADA', 'descontinuada', 'inativa')"))
+            session.commit()
+        except Exception as e:
+            print(f"Error updating variables status to INATIVA: {e}")
