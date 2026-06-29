@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-06-29
+ 
+### Added
+- **Seeding Idempotente e Inteligente**:
+  - Modificação do processo de semeadura do banco de dados (`backend/seeding.py`) para evitar a destruição de dados a cada inicialização da API.
+  - O banco de dados agora só faz a carga inicial a partir do JSON se a tabela `variables` estiver completamente vazia.
+  - Adicionado suporte para carregar status de variáveis (`STATUS`) e configurações do plano de safra (`IN_HARVEST_PLAN`, `HARVEST_PLAN_OP`, `HARVEST_PLAN_WEIGHT_VAR_ID`) a partir do JSON de carga inicial.
+  - Refatoração do script de semeadura em funções especializadas sob o limite constitucional de 40 linhas e baixa complexidade.
+- **Utilitário de Exportação de Dados**:
+  - Criação do script `backend/export_database_to_json.py` para ler os dados do banco e atualizar de volta o arquivo `memorial_de_calculo_balanco.json` de forma atômica nos 3 destinos (backend, docs e frontend).
+  - Conversão automatizada de caracteres corrompidos do PowerShell e restauração limpa de acentuação em UTF-8.
+- **Backup e Restauração Binária**:
+  - Atualização de `info.txt` documentando comandos binários seguros (`pg_dump` e `pg_restore` com `-F c`) de dentro do container Docker para eliminar problemas de encoding.
+
 ## [2.9.0] - 2026-06-29
 
 ### Added
