@@ -13,6 +13,7 @@ interface HeaderProps {
   setActiveTab: (tab: ActiveTab) => void;
   residual: number;
   tolerance: number;
+  isOffline: boolean;
 }
 
 type ConnectionStatus = 'connected' | 'disconnected' | 'checking';
@@ -51,8 +52,10 @@ export function Header({
   setActiveTab,
   residual,
   tolerance,
+  isOffline,
 }: HeaderProps) {
-  const connStatus = useBackendStatus();
+  const checkStatus = useBackendStatus();
+  const connStatus = isOffline ? 'disconnected' : checkStatus;
 
   const statusColors: Record<ConnectionStatus, string> = {
     connected:    'bg-emerald-400',

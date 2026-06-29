@@ -3,7 +3,7 @@
 > Last updated: 2026-06-29
 
 ## Last Task Completed
-- Feature/fix: padronizacao-exibicao-variaveis-e-percentuais
+- Feature/fix: Tratamento Fail-Fast de Conexão com Servidor Offline e Travamento de UI (Tarefa 10.5)
 - Branch: main
 - Status: ACCEPTED
 
@@ -11,6 +11,6 @@
 - Nenhum.
 
 ## Next Steps
-- Implementar novas regras e verificações solicitadas pelo usuário.
+- Aguardar novas solicitações de melhorias no motor de cálculo, usabilidade ou integrações.
 
 

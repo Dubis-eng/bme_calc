@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Variable } from '../types';
-import { formatHarvestYear } from '../utils/useScenario';
+import { formatHarvestYear } from '../utils/helpers';
 import { SCENARIO_STATUS_BADGE } from '../theme/design-system';
 
 export interface ScenarioMetadata {

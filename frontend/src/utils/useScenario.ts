@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Variable, Sector } from '../types';
+import { Variable, Sector, BackendVariable } from '../types';
 import { ScenarioMetadata } from '../components/ScenarioManager';
-
-export const formatHarvestYear = (year: number | string): string => {
-  const y = typeof year === 'string' ? parseInt(year, 10) : year;
-  return isNaN(y) ? String(year) : `${y}/${y + 1}`;
-};
-
-export const parseHarvestYear = (yearStr: string): number => parseInt(yearStr.match(/\d{4}/)?.[0] || '2026', 10);
+import { formatHarvestYear, parseHarvestYear, mapBackendVariableToFrontend } from './helpers';
 
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [variables, setVariables] = useState<Variable[]>([]);
@@ -26,10 +20,29 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [savingActive, setSavingActive] = useState(false);
   const [years, setYears] = useState<{ id: number; active: boolean }[]>([]);
   const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
+  const [isOffline, setIsOffline] = useState(false);
   const [residual, setResidual] = useState<number>(0);
   const [tolerance, setTolerance] = useState<number>(() => {
     return parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5');
   });
+
+  const checkConnection = async () => {
+    try {
+      await axios.get('http://localhost:8000/api/scenarios', { timeout: 2000 });
+      setIsOffline(false);
+      return true;
+    } catch {
+      setIsOffline(true);
+      return false;
+    }
+  };
+
+  const handleApiError = (err: unknown) => {
+    const error = err as { response?: { status: number }; code?: string; message?: string };
+    if (!error.response || error.code === 'ERR_NETWORK' || error.message === 'Network Error' || (error.response && error.response.status >= 500)) {
+      setIsOffline(true);
+    }
+  };
 
   const loadLocalFallback = () => {
     fetch('/memorial_de_calculo_balanco.json')
@@ -37,9 +50,8 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       .then(data => {
         setVariables(data);
         if (data.length > 0) setActiveSector(data[0].SETOR);
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .finally(() => setLoading(false));
   };
 
   const fetchYearsAndMonths = async () => {
@@ -49,14 +61,21 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       const moRes = await axios.get('http://localhost:8000/api/harvest-months');
       setMonths(moRes.data);
     } catch (err) {
-      console.error("Erro ao carregar anos/meses:", err);
+      handleApiError(err);
     }
   };
+
+  useEffect(() => {
+    if (!isOffline) return;
+    const interval = setInterval(checkConnection, 5000);
+    return () => clearInterval(interval);
+  }, [isOffline]);
 
   useEffect(() => {
     fetchYearsAndMonths();
     axios.get('http://localhost:8000/api/scenarios')
       .then(res => {
+        setIsOffline(false);
         if (res.data?.length > 0) {
           const latest = res.data[0];
           axios.get(`http://localhost:8000/api/scenarios/${latest.id}`)
@@ -64,10 +83,18 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
               onLoadScenario(detailRes.data.variables, latest);
               setLoading(false);
             })
-            .catch(() => loadLocalFallback());
-        } else loadLocalFallback();
+            .catch(err => {
+              handleApiError(err);
+              setLoading(false);
+            });
+        } else {
+          loadLocalFallback();
+        }
       })
-      .catch(() => loadLocalFallback());
+      .catch(err => {
+        handleApiError(err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -84,13 +111,14 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
 
   const handleChange = (id: string, value: string) => {
-    if (!isLocked) {
+    if (!isLocked && !isOffline) {
       setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
       setHasUnsavedChanges(true);
     }
   };
 
   const triggerCalculate = async (varsList: Variable[], tolVal?: number) => {
+    if (isOffline) return;
     setCalculating(true);
     setConvergenceError(false);
     try {
@@ -104,6 +132,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       setResidual(response.data.residual || 0);
     } catch (err) {
       console.error(err);
+      handleApiError(err);
       alert("Erro ao calcular.");
     } finally {
       setCalculating(false);
@@ -119,17 +148,15 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const handleCalculate = () => triggerCalculate(variables);
 
   const onLoadScenario = (loadedVars: Variable[], meta: ScenarioMetadata) => {
-    setVariables(loadedVars);
-    setCurrentScenario(meta);
+    setVariables(loadedVars); setCurrentScenario(meta);
     const parsedYear = typeof meta.year_harvest === 'string' ? parseHarvestYear(meta.year_harvest) : meta.year_harvest;
-    setAnoSafra(parsedYear);
-    setMesReferencia(meta.reference_month);
-    setHasUnsavedChanges(false);
+    setAnoSafra(parsedYear); setMesReferencia(meta.reference_month); setHasUnsavedChanges(false);
     if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
     triggerCalculate(loadedVars);
   };
 
   const handleSaveNew = async () => {
+    if (isOffline) return;
     setSaving(true);
     try {
       const res = await axios.post('http://localhost:8000/api/scenarios', {
@@ -143,6 +170,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       alert(`Cenário salvo com sucesso! Versão: v${res.data.version}`);
       fetchSectors();
     } catch (err) {
+      handleApiError(err);
       alert("Erro ao salvar cenário.");
     } finally {
       setSaving(false);
@@ -150,7 +178,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   };
 
   const handleSaveActive = async () => {
-    if (!currentScenario) return;
+    if (!currentScenario || isOffline) return;
     setSavingActive(true);
     try {
       await axios.put(`http://localhost:8000/api/scenarios/${currentScenario.id}`, {
@@ -159,6 +187,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       setHasUnsavedChanges(false);
       alert('Alterações salvas com sucesso!');
     } catch (err) {
+      handleApiError(err);
       alert('Erro ao salvar alterações do cenário.');
       console.error(err);
     } finally {
@@ -198,7 +227,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       etapa: newVar["ETAPA"] || "",
       ponto_controle: newVar["PONTO DE CONTROLE"] || "",
       equation_value: String(newVar["EQUAÇÕES E VALORES"] || ""),
-      casas_decimais: (newVar.casas_decimais === undefined || newVar.casas_decimais === null || (newVar.casas_decimais as any) === '') ? null : Number(newVar.casas_decimais),
+      casas_decimais: (newVar.casas_decimais === undefined || newVar.casas_decimais === null || (newVar.casas_decimais as unknown) === '') ? null : Number(newVar.casas_decimais),
       tipo_exibicao: newVar.tipo_exibicao || "NUMBER",
       percent_base: newVar.percent_base || "DECIMAL"
     };
@@ -248,31 +277,12 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     } else {
       try {
         const res = await axios.get('http://localhost:8000/api/variables');
-        const mapped: Variable[] = res.data.map((v: {
-          id: string;
-          tipo: 'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO';
-          status: string;
-          setor_id: string;
-          etapa: string;
-          ponto_controle: string;
-          descricao: string;
-          unidade: string;
-          equation_value: string;
-        }) => ({
-          'ID - REF': v.id,
-          TIPO: v.tipo,
-          STATUS: v.status as 'ativa' | 'pendente' | 'inválida' | 'inativa',
-          SETOR: v.setor_id,
-          ETAPA: v.etapa,
-          'PONTO DE CONTROLE': v.ponto_controle,
-          'DESCRIÇÃO': v.descricao,
-          'UNIDADE DE MEDIDA': v.unidade,
-          'EQUAÇÕES E VALORES': v.equation_value
-        }));
+        const mapped: Variable[] = res.data.map((v: BackendVariable) => mapBackendVariableToFrontend(v));
         setVariables(mapped);
         triggerCalculate(mapped);
       } catch (err) {
         console.error(err);
+        handleApiError(err);
       }
     }
   };
@@ -283,6 +293,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     setCurrentScenario, saving, anoSafra, setAnoSafra, mesReferencia, setMesReferencia,
     hasUnsavedChanges, setHasUnsavedChanges, savingActive, handleChange, handleCalculate,
     onLoadScenario, handleSaveNew, handleSaveActive, onApplyOptimalValue, handleSaveVariable,
-    isLocked, years, months, fetchYearsAndMonths, residual, tolerance, updateTolerance
+    isLocked, years, months, fetchYearsAndMonths, residual, tolerance, updateTolerance,
+    isOffline, checkConnection
   };
 }

@@ -50,7 +50,8 @@ function App() {
     handleChange, handleCalculate, onLoadScenario, handleSaveNew,
     handleSaveActive, onApplyOptimalValue, handleSaveVariable, isLocked,
     years, months, fetchYearsAndMonths,
-    residual, tolerance, updateTolerance
+    residual, tolerance, updateTolerance,
+    isOffline, checkConnection
   } = useScenario(sectors, fetchSectors);
 
   const search = useSearch(variables);
@@ -115,17 +116,32 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen bg-bme-bg text-slate-200 font-sans overflow-hidden">
+      {isOffline && (
+        <div className="bg-gradient-to-r from-rose-600 via-amber-600 to-red-700 text-white shadow-lg flex items-center justify-between p-3 border-b border-rose-500/20 backdrop-blur-sm sticky top-0 z-50 animate-pulse">
+          <div className="flex items-center gap-2">
+            <span className="font-bold">⚠️ Conexão Perdida:</span>
+            <span>O servidor está offline. As alterações e os cálculos estão bloqueados para evitar perda de dados.</span>
+          </div>
+          <button 
+            onClick={() => checkConnection()}
+            className="bg-white text-rose-700 hover:text-rose-900 font-bold px-4 py-1.5 rounded-lg shadow hover:bg-slate-100 transition-all text-xs active:scale-95"
+          >
+            Tentar Reconectar
+          </button>
+        </div>
+      )}
       <Header
         searchQuery={search.searchQuery}
         onSearchInput={search.handleSearchInput}
         iterations={iterations}
         handleCalculate={handleCalculate}
         calculating={calculating}
-        isLocked={isLocked}
+        isLocked={isLocked || isOffline}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         residual={residual}
         tolerance={tolerance}
+        isOffline={isOffline}
       />
 
       {activeTab === 'flowchart' && (
@@ -180,10 +196,10 @@ function App() {
                 </div>
 
                 {/* ── Status banners ── */}
-                {isLocked && (
+                {(isLocked || isOffline) && (
                   <div className="mb-3 px-4 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg text-slate-400 text-xs font-semibold flex items-center gap-2">
                     <span>🔒</span>
-                    <span>Cenário Congelado (Status: {currentScenario?.status}). Edições e recalculações bloqueadas.</span>
+                    <span>{isOffline ? 'Modo Offline. Todas as alterações e recálculos estão suspensos.' : `Cenário Congelado (Status: ${currentScenario?.status}). Edições e recalculações bloqueadas.`}</span>
                   </div>
                 )}
                 {convergenceError && (
@@ -204,7 +220,7 @@ function App() {
                   <button
                     id="btn-add-variable"
                     onClick={() => handleAddVariable(activeSector, '')}
-                    disabled={isLocked}
+                    disabled={isLocked || isOffline}
                     className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs"
                   >
                     <span>+</span>
@@ -217,7 +233,7 @@ function App() {
                     activeSector={activeSector}
                     variables={variables}
                     results={results}
-                    isLocked={isLocked}
+                    isLocked={isLocked || isOffline}
                     highlightedVarId={search.highlightedVarId}
                     onEditVariable={handleEditVariable}
                     onAddVariable={handleAddVariable}
@@ -246,7 +262,7 @@ function App() {
             savingActive={savingActive}
             hasUnsavedChanges={hasUnsavedChanges}
             scenarioVars={scenarioVars}
-            isLocked={isLocked}
+            isLocked={isLocked || isOffline}
             onVariableChange={handleChange}
             onGoalSeekOpen={() => setIsGoalSeekOpen(true)}
             sectors={sectors}

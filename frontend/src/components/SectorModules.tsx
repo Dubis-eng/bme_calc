@@ -154,7 +154,7 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
           <span className="text-2xl mb-3 opacity-40">◈</span>
           <p className="text-sm font-semibold text-slate-400 mb-1">Nenhuma variável encontrada</p>
           {activeTypeFilter === 'ALL' && (
-            <button onClick={() => onAddVariable(activeSector, 'GERAL')} className="btn-primary px-4 py-1.5 text-xs mt-4">+ Cadastrar Primeira Variável</button>
+            <button onClick={() => onAddVariable(activeSector, 'GERAL')} disabled={isLocked} className="btn-primary px-4 py-1.5 text-xs mt-4 disabled:opacity-50">+ Cadastrar Primeira Variável</button>
           )}
         </div>
       ) : (

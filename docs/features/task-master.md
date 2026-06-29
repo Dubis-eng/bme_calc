@@ -84,6 +84,7 @@ graph TD
 * [x] **Tarefa 10.2** *(Botão Salvar Alterações)* — Adicionar botão no painel de gerenciador de cenários do frontend para salvar as alterações do cenário ativo com indicador visual de pendência.
 * [x] **Tarefa 10.3** *(Alerta de Saída)* — Registrar evento beforeunload no frontend para exibir alerta de confirmação ao tentar fechar/atualizar a aba caso existam modificações pendentes.
 * [x] **Tarefa 10.4** *(Auditoria e Homologação)* — Executar suite de qualidade local e docker tests.
+* [x] **Tarefa 10.5** *(Tratamento Fail-Fast de Conexão)* — Implementar banner de aviso offline, travamento de interface no frontend e desabilitar fallbacks silenciosos.
 
 ---
 

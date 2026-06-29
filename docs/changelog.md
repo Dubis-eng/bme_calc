@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2026-06-29
+
+### Added
+- **Tratamento Fail-Fast de Conexão com Servidor Offline (Tarefa 10.5)**:
+  - Implementação de um banner visual persistente no topo da tela com estilização Maestro UI avisando quando o servidor está inacessível.
+  - Inclusão de botão "Tentar Reconectar" no banner para reavaliação manual do estado de conexão.
+  - Implementação de mecanismo de polling de conexão (heartbeat de reconexão automática) a cada 5 segundos que executa exclusivamente enquanto o frontend está em modo offline.
+  - Bloqueio completo de escrita e recálculo no frontend: desabilitação de todos os campos de entrada de dados, botões de cálculo, cadastros e painel de cenários quando a conexão é perdida.
+  - Remoção de fallbacks silenciosos que simulavam funcionamento offline (como o carregamento silencioso de dados em cache local em caso de erro na inicialização).
+  - Refatoração e otimização do hook `useScenario.ts` para extrair utilitários de data e mappers para `helpers.ts`, mantendo o arquivo estritamente sob o limite constitucional de 300 linhas de código.
+
 ## [2.11.0] - 2026-06-29
 
 ### Added

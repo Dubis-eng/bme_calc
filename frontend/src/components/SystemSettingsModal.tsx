@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { formatHarvestYear } from '../utils/useScenario';
+import { formatHarvestYear } from '../utils/helpers';
 import { BmeIcon } from '../theme/design-system';
 
 interface SystemSettingsModalProps {
