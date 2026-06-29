@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Variable, Sector } from './types';
+import { Variable, Sector, FilterStatus } from './types';
 import { GoalSeekModal } from './components/GoalSeekModal';
 import { SectorModules } from './components/SectorModules';
 import { VariableModal } from './components/VariableModal';
@@ -30,6 +30,7 @@ function App() {
   const [prefilledSector, setPrefilledSector] = useState('');
   const [prefilledEtapa, setPrefilledEtapa] = useState('');
   const [showDashboard, setShowDashboard] = useState(true);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<FilterStatus>('all');
 
   const fetchSectors = () => {
     axios.get('http://localhost:8000/api/sectors')
@@ -163,6 +164,8 @@ function App() {
                 sectors={sectors}
                 variables={variables}
                 results={resultsMap}
+                filter={activeStatusFilter}
+                setFilter={setActiveStatusFilter}
                 onSectorClick={handleSectorFromDashboard}
               />
             ) : (
@@ -220,6 +223,8 @@ function App() {
                     onAddVariable={handleAddVariable}
                     onVariableChange={handleChange}
                     onNavigateToVariable={onScrollTo}
+                    activeStatusFilter={activeStatusFilter}
+                    setActiveStatusFilter={setActiveStatusFilter}
                   />
                 </div>
               </div>

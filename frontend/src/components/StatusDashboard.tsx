@@ -1,15 +1,15 @@
-import React, { useMemo, useState } from 'react';
-import { Variable, Sector } from '../types';
+import React, { useMemo } from 'react';
+import { Variable, Sector, FilterStatus } from '../types';
 import { getFriendlySectorName } from '../utils/helpers';
 
 interface StatusDashboardProps {
   sectors: Sector[];
   variables: Variable[];
   results: Record<string, { value: number | null; status: string }>;
+  filter: FilterStatus;
+  setFilter: (filter: FilterStatus) => void;
   onSectorClick: (sectorId: string) => void;
 }
-
-type FilterStatus = 'all' | 'ok' | 'error' | 'idle';
 
 interface SectorSummary {
   id: string;
@@ -60,8 +60,7 @@ const FILTER_TABS: { id: FilterStatus; label: string }[] = [
   { id: 'idle',  label: 'Pendente' },
 ];
 
-export function StatusDashboard({ sectors, variables, results, onSectorClick }: StatusDashboardProps) {
-  const [filter, setFilter] = useState<FilterStatus>('all');
+export function StatusDashboard({ sectors, variables, results, filter, setFilter, onSectorClick }: StatusDashboardProps) {
 
   const uniqueSectorIds = useMemo(() => Array.from(new Set([
     ...sectors.map(s => s.id),

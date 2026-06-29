@@ -22,3 +22,6 @@ export interface Sector {
     descricao?: string;
     ordem: number;
 }
+
+export type FilterStatus = 'all' | 'ok' | 'error' | 'idle';
+

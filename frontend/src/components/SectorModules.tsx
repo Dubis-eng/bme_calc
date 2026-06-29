@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Variable } from '../types';
+import { Variable, FilterStatus } from '../types';
 import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
 
 interface SectorModulesProps {
@@ -12,6 +12,8 @@ interface SectorModulesProps {
   onAddVariable: (sector: string, definition: string) => void;
   onVariableChange: (id: string, value: string) => void;
   onNavigateToVariable?: (id: string) => void;
+  activeStatusFilter: FilterStatus;
+  setActiveStatusFilter: (filter: FilterStatus) => void;
 }
 
 const FUNCTIONS = new Set([
@@ -21,15 +23,9 @@ const FUNCTIONS = new Set([
 ]);
 
 export const SectorModules: React.FC<SectorModulesProps> = ({
-  activeSector,
-  variables,
-  results,
-  isLocked,
-  highlightedVarId,
-  onEditVariable,
-  onAddVariable,
-  onVariableChange,
-  onNavigateToVariable
+  activeSector, variables, results, isLocked, highlightedVarId,
+  onEditVariable, onAddVariable, onVariableChange, onNavigateToVariable,
+  activeStatusFilter, setActiveStatusFilter
 }) => {
   const [activeTypeFilter, setActiveTypeFilter] = useState<'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA'>('ALL');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
@@ -37,10 +33,22 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
   const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
 
+  const matchesStatus = (v: Variable): boolean => {
+    if (activeStatusFilter === 'all') return true;
+    const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
+    const res = results[v['ID - REF']];
+    if (isInput) return activeStatusFilter === 'idle' && (!v['EQUAÇÕES E VALORES'] || String(v['EQUAÇÕES E VALORES']).trim() === '');
+    const st = res?.status;
+    if (activeStatusFilter === 'ok') return st === 'OK';
+    if (activeStatusFilter === 'error') return !!st && st !== 'OK' && st !== 'PENDING';
+    return !st || st === 'PENDING';
+  };
+
   const sectorVariables = variables.filter(v => {
     if (v.SETOR !== activeSector) return false;
     if (v.STATUS === 'inativa' && !showInactive) return false;
-    return activeTypeFilter === 'ALL' || v.TIPO === activeTypeFilter;
+    if (activeTypeFilter !== 'ALL' && v.TIPO !== activeTypeFilter) return false;
+    return matchesStatus(v);
   });
 
   const stages: Record<string, Record<string, Variable[]>> = {};
@@ -70,39 +78,45 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
 
   return (
     <div className="space-y-4 relative">
-      {/* Type Filter Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/40 p-2 rounded-xl border border-slate-800/60">
-        <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Tipo:</span>
-        {([
-          { id: 'ALL', label: 'Todos' },
-          { id: 'INPUT', label: 'INPUT' },
-          { id: 'OUTPUT', label: 'OUTPUT' },
-          { id: 'CENARIO', label: 'Cenário' },
-          { id: 'DERIVADA', label: 'Derivada' }
-        ] as const).map(opt => (
+      {/* Type & Status Filter Bar */}
+      <div className="flex flex-col gap-2 bg-slate-900/40 p-3 rounded-xl border border-slate-800/60">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Tipo:</span>
+          {([
+            { id: 'ALL', label: 'Todos' }, { id: 'INPUT', label: 'INPUT' },
+            { id: 'OUTPUT', label: 'OUTPUT' }, { id: 'CENARIO', label: 'Cenário' }, { id: 'DERIVADA', label: 'Derivada' }
+          ] as const).map(opt => (
+            <button
+              key={opt.id} onClick={() => setActiveTypeFilter(opt.id)}
+              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeTypeFilter === opt.id ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm' : 'text-slate-500 hover:text-slate-300 bg-transparent border border-transparent'}`}
+            >
+              {opt.label}
+            </button>
+          ))}
           <button
-            key={opt.id}
-            onClick={() => setActiveTypeFilter(opt.id)}
-            className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
-              activeTypeFilter === opt.id
-                ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm'
-                : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
-            }`}
+            type="button" onClick={() => setShowInactive(prev => !prev)}
+            className={`ml-auto px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${showInactive ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30 shadow-sm' : 'text-slate-500 hover:text-slate-300 bg-transparent border border-transparent'}`}
           >
-            {opt.label}
+            {showInactive ? 'Ocultar Inativas' : 'Mostrar Inativas'}
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => setShowInactive(prev => !prev)}
-          className={`ml-auto px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
-            showInactive
-              ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30 shadow-sm'
-              : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
-          }`}
-        >
-          {showInactive ? 'Ocultar Inativas' : 'Mostrar Inativas'}
-        </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-800/60 pt-2">
+          <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Status:</span>
+          {([
+            { id: 'all', label: 'Todos', style: 'bg-teal-500/20 text-teal-400 border-teal-500/40 shadow-sm' },
+            { id: 'ok', label: 'Convergido', style: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-sm' },
+            { id: 'error', label: 'Com Erro', style: 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-sm' },
+            { id: 'idle', label: 'Pendente', style: 'bg-slate-700/30 text-teal-500/40 border-teal-500/20' }
+          ] as const).map(opt => (
+            <button
+              key={opt.id} onClick={() => setActiveStatusFilter(opt.id)}
+              aria-label={`Filtrar status por ${opt.label}`}
+              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${activeStatusFilter === opt.id ? opt.style : 'text-slate-500 hover:text-slate-300 border-transparent bg-transparent'}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Floating Audit Card */}
