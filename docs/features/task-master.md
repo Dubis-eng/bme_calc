@@ -124,6 +124,15 @@ graph TD
 
 ---
 
+### Épico 16: Persistência e Filtragem Reativa de Status do Dashboard (CONCLUÍDO)
+
+* [x] **Tarefa 16.1** *(Elevação do Estado)* — Elevar o estado do filtro de status do dashboard (`activeStatusFilter`, `setActiveStatusFilter`) para o `App.tsx` e integrá-lo com `StatusDashboard.tsx`.
+* [x] **Tarefa 16.2** *(Barra de Filtro local)* — Implementar a barra visual de filtro de status (Todos, Convergido, Com Erro, Pendente) no componente `SectorModules.tsx`.
+* [x] **Tarefa 16.3** *(Lógica de Filtragem de Variáveis)* — Implementar a lógica de filtragem por status na listagem de variáveis de `SectorModules.tsx` baseada na classificação de calculado convergido/erros e inputs sem valor.
+* [x] **Tarefa 16.4** *(Qualidade e Validação)* — Executar verificação com `checklist.py`, testar o fluxo de filtragem e validar as diretrizes de código limpo.
+
+---
+
 ## 🛠️ Infraestrutura & DevOps
 
 * [x] **Tarefa 7.1** *(Criação do .gitignore)* — Criar o arquivo `.gitignore` na raiz do projeto com as regras para ignorar a pasta `.agent/`, bancos locais SQLite (`*.db`), backups SQL (`*.sql`), ambientes virtuais Python (`.venv`, `__pycache__`), diretórios do Node.js (`node_modules`, `dist`, `build`) e arquivos sensíveis (`.env*`).

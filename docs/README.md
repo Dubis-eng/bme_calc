@@ -20,8 +20,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Tarefa 6.4 (Tolerância de Reciclo e Filtros de Tipo)** — Adicionar configuração dinâmica de tolerância do solucionador, exibição contínua do resíduo e botões rápidos para filtragem por tipo de variável.
 * **[DONE] [feat-014-variable-substitution.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-014-variable-substitution.md)** — Substituição Inteligente de Variáveis nas Equações (Épico 14): motor de substituição AST, modo cascata (recursivo), preview "Antes e Depois" e tratamento de órfãs.
 * **[DONE] Épico 15: Segregação de Variáveis Inativas** — Ocultação de variáveis inativas por padrão nas listagens gerais, de setores e plano de safra, adição do toggle "Mostrar Inativas" na barra de tipo com estilo desbotado/itálico e inputs desabilitados, e renomeação do termo "descontinuada" para "inativa" em todo o sistema.
-
-
+* **[DONE] [feat-016-persist-dashboard-filters.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-016-persist-dashboard-filters.md)** — Persistência e Filtragem Reativa de Status do Dashboard na Tabela de Equações (Épico 16).
 
 ---
 

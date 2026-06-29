@@ -1,14 +1,18 @@
-# HITL Review — Especificação de Substituição de Variáveis
+# HITL Review — Especificação de Persistência e Filtragem Reativa de Status
 
-Este documento resume as decisões e o escopo acordado para a implementação da funcionalidade de Substituição de Variáveis no sistema de Balanço de Massa e Energia.
+Este documento resume as decisões e o escopo acordado para a implementação da funcionalidade de Persistência e Filtragem de Status do Dashboard na Tabela de Equações (Épico 16).
 
 ## 📋 Resumo das Decisões do Usuário
 
-1. **Método de Substituição:** A variável será substituída pelo corpo de sua expressão matemática correspondente. Toda substituição será encapsulada em parênteses de forma a manter a precedência dos operadores (ex: `J168` com `=J34 + 10` substituído em `=J168 * 2` resultará em `=(J34 + 10) * 2`).
-2. **Cascata Recursiva:** O sistema suportará a propagação recursiva da substituição ao longo de toda a árvore de dependência descendente (ex: inlining de toda a cadeia `J34 -> J168 -> J167 -> J166` caso o usuário habilite a opção).
-3. **Limpeza de Órfãs:** Se a variável substituída deixar de ser usada, o modal de confirmação no frontend sugerirá descontinuar (soft-delete) ou excluir permanentemente (hard-delete com aviso de segurança).
-4. **Pré-visualização (Preview):** O usuário poderá ver uma comparação "Antes e Depois" detalhada de todas as equações que serão afetadas antes de confirmar a persistência no banco.
+1. **Persistência Bidirecional:** O estado do filtro de status do dashboard ("Convergido", "Com Erro", "Pendente") será elevado para o `App.tsx` e compartilhado bidirecionalmente entre o Dashboard e a tabela de equações (`SectorModules.tsx`). Qualquer mudança na tabela de equações altera o estado global e reflete no Dashboard ao voltar.
+2. **Interação com Filtro por Tipo:** O filtro de status e o filtro por tipo (INPUT, OUTPUT, etc.) irão se acumular (operação lógica E).
+3. **Classificação de Status por Variável:**
+   - **Convergidos:** Apenas variáveis que possuem equações calculadas (tipo diferente de `INPUT` e `CENARIO`) e cujo status de resultado é `"OK"`.
+   - **Com Erro:** Apenas variáveis que possuem equações calculadas e cujo status de resultado é diferente de `"OK"` e diferente de `"PENDING"`.
+   - **Pendente:**
+     - Variáveis calculadas que possuem status de resultado `"PENDING"` ou sem resultado calculado.
+     - Variáveis do tipo `INPUT` ou `CENARIO` que estiverem vazias ou apenas com espaços em branco (sem valor).
+4. **Interface (UI/UX):** Será adicionada uma barra visual de filtro de status no componente `SectorModules.tsx` para permitir visualizar o filtro atual, alterá-lo localmente ou limpá-lo.
 
 ## 🚀 Próximos Passos
-- Aguardar aprovação do plano de implementação pelo usuário.
-- Iniciar a execução das tarefas (Épico 14).
+- Aguardar aprovação do plano de implementação pelo usuário para prosseguir à fase de execução (/dev).

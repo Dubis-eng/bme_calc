@@ -1,18 +1,16 @@
 # SESSION
 
-> Last updated: 2026-06-28
+> Last updated: 2026-06-29
 
 ## Last Task Completed
-- Feature/fix: segregate-discontinued-variables
-- Branch: feature/segregate-discontinued-variables
+- Feature/fix: persist-dashboard-filters
+- Branch: feature/persist-dashboard-filters
 - Status: ACCEPTED
 
 ## Open Issues / Blockers
 - Nenhum.
 
 ## Next Steps
-1. Rebuild do docker compose local (`docker compose down -v && docker compose up --build -d`) para validar em base limpa.
-2. Homologação em ambiente de staging.
-3. Mesclar a branch feature/segregate-discontinued-variables na branch main.
+- Mesclar a branch feature/persist-dashboard-filters na branch main.
 
 
