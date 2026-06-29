@@ -35,7 +35,10 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
             "TIPO": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
             "UNIDADE DE MEDIDA": var.unidade,
             "EQUAÇÕES E VALORES": eq_val,
-            "STATUS": var.status.value if hasattr(var.status, 'value') else str(var.status)
+            "STATUS": var.status.value if hasattr(var.status, 'value') else str(var.status),
+            "casas_decimais": var.casas_decimais,
+            "tipo_exibicao": var.tipo_exibicao,
+            "percent_base": var.percent_base
         })
     return variables_list
 

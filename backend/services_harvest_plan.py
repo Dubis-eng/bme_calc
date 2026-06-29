@@ -251,24 +251,20 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
         elif op == "CALCULATE":
             pass
             
-        if op != "CALCULATE":
-            engine_vars.append({
-                "ID - REF": var_id,
-                "SETOR": var.setor_id,
-                "TIPO": "INPUT",
-                "UNIDADE DE MEDIDA": var.unidade,
-                "DESCRIÇÃO": var.nome,
-                "EQUAÇÕES E VALORES": str(accum_val) if accum_val is not None else "0"
-            })
-        else:
-            engine_vars.append({
-                "ID - REF": var_id,
-                "SETOR": var.setor_id,
-                "TIPO": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
-                "UNIDADE DE MEDIDA": var.unidade,
-                "DESCRIÇÃO": var.nome,
-                "EQUAÇÕES E VALORES": expr if expr else "0"
-            })
+        t_val = str(accum_val) if accum_val is not None else "0"
+        t_type = "INPUT"
+        if op == "CALCULATE":
+            t_val = expr if expr else "0"
+            t_type = var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo)
+
+        engine_vars.append({
+            "ID - REF": var_id,
+            "SETOR": var.setor_id,
+            "TIPO": t_type,
+            "UNIDADE DE MEDIDA": var.unidade,
+            "DESCRIÇÃO": var.nome,
+            "EQUAÇÕES E VALORES": t_val
+        })
             
     calc_results = engine.calculate_state(engine_vars)
     accumulated_results = calc_results["results"]
@@ -291,7 +287,10 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
                 "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
                 "monthly_values": month_vals_dict,
                 "monthly_statuses": month_statuses_dict,
-                "accumulated": accum_res
+                "accumulated": accum_res,
+                "casas_decimais": var.casas_decimais,
+                "tipo_exibicao": var.tipo_exibicao,
+                "percent_base": var.percent_base
             })
         
     return {

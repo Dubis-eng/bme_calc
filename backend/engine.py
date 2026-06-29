@@ -168,7 +168,7 @@ def calculate_state(variables_list, tolerance=0.0001):
             if isinstance(val, bool):
                 rounded_results[k] = {"value": val, "status": "OK", "error_message": ""}
             else:
-                try: rounded_results[k] = {"value": float(round(to_decimal(val), 4)), "status": "OK", "error_message": ""}
+                try: rounded_results[k] = {"value": float(to_decimal(val)), "status": "OK", "error_message": ""}
                 except Exception as e: rounded_results[k] = {"value": None, "status": "INVALID_VALUE", "error_message": str(e)}
         else:
             rounded_results[k] = {"value": None, "status": v["status"], "error_message": v.get("error_message", "")}

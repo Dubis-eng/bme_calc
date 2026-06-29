@@ -258,6 +258,24 @@ def migrate_database_schema(session: Session):
                 session.commit()
             except Exception as e:
                 print(f"Error migrating harvest_plan_weight_var_id: {e}")
+        if "casas_decimais" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN casas_decimais INTEGER DEFAULT NULL"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating casas_decimais: {e}")
+        if "tipo_exibicao" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN tipo_exibicao VARCHAR DEFAULT 'NUMBER'"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating tipo_exibicao: {e}")
+        if "percent_base" not in cols:
+            try:
+                session.execute(text("ALTER TABLE variables ADD COLUMN percent_base VARCHAR DEFAULT 'DECIMAL'"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating percent_base: {e}")
 
     # Migrate 'DESCONTINUADA' to 'INATIVA'
     if "variables" in tables:

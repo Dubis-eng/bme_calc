@@ -16,6 +16,9 @@ export interface ConsolidatedItem {
     status: string;
     error_message: string;
   };
+  casas_decimais?: number | null;
+  tipo_exibicao?: 'NUMBER' | 'PERCENTAGE';
+  percent_base?: 'DECIMAL' | 'INTEGER';
 }
 
 interface HarvestPlanTableProps {
@@ -33,8 +36,25 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
   availableScenarios,
   handleSelectScenario,
 }) => {
-  const formatNumber = (num: number) => {
-    return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  const formatConsolidatedValue = (val: number | null | undefined, item: ConsolidatedItem) => {
+    if (val === null || val === undefined || isNaN(Number(val))) return '—';
+    const isPercent = item.tipo_exibicao === 'PERCENTAGE';
+    const base = item.percent_base || 'DECIMAL';
+    const decimals = item.casas_decimais !== undefined && item.casas_decimais !== null 
+      ? item.casas_decimais 
+      : (isPercent ? 2 : 4);
+    
+    let displayVal = Number(val);
+    if (isPercent && base === 'DECIMAL') {
+      displayVal = displayVal * 100;
+    }
+    
+    const numStr = displayVal.toLocaleString('pt-BR', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+    
+    return isPercent ? `${numStr}%` : numStr;
   };
 
   const renderStatusBadge = (status: string) => {
@@ -134,7 +154,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                     return (
                       <td key={m} className="bme-table-cell text-right font-mono font-semibold text-slate-400">
                         {status === 'OK' && val !== null ? (
-                          formatNumber(val)
+                          formatConsolidatedValue(val, item)
                         ) : (
                           renderStatusBadge(status)
                         )}
@@ -144,7 +164,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                   {/* Accumulated column */}
                   <td className="bme-table-cell text-right font-mono font-bold bg-teal-500/10 text-teal-300 border-l border-slate-850">
                     {item.accumulated.status === 'OK' && item.accumulated.value !== null ? (
-                      formatNumber(item.accumulated.value)
+                      formatConsolidatedValue(item.accumulated.value, item)
                     ) : (
                       <div className="flex justify-end">
                         {renderStatusBadge(item.accumulated.status)}

@@ -95,6 +95,9 @@ class VariableCreate(BaseModel):
     etapa: Optional[str] = ""
     ponto_controle: Optional[str] = ""
     equation_value: Optional[str] = ""
+    casas_decimais: Optional[int] = None
+    tipo_exibicao: Optional[str] = "NUMBER"
+    percent_base: Optional[str] = "DECIMAL"
 
 class VariableUpdate(BaseModel):
     nome: str
@@ -106,6 +109,9 @@ class VariableUpdate(BaseModel):
     etapa: Optional[str] = ""
     ponto_controle: Optional[str] = ""
     equation_value: Optional[str] = ""
+    casas_decimais: Optional[int] = None
+    tipo_exibicao: Optional[str] = "NUMBER"
+    percent_base: Optional[str] = "DECIMAL"
 
 class VariableDetail(BaseModel):
     id: str
@@ -118,6 +124,9 @@ class VariableDetail(BaseModel):
     etapa: str
     ponto_controle: str
     equation_value: str
+    casas_decimais: Optional[int] = None
+    tipo_exibicao: str
+    percent_base: str
 
 class HarvestPlanSettingUpdate(BaseModel):
     start_month: str

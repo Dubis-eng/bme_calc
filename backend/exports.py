@@ -128,11 +128,21 @@ def generate_scenario_pdf(scenario_data) -> BytesIO:
             val = val_entry.get("value") if isinstance(val_entry, dict) else val_entry
             status = val_entry.get("status", "OK") if isinstance(val_entry, dict) else "OK"
             
+            casas = v.get("casas_decimais")
+            if casas is None:
+                casas = 2
+            tipo_exib = v.get("tipo_exibicao", "NUMBER")
+            base = v.get("percent_base", "DECIMAL")
+            
             if status != "OK":
                 val_str = status
             elif val is not None:
                 if isinstance(val, (int, float)):
-                    val_str = f"{val:,.4f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    if tipo_exib == "PERCENTAGE":
+                        formatted_val = val * 100 if base == "DECIMAL" else val
+                        val_str = f"{formatted_val:.{casas}f}".replace(".", ",") + "%"
+                    else:
+                        val_str = f"{val:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
                 else:
                     val_str = str(val)
             else:
@@ -217,7 +227,22 @@ def generate_scenario_xlsx(scenario_data) -> BytesIO:
             if val is None:
                 val = v.get("EQUAÇÕES E VALORES", "")
             
-        ws.append([ref, sector, etapa, pc, description, v_type, unit, val])
+        casas = v.get("casas_decimais")
+        if casas is None:
+            casas = 2
+        tipo_exib = v.get("tipo_exibicao", "NUMBER")
+        base = v.get("percent_base", "DECIMAL")
+
+        if isinstance(val, (int, float)):
+            if tipo_exib == "PERCENTAGE":
+                formatted_val = val * 100 if base == "DECIMAL" else val
+                val_str = f"{formatted_val:.{casas}f}".replace(".", ",") + "%"
+            else:
+                val_str = f"{val:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        else:
+            val_str = str(val)
+
+        ws.append([ref, sector, etapa, pc, description, v_type, unit, val_str])
 
     # Auto-fit column widths
     for col in ws.columns:

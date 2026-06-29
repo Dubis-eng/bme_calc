@@ -22,6 +22,8 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Épico 15: Segregação de Variáveis Inativas** — Ocultação de variáveis inativas por padrão nas listagens gerais, de setores e plano de safra, adição do toggle "Mostrar Inativas" na barra de tipo com estilo desbotado/itálico e inputs desabilitados, e renomeação do termo "descontinuada" para "inativa" em todo o sistema.
 * **[DONE] [feat-016-persist-dashboard-filters.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-016-persist-dashboard-filters.md)** — Persistência e Filtragem Reativa de Status do Dashboard na Tabela de Equações (Épico 16).
 
+* **[DONE] Épico 17: Arredondamento e Exibição de Percentual Dinâmico** — Metadados de formatação de variáveis, controles no modal de cadastro, suporte reativo a inputs percentuais com base decimal/inteiro no grid de cenários e Plano de Safra, e formatação dinâmica nas exportações PDF/Excel.
+
 ---
 
 ## 📌 Backlog & Pendências de Arquitetura

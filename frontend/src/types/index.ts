@@ -8,6 +8,9 @@ export interface Variable {
     "UNIDADE DE MEDIDA": string;
     "EQUAÇÕES E VALORES": string | number;
     "STATUS"?: "ativa" | "pendente" | "inválida" | "inativa";
+    "casas_decimais"?: number | null;
+    "tipo_exibicao"?: "NUMBER" | "PERCENTAGE";
+    "percent_base"?: "DECIMAL" | "INTEGER";
 }
 
 export interface Result {

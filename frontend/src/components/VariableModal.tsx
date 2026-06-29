@@ -4,8 +4,10 @@ import { Variable } from '../types';
 import { useEquationAutocomplete } from '../utils/useEquationAutocomplete';
 import { EquationDropdown } from './EquationDropdown';
 import { FormulaEditor } from './FormulaEditor';
-import { BmeIcon } from '../theme/design-system';
 import { SubstitutionModal } from './SubstitutionModal';
+import { VariableFormattingFields } from './VariableFormattingFields';
+import { ThermodynamicGuide } from './ThermodynamicGuide';
+import { VariableModalHeader, VariableModalFooter } from './VariableModalControls';
 
 interface VariableModalProps {
   isOpen: boolean;
@@ -44,6 +46,10 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   const [isFormulaValid, setIsFormulaValid] = useState(true);
   const [formulaError, setFormulaError] = useState<string | null>(null);
 
+  const [casasDecimais, setCasasDecimais] = useState<number | ''>('');
+  const [tipoExibicao, setTipoExibicao] = useState<'NUMBER' | 'PERCENTAGE'>('NUMBER');
+  const [percentBase, setPercentBase] = useState<'DECIMAL' | 'INTEGER'>('DECIMAL');
+
   const equationInputRef = useRef<HTMLTextAreaElement>(null);
   const ac = useEquationAutocomplete(variables);
 
@@ -51,27 +57,19 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setError('');
-      if (variableToEdit) {
-        setIdRef(variableToEdit['ID - REF']);
-        setType(variableToEdit.TIPO);
-        setStatus(variableToEdit.STATUS || 'ativa');
-        setSector(variableToEdit.SETOR);
-        setEtapa(variableToEdit.ETAPA || '');
-        setPontoControle(variableToEdit['PONTO DE CONTROLE'] || '');
-        setDescription(variableToEdit['DESCRIÇÃO']);
-        setUnit(variableToEdit['UNIDADE DE MEDIDA'] || '');
-        setEquationValue(String(variableToEdit['EQUAÇÕES E VALORES']));
-      } else {
-        setIdRef('');
-        setType('INPUT');
-        setStatus('ativa');
-        setSector(prefilledSector);
-        setEtapa(prefilledEtapa);
-        setPontoControle('');
-        setDescription('');
-        setUnit('');
-        setEquationValue('');
-      }
+      const edit = variableToEdit;
+      setIdRef(edit ? edit['ID - REF'] : '');
+      setType(edit ? edit.TIPO : 'INPUT');
+      setStatus(edit ? (edit.STATUS || 'ativa') : 'ativa');
+      setSector(edit ? edit.SETOR : prefilledSector);
+      setEtapa(edit ? (edit.ETAPA || '') : prefilledEtapa);
+      setPontoControle(edit ? (edit['PONTO DE CONTROLE'] || '') : '');
+      setDescription(edit ? edit['DESCRIÇÃO'] : '');
+      setUnit(edit ? (edit['UNIDADE DE MEDIDA'] || '') : '');
+      setEquationValue(edit ? String(edit['EQUAÇÕES E VALORES']) : '');
+      setCasasDecimais(edit && edit.casas_decimais !== undefined && edit.casas_decimais !== null ? edit.casas_decimais : '');
+      setTipoExibicao(edit ? (edit.tipo_exibicao || 'NUMBER') : 'NUMBER');
+      setPercentBase(edit ? (edit.percent_base || 'DECIMAL') : 'DECIMAL');
     }
   }, [isOpen, variableToEdit, prefilledSector, prefilledEtapa]);
 
@@ -106,7 +104,10 @@ export const VariableModal: React.FC<VariableModalProps> = ({
       'PONTO DE CONTROLE': pontoControle.trim(),
       'DESCRIÇÃO': description.trim(),
       'UNIDADE DE MEDIDA': unit.trim(),
-      'EQUAÇÕES E VALORES': equationValue.trim()
+      'EQUAÇÕES E VALORES': equationValue.trim(),
+      casas_decimais: casasDecimais === '' ? null : Number(casasDecimais),
+      tipo_exibicao: tipoExibicao,
+      percent_base: percentBase
     };
 
     try {
@@ -127,15 +128,11 @@ export const VariableModal: React.FC<VariableModalProps> = ({
   return (
     <div className="bme-modal-overlay">
       <div className="bme-modal-container max-w-3xl" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        {/* Header */}
-        <div className="bme-modal-header">
-          <h3 id="modal-title" className="text-base font-bold tracking-tight">
-            {isEdit ? `Editar Variável: ${variableToEdit?.['ID - REF']}` : 'Cadastrar Nova Variável'}
-          </h3>
-          <button onClick={onClose} className="btn-ghost p-1.5 flex items-center justify-center" aria-label="Fechar modal">
-            <BmeIcon name="close" size={14} />
-          </button>
-        </div>
+        <VariableModalHeader
+          isEdit={isEdit}
+          variableId={variableToEdit?.['ID - REF']}
+          onClose={onClose}
+        />
 
         {/* Form Wrap */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
@@ -203,6 +200,15 @@ export const VariableModal: React.FC<VariableModalProps> = ({
               <input id="var-desc" type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Ex: Rotação no primeiro terno" className="input-field p-2 text-xs font-medium" required />
             </div>
 
+            <VariableFormattingFields
+              casasDecimais={casasDecimais}
+              setCasasDecimais={setCasasDecimais}
+              tipoExibicao={tipoExibicao}
+              setTipoExibicao={setTipoExibicao}
+              percentBase={percentBase}
+              setPercentBase={setPercentBase}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="flex flex-col col-span-1">
                 <label htmlFor="var-unit" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Unidade</label>
@@ -254,32 +260,17 @@ export const VariableModal: React.FC<VariableModalProps> = ({
                     });
                   }}
                 />
-                <div className="mt-1.5 text-[10px] text-slate-500 bg-slate-900/60 p-2.5 rounded border border-slate-800/40 leading-relaxed">
-                  <span className="font-semibold text-teal-600 block mb-0.5">Guia de Funções e Termodinâmica (IAPWS-IF97):</span>
-                  <span>Fórmulas: <code>=VAPOR_H(P; T)</code> (entalpia), <code>=VAPOR_S(P; T)</code> (entropia), <code>=VAPOR_H_SAT(P)</code> (entalpia sat. vapor), <code>=VAPOR_H_LIQ(P)</code> (entalpia sat. líquido), <code>=VAPOR_H_PS(P; s)</code> (entalpia teórica por entropia <code>s</code>), <code>=VAPOR_T_SAT(P)</code> (temp. saturação), <code>=VAPOR_LATENT(P)</code> (calor latente).</span>
-                  <span className="block mt-1 font-semibold text-amber-600">⚠️ Importante: Use PRESSÃO ABSOLUTA em bar nas funções VAPOR_*. Ex: J645 (21 bar abs).</span>
-                </div>
+                <ThermodynamicGuide />
               </div>
             </div>
           </div>
 
-          <div className="bme-modal-footer">
-            {isEdit && equationValue.trim().startsWith('=') && (
-              <button
-                type="button"
-                onClick={() => setIsSubstitutionOpen(true)}
-                className="mr-auto bg-amber-600/20 hover:bg-amber-600/35 border border-amber-600/30 text-amber-300 font-bold py-1.5 px-4 rounded text-xs transition-colors"
-              >
-                Substituir esta Variável
-              </button>
-            )}
-            <button type="button" onClick={onClose} className="bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1.5 px-4 rounded text-xs transition-colors">
-              Cancelar
-            </button>
-            <button type="submit" className="btn-primary py-1.5 px-4 text-xs font-bold">
-              {isEdit ? 'Salvar Alterações' : 'Cadastrar Variável'}
-            </button>
-          </div>
+          <VariableModalFooter
+            isEdit={isEdit}
+            equationValue={equationValue}
+            onClose={onClose}
+            onOpenSubstitution={() => setIsSubstitutionOpen(true)}
+          />
         </form>
       </div>
 

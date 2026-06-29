@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Variable, FilterStatus } from '../types';
 import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
+import { SectorFilterBar } from './SectorFilterBar';
+import { SectorFormulaPopover } from './SectorFormulaPopover';
+import { SectorAuditCard } from './SectorAuditCard';
 
 interface SectorModulesProps {
   activeSector: string;
@@ -32,6 +35,54 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   const [showInactive, setShowInactive] = useState(false);
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
   const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
+
+  const formatVariableValue = (val: number, variable: Variable) => {
+    const isPercent = variable.tipo_exibicao === 'PERCENTAGE';
+    const base = variable.percent_base || 'DECIMAL';
+    const decimals = variable.casas_decimais !== undefined && variable.casas_decimais !== null 
+      ? variable.casas_decimais 
+      : (isPercent ? 2 : 4);
+    
+    let displayVal = val;
+    if (isPercent && base === 'DECIMAL') {
+      displayVal = val * 100;
+    }
+    
+    const numStr = displayVal.toLocaleString('pt-BR', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+    
+    return isPercent ? `${numStr}%` : numStr;
+  };
+
+  const getInputValue = (v: Variable) => {
+    const rawVal = v['EQUAÇÕES E VALORES'];
+    if (typeof rawVal === 'string' && rawVal.startsWith('=')) {
+      return rawVal;
+    }
+    if (v.tipo_exibicao === 'PERCENTAGE' && v.percent_base === 'DECIMAL') {
+      const num = Number(rawVal);
+      if (!isNaN(num) && rawVal !== '') {
+        return String(num * 100);
+      }
+    }
+    return String(rawVal);
+  };
+
+  const handleInputChange = (id: string, value: string, variable: Variable) => {
+    let finalValue = value;
+    if (variable.tipo_exibicao === 'PERCENTAGE' && variable.percent_base === 'DECIMAL') {
+      const cleaned = value.trim();
+      if (!cleaned.startsWith('=')) {
+        const num = Number(cleaned.replace(',', '.'));
+        if (!isNaN(num) && cleaned !== '') {
+          finalValue = String(num / 100);
+        }
+      }
+    }
+    onVariableChange(id, finalValue);
+  };
 
   const matchesStatus = (v: Variable): boolean => {
     if (activeStatusFilter === 'all') return true;
@@ -78,82 +129,24 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
 
   return (
     <div className="space-y-4 relative">
-      {/* Type & Status Filter Bar */}
-      <div className="flex flex-col gap-2 bg-slate-900/40 p-3 rounded-xl border border-slate-800/60">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Tipo:</span>
-          {([
-            { id: 'ALL', label: 'Todos' }, { id: 'INPUT', label: 'INPUT' },
-            { id: 'OUTPUT', label: 'OUTPUT' }, { id: 'CENARIO', label: 'Cenário' }, { id: 'DERIVADA', label: 'Derivada' }
-          ] as const).map(opt => (
-            <button
-              key={opt.id} onClick={() => setActiveTypeFilter(opt.id)}
-              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeTypeFilter === opt.id ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm' : 'text-slate-500 hover:text-slate-300 bg-transparent border border-transparent'}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-          <button
-            type="button" onClick={() => setShowInactive(prev => !prev)}
-            className={`ml-auto px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${showInactive ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30 shadow-sm' : 'text-slate-500 hover:text-slate-300 bg-transparent border border-transparent'}`}
-          >
-            {showInactive ? 'Ocultar Inativas' : 'Mostrar Inativas'}
-          </button>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-800/60 pt-2">
-          <span className="text-[10px] uppercase font-bold text-slate-500 mr-2 px-1">Filtrar Status:</span>
-          {([
-            { id: 'all', label: 'Todos', style: 'bg-teal-500/20 text-teal-400 border-teal-500/40 shadow-sm' },
-            { id: 'ok', label: 'Convergido', style: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-sm' },
-            { id: 'error', label: 'Com Erro', style: 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-sm' },
-            { id: 'idle', label: 'Pendente', style: 'bg-slate-700/30 text-teal-500/40 border-teal-500/20' }
-          ] as const).map(opt => (
-            <button
-              key={opt.id} onClick={() => setActiveStatusFilter(opt.id)}
-              aria-label={`Filtrar status por ${opt.label}`}
-              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${activeStatusFilter === opt.id ? opt.style : 'text-slate-500 hover:text-slate-300 border-transparent bg-transparent'}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <SectorFilterBar
+        activeTypeFilter={activeTypeFilter}
+        setActiveTypeFilter={setActiveTypeFilter}
+        showInactive={showInactive}
+        setShowInactive={setShowInactive}
+        activeStatusFilter={activeStatusFilter}
+        setActiveStatusFilter={setActiveStatusFilter}
+      />
 
-      {/* Floating Audit Card */}
-      {auditVarId && (
-        <div className="glass-card p-4 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-3 max-w-md w-full sticky top-0 z-40 animate-fade-in-up">
-          <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-slate-300">Auditoria de Fluxo: <span className="font-mono text-teal-400">{auditVarId}</span></span>
-            <button onClick={() => setAuditVarId(null)} className="btn-ghost p-1 text-slate-500 hover:text-white"><BmeIcon name="close" size={10} /></button>
-          </div>
-          <div className="text-xs space-y-2">
-            <p className="text-slate-400">{internalAuditDeps.length > 0 ? `Destacando ${internalAuditDeps.length} células dependentes neste setor.` : 'Nenhuma célula dependente no setor ativo.'}</p>
-            {externalAuditDeps.length > 0 && (
-              <>
-                <p className="font-bold text-teal-500 mt-2">Dependências Externas:</p>
-                <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
-                  {externalAuditDeps.map(depId => {
-                    const depVar = variables.find(v => v['ID - REF'] === depId), depRes = results[depId];
-                    if (!depVar) return null;
-                    return (
-                      <div key={depId} className="flex justify-between items-center bg-slate-900/60 p-2 rounded border border-slate-800/40">
-                        <div className="min-w-0">
-                          <p className="font-mono text-slate-200 font-semibold truncate">{depId} <span className="text-[9px] text-slate-500 uppercase">({depVar.SETOR})</span></p>
-                          <p className="text-[10px] text-slate-500 truncate">{depVar['DESCRIÇÃO']}</p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4 shrink-0">
-                          <span className="font-mono text-slate-300">{depRes?.status === 'OK' && depRes.value !== null ? depRes.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : '—'}</span>
-                          <button onClick={() => onNavigateToVariable && onNavigateToVariable(depId)} className="text-[10px] text-teal-400 hover:text-teal-300 border border-teal-500/20 hover:border-teal-500/50 px-1.5 py-0.5 rounded transition-all">Ir para</button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <SectorAuditCard
+        auditVarId={auditVarId}
+        setAuditVarId={setAuditVarId}
+        internalAuditDeps={internalAuditDeps}
+        externalAuditDeps={externalAuditDeps}
+        variables={variables}
+        results={results}
+        onNavigateToVariable={onNavigateToVariable}
+      />
 
       {/* Tables list */}
       {stageNames.length === 0 ? (
@@ -239,13 +232,23 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                                     {/* Value / Input (aligned right) */}
                                     <td className="bme-table-cell font-mono font-bold text-right">
                                       {isInput ? (
-                                        <div className="flex justify-end">
-                                          <input type="text" aria-label={`Valor para ${id}`} disabled={isLocked || isInactive} value={String(v['EQUAÇÕES E VALORES'])} onChange={e => onVariableChange(id, e.target.value)} className="w-28 px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800" />
+                                        <div className="flex justify-end items-center gap-1.5">
+                                          <input
+                                            type="text"
+                                            aria-label={`Valor para ${id}`}
+                                            disabled={isLocked || isInactive}
+                                            value={getInputValue(v)}
+                                            onChange={e => handleInputChange(id, e.target.value, v)}
+                                            className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800`}
+                                          />
+                                          {v.tipo_exibicao === 'PERCENTAGE' && (
+                                            <span className="text-[10px] font-bold text-slate-500 w-4 shrink-0 select-none text-left">%</span>
+                                          )}
                                         </div>
                                       ) : (
                                         res !== undefined ? (
                                           res.status === 'OK' && res.value !== null ? (
-                                            <span className="text-slate-200 tabular-nums">{res.value.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</span>
+                                            <span className="text-slate-200 tabular-nums">{formatVariableValue(res.value, v)}</span>
                                           ) : (
                                             <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[res.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`} title={res.error_message || res.status}>⚠ {res.status}</span>
                                           )
@@ -272,21 +275,10 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
         })
       )}
 
-      {/* Expanded Formula Popover Modal */}
-      {activeFormulaPopover && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setActiveFormulaPopover(null)}>
-          <div className="glass-card max-w-lg w-full p-4 relative flex flex-col gap-3 border border-slate-700/40" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-              <span className="text-xs font-bold text-teal-400 font-mono">{activeFormulaPopover.varId}</span>
-              <button className="btn-ghost p-1" onClick={() => setActiveFormulaPopover(null)}><BmeIcon name="close" size={12} /></button>
-            </div>
-            <div className="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-xs text-slate-300 break-all whitespace-pre-wrap leading-relaxed select-all">{activeFormulaPopover.formula}</div>
-            <div className="flex justify-end">
-              <button className="btn-primary px-3 py-1.5 text-[11px] flex items-center gap-1.5" onClick={() => { navigator.clipboard.writeText(activeFormulaPopover.formula); alert('Fórmula copiada com sucesso!'); }}>📋 Copiar Fórmula</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SectorFormulaPopover
+        activeFormulaPopover={activeFormulaPopover}
+        onClose={() => setActiveFormulaPopover(null)}
+      />
     </div>
   );
 };

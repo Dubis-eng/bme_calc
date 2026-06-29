@@ -3,7 +3,7 @@
 > Last updated: 2026-06-29
 
 ## Last Task Completed
-- Feature/fix: seeding-idempotente-e-exportacao-json
+- Feature/fix: padronizacao-exibicao-variaveis-e-percentuais
 - Branch: main
 - Status: ACCEPTED
 
@@ -11,6 +11,6 @@
 - Nenhum.
 
 ## Next Steps
-- Continuar desenvolvimento de novas features e cenários de testes.
+- Implementar novas regras e verificações solicitadas pelo usuário.
 
 

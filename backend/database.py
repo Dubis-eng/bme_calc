@@ -93,6 +93,11 @@ class Variable(SQLModel, table=True):
     harvest_plan_op: Optional[str] = Field(default=None)
     harvest_plan_weight_var_id: Optional[str] = Field(default=None, foreign_key="variables.id")
 
+    # Rounding and Formatting configurations
+    casas_decimais: Optional[int] = Field(default=None, sa_column_kwargs={"nullable": True})
+    tipo_exibicao: str = Field(default="NUMBER", sa_column_kwargs={"nullable": False})
+    percent_base: str = Field(default="DECIMAL", sa_column_kwargs={"nullable": False})
+
 class Equation(SQLModel, table=True):
     __tablename__ = "equations"
 

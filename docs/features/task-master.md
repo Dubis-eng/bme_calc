@@ -133,6 +133,17 @@ graph TD
 
 ---
 
+### Épico 17: Padronização de Exibição e Percentuais (CONCLUÍDO)
+
+* [x] **Tarefa 17.1** *(Modelos e Migração do Banco de Dados)* — Adicionar as colunas `casas_decimais` (int, nullable), `tipo_exibicao` (string, default "NUMBER") e `percent_base` (string, default "DECIMAL") à classe SQLModel `Variable` em `backend/database.py`, e atualizar a rotina de migração em `backend/migrations.py` para criar estas colunas no banco de dados existente com valores padrão coerentes.
+* [x] **Tarefa 17.2** *(Schemas e Endpoints de API)* — Atualizar as classes Pydantic em `backend/schemas.py` para incluir os novos campos (`casas_decimais`, `tipo_exibicao`, `percent_base`). Modificar as rotinas de criação/atualização em `backend/services_variables.py` e endpoints em `backend/main.py` para ler e persistir estas novas configurações de variável.
+* [x] **Tarefa 17.3** *(Exportações formatadas)* — Modificar a lógica de formatação de valores em `backend/exports.py` (relatórios PDF e planilhas Excel) para que utilizem a propriedade `casas_decimais` (ou fallback de 2 casas) e apliquem a notação `%` caso o `tipo_exibicao` seja `PERCENTAGE`.
+* [x] **Tarefa 17.4** *(Frontend: Cadastro de Variáveis)* — Atualizar o componente `VariableModal.tsx` no frontend para permitir configurar os novos campos: casas decimais (input numérico 0-6), tipo de exibição (Número vs Percentual) e base de cálculo (Decimal vs Inteiro - exibido apenas se tipo for Percentual).
+* [x] **Tarefa 17.5** *(Frontend: Exibição e Edição nos Módulos)* — Ajustar a exibição e edição de inputs de variáveis no frontend (`SectorModules.tsx` e `App.tsx`). Se uma variável for percentual com base decimal, converter o valor do input (ex: `value * 100`) para exibição e edição, salvando de volta como `value / 100`. Mostrar o símbolo `%` e aplicar o arredondamento `.toFixed(casas_decimais)` na visualização.
+* [x] **Tarefa 17.6** *(Testes e Homologação)* — Criar suíte de testes unitários para validar a migração de esquema, criação/edição de variáveis com metadados de formatação, e testes de integração de cálculo/resolução de variáveis com diferentes formatações. Rodar o script `checklist.py`.
+
+---
+
 ## 🛠️ Infraestrutura & DevOps
 
 * [x] **Tarefa 7.1** *(Criação do .gitignore)* — Criar o arquivo `.gitignore` na raiz do projeto com as regras para ignorar a pasta `.agent/`, bancos locais SQLite (`*.db`), backups SQL (`*.sql`), ambientes virtuais Python (`.venv`, `__pycache__`), diretórios do Node.js (`node_modules`, `dist`, `build`) e arquivos sensíveis (`.env*`).

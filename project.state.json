@@ -75,6 +75,42 @@
       "description": "Executar verificação com checklist.py, testar o fluxo de filtragem e validar as diretrizes de código limpo (limite de 300 linhas).",
       "scope": "frontend/src/App.tsx, frontend/src/components/SectorModules.tsx",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-1701",
+      "description": "Adicionar colunas casas_decimais, tipo_exibicao e percent_base em Variable (backend/database.py) e ajustar a migração de banco (backend/migrations.py).",
+      "scope": "backend/database.py, backend/migrations.py",
+      "status": "TODO"
+    },
+    {
+      "id": "TASK-1702",
+      "description": "Atualizar schemas Pydantic (backend/schemas.py) e ajustar endpoints e serviços de CRUD de variáveis no backend.",
+      "scope": "backend/schemas.py, backend/services_variables.py, backend/main.py",
+      "status": "TODO"
+    },
+    {
+      "id": "TASK-1703",
+      "description": "Ajustar lógica de formatação de valores nas exportações de PDF e Excel (backend/exports.py) com base nos novos metadados da variável.",
+      "scope": "backend/exports.py",
+      "status": "TODO"
+    },
+    {
+      "id": "TASK-1704",
+      "description": "Atualizar o modal de cadastro de variáveis no frontend (VariableModal.tsx) para permitir edição de casas_decimais, tipo_exibicao e percent_base.",
+      "scope": "frontend/src/components/VariableModal.tsx",
+      "status": "TODO"
+    },
+    {
+      "id": "TASK-1705",
+      "description": "Ajustar o grid de cenários e inputs do frontend (SectorModules.tsx, App.tsx) para formatar e tratar a exibição e entrada de dados das variáveis do tipo PERCENTAGE.",
+      "scope": "frontend/src/components/SectorModules.tsx, frontend/src/App.tsx",
+      "status": "TODO"
+    },
+    {
+      "id": "TASK-1706",
+      "description": "Criar testes unitários/integração no backend e frontend para validar a precisão, conversão de percentuais, exportação e formatação decimal, executando o checklist.",
+      "scope": "backend/test_variables_formatting.py",
+      "status": "TODO"
     }
   ]
 }

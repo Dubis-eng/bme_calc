@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-06-29
+
+### Added
+- **Arredondamento e Exibição de Percentual Dinâmico (Épico 17)**:
+  - Adição de novos metadados de formatação no cadastro de variáveis: `casas_decimais` (casas decimais de exibição), `tipo_exibicao` (`NUMBER` ou `PERCENTAGE`) e `percent_base` (`DECIMAL` ou `INTEGER`).
+  - Atualização do modal de cadastro de variáveis (`VariableModal.tsx`) para incluir controles visuais de precisão decimal, tipo de exibição e base percentual, isolando componentes sob o limite de 300 linhas.
+  - Implementação de formatação dinâmica baseada em metadados no grid de cenários (`SectorModules.tsx`) e na consolidação do plano de safra (`HarvestPlanTable.tsx`).
+  - Suporte reativo a inputs percentuais: quando uma variável possui exibição percentual e base decimal, o valor inserido na UI é multiplicado por 100 ao focar e dividido por 100 ao salvar.
+  - Formatação e arredondamento customizados aplicados diretamente nas exportações para PDF e Excel (`exports.py`), sem comprometer a precisão matemática dos cálculos no backend (`engine.py`), que continua utilizando ponto flutuante bruto de precisão total.
+  - Criação de suíte de testes unitários e de integração (`backend/test_variables_formatting.py`) validando as regras de CRUD, cálculo com precisão total de floats e exportações.
+
+### Fixed
+- **Persistência de Dados de Formatação**: Correção na montagem do payload da API em `useScenario.ts` que impedia o salvamento das opções de formatação das variáveis no banco de dados.
+- **Resiliência do Plano de Safra**: Correção de travamento no renderizador React da tabela de consolidação (`HarvestPlanTable.tsx`) ao processar células com valores nulos/indefinidos originados de bancos de dados recém-iniciados sem histórico.
+
 ## [2.10.0] - 2026-06-29
  
 ### Added

@@ -197,7 +197,10 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       status: newVar["STATUS"] || "ativa",
       etapa: newVar["ETAPA"] || "",
       ponto_controle: newVar["PONTO DE CONTROLE"] || "",
-      equation_value: String(newVar["EQUAÇÕES E VALORES"] || "")
+      equation_value: String(newVar["EQUAÇÕES E VALORES"] || ""),
+      casas_decimais: (newVar.casas_decimais === undefined || newVar.casas_decimais === null || (newVar.casas_decimais as any) === '') ? null : Number(newVar.casas_decimais),
+      tipo_exibicao: newVar.tipo_exibicao || "NUMBER",
+      percent_base: newVar.percent_base || "DECIMAL"
     };
 
     try {

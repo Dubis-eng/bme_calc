@@ -128,7 +128,10 @@ def list_variables(db: Session) -> List[Dict[str, Any]]:
             "status": var.status.value if hasattr(var.status, 'value') else str(var.status),
             "etapa": var.etapa,
             "ponto_controle": var.ponto_controle,
-            "equation_value": eq_val
+            "equation_value": eq_val,
+            "casas_decimais": var.casas_decimais,
+            "tipo_exibicao": var.tipo_exibicao,
+            "percent_base": var.percent_base
         })
     return vars_list
 
@@ -157,7 +160,10 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         unidade=req.unidade.strip() if req.unidade else "",
         status=VariableStatus(req.status.strip() if req.status else "ativa"),
         etapa=req.etapa.strip() if req.etapa else "",
-        ponto_controle=req.ponto_controle.strip() if req.ponto_controle else ""
+        ponto_controle=req.ponto_controle.strip() if req.ponto_controle else "",
+        casas_decimais=req.casas_decimais,
+        tipo_exibicao=req.tipo_exibicao.strip() if req.tipo_exibicao else "NUMBER",
+        percent_base=req.percent_base.strip() if req.percent_base else "DECIMAL"
     )
     db.add(db_var)
     db.flush()
@@ -180,7 +186,10 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         "status": db_var.status.value,
         "etapa": db_var.etapa,
         "ponto_controle": db_var.ponto_controle,
-        "equation_value": eq_val
+        "equation_value": eq_val,
+        "casas_decimais": db_var.casas_decimais,
+        "tipo_exibicao": db_var.tipo_exibicao,
+        "percent_base": db_var.percent_base
     }
 
 def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
@@ -207,6 +216,9 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
     db_var.status = VariableStatus(req.status.strip() if req.status else "ativa")
     db_var.etapa = req.etapa.strip() if req.etapa else ""
     db_var.ponto_controle = req.ponto_controle.strip() if req.ponto_controle else ""
+    db_var.casas_decimais = req.casas_decimais
+    db_var.tipo_exibicao = req.tipo_exibicao.strip() if req.tipo_exibicao else "NUMBER"
+    db_var.percent_base = req.percent_base.strip() if req.percent_base else "DECIMAL"
     db.add(db_var)
     db.flush()
     
@@ -230,6 +242,9 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
         "status": db_var.status.value,
         "etapa": db_var.etapa,
         "ponto_controle": db_var.ponto_controle,
-        "equation_value": eq_val
+        "equation_value": eq_val,
+        "casas_decimais": db_var.casas_decimais,
+        "tipo_exibicao": db_var.tipo_exibicao,
+        "percent_base": db_var.percent_base
     }
 
