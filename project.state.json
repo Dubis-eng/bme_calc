@@ -51,6 +51,30 @@
       "description": "Implementar a segregação e renomeação de variáveis inativas em todo o ecossistema (backend, banco de dados, testes e frontend).",
       "scope": "backend/database.py, backend/services_variables.py, backend/services_harvest_plan.py, backend/services_scenarios.py, frontend/src/components/SectorModules.tsx, frontend/src/types/index.ts",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-1601",
+      "description": "Elevar o estado do filtro de status (activeStatusFilter, setActiveStatusFilter) para App.tsx e integrá-lo com StatusDashboard.tsx.",
+      "scope": "frontend/src/App.tsx, frontend/src/components/StatusDashboard.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1602",
+      "description": "Implementar a barra de filtro de status (Todos, Convergido, Com Erro, Pendente) no componente SectorModules.tsx.",
+      "scope": "frontend/src/components/SectorModules.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1603",
+      "description": "Implementar a lógica de filtragem por status na listagem de variáveis de SectorModules.tsx conforme regras definidas.",
+      "scope": "frontend/src/components/SectorModules.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1604",
+      "description": "Executar verificação com checklist.py, testar o fluxo de filtragem e validar as diretrizes de código limpo (limite de 300 linhas).",
+      "scope": "frontend/src/App.tsx, frontend/src/components/SectorModules.tsx",
+      "status": "DONE"
     }
   ]
 }

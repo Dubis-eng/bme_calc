@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-06-29
+
+### Added
+- **Persistência e Filtragem Reativa de Status do Dashboard (Épico 16)**:
+  - Elevação do estado do filtro de status do dashboard (`activeStatusFilter`) para `App.tsx` para sincronização bidirecional entre o Dashboard e as tabelas de equações dos setores.
+  - Implementação de barra visual de filtragem por status (`Todos`, `Convergido`, `Com Erro`, `Pendente`) no componente `SectorModules.tsx` totalmente integrada com o design system Maestro UI.
+  - Lógica acumulada de filtragem por status e tipo (operação lógica E) para permitir refinamento de busca.
+  - Classificação estrita de status por variável individual: calculadas que convergiram (`status === 'OK'`), falharam (`status !== 'OK' && status !== 'PENDING'`), ou estão pendentes de cálculo (`status === 'PENDING'`), além de variáveis de tipo `INPUT`/`CENARIO` vazias que são consideradas pendentes.
+
 ## [2.8.0] - 2026-06-28
 
 ### Added
