@@ -5,7 +5,7 @@
 ## Last Task Completed
 - Feature/fix: persist-dashboard-filters
 - Branch: feature/persist-dashboard-filters
-- Status: ACCEPTED
+- Status: PR_OPEN
 
 ## Open Issues / Blockers
 - Nenhum.
