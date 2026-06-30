@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2026-06-29
+
+### Added
+- **Ordenação em Cascata das Variáveis, Etapas e Pontos de Controle (Tarefa 18.1)**:
+  - Implementação de ordenação por Drag-and-Drop e botões rápidos (Subir/Descer) para Etapas, Pontos de Controle e Variáveis.
+  - CRUD completo para rotas de reordenação no backend em `services_reorder.py` e rotas `/reorder` correspondentes.
+  - Divisão de arquivos de backend e componentes de frontend para respeitar o limite de 300 linhas físicas (ex: `SectorVariableRow.tsx`, `SectorControlPointTable.tsx`, `migrations_legacy.py`).
+  - Suíte de testes automatizados (`backend/test_cascade_sorting.py`) validando a consistência e a cascata de ordenação no banco de dados.
+
 ## [2.12.0] - 2026-06-29
 
 ### Added

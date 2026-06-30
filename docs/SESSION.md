@@ -3,14 +3,14 @@
 > Last updated: 2026-06-29
 
 ## Last Task Completed
-- Feature/fix: Tratamento Fail-Fast de Conexão com Servidor Offline e Travamento de UI (Tarefa 10.5)
-- Branch: main
+- Feature/fix: Ordenação em cascata (Drag-and-drop / botões) para Etapa, Ponto de Controle e Variável (Tarefa 18.1)
+- Branch: feature/cascade-sorting
 - Status: ACCEPTED
 
 ## Open Issues / Blockers
 - Nenhum.
 
 ## Next Steps
-- Aguardar novas solicitações de melhorias no motor de cálculo, usabilidade ou integrações.
+- Aguardar aprovação do usuário para fazer o merge.
 
 

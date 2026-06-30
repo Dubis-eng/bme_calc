@@ -3,67 +3,9 @@ from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
 from database import (
     Variable, Equation, Dependency, Sector,
-    VariableType, VariableStatus
+    VariableType, VariableStatus, Stage, ControlPoint
 )
-from schemas import SectorCreate, SectorUpdate
 import engine
-
-def list_sectors(db: Session) -> List[Sector]:
-    return db.exec(select(Sector).order_by(Sector.ordem)).all()
-
-def create_sector(req: SectorCreate, db: Session) -> Sector:
-    sector_id = req.id.strip().upper()
-    existing = db.get(Sector, sector_id)
-    if existing:
-        raise ValueError(f"Setor com ID '{sector_id}' já está cadastrado.")
-    
-    existing_ordem = db.exec(select(Sector).where(Sector.ordem == req.ordem)).first()
-    if existing_ordem:
-        raise ValueError(f"A ordem {req.ordem} já está em uso pelo setor '{existing_ordem.nome}'.")
-    
-    db_sector = Sector(
-        id=sector_id,
-        nome=req.nome.strip(),
-        descricao=req.descricao.strip() if req.descricao else "",
-        ordem=req.ordem
-    )
-    db.add(db_sector)
-    db.commit()
-    db.refresh(db_sector)
-    return db_sector
-
-def update_sector(sector_id: str, req: SectorUpdate, db: Session) -> Sector:
-    db_sector = db.get(Sector, sector_id)
-    if not db_sector:
-        raise ValueError("Setor não encontrado.")
-    
-    existing_ordem = db.exec(select(Sector).where(Sector.ordem == req.ordem, Sector.id != sector_id)).first()
-    if existing_ordem:
-        raise ValueError(f"A ordem {req.ordem} já está em uso pelo setor '{existing_ordem.nome}'.")
-    
-    db_sector.nome = req.nome.strip()
-    if req.descricao is not None:
-        db_sector.descricao = req.descricao.strip()
-    db_sector.ordem = req.ordem
-    
-    db.add(db_sector)
-    db.commit()
-    db.refresh(db_sector)
-    return db_sector
-
-def delete_sector(sector_id: str, db: Session) -> bool:
-    db_sector = db.get(Sector, sector_id)
-    if not db_sector:
-        raise ValueError("Setor não encontrado.")
-    
-    stmt = select(Variable).where(Variable.setor_id == sector_id)
-    vars_associated = db.exec(stmt).all()
-    if vars_associated:
-        raise ValueError(f"Não é possível excluir o setor '{db_sector.nome}' porque existem {len(vars_associated)} variáveis associadas a ele.")
-    
-    db.delete(db_sector)
-    db.commit()
-    return True
 
 def _update_variable_equation(var_id: str, new_eq_val: str, db_var: Variable, db: Session):
     stmt = select(Equation).where(Equation.variable_id == var_id, Equation.status == "ativa")
@@ -111,13 +53,44 @@ def _update_variable_equation(var_id: str, new_eq_val: str, db_var: Variable, db
         db.add(db_dep)
 
 def list_variables(db: Session) -> List[Dict[str, Any]]:
-    db_vars = db.exec(select(Variable).where(Variable.status != VariableStatus.INATIVA)).all()
+    stmt = (
+        select(Variable)
+        .where(Variable.status != VariableStatus.INATIVA)
+        .outerjoin(ControlPoint, Variable.control_point_id == ControlPoint.id)
+        .outerjoin(Stage, ControlPoint.stage_id == Stage.id)
+        .outerjoin(Sector, Variable.setor_id == Sector.id)
+        .order_by(Sector.ordem, Stage.ordem, ControlPoint.ordem, Variable.ordem)
+    )
+    db_vars = db.exec(stmt).all()
+    
+    stages = db.exec(select(Stage)).all()
+    cps = db.exec(select(ControlPoint)).all()
+    stage_map = {s.id: s for s in stages}
+    cp_map = {cp.id: cp for cp in cps}
+    
     eqs = db.exec(select(Equation).where(Equation.status == "ativa")).all()
     eq_map = {eq.variable_id: eq.expression_original for eq in eqs}
     
     vars_list = []
     for var in db_vars:
         eq_val = eq_map.get(var.id, "")
+        
+        etapa_name = ""
+        cp_name = ""
+        stage_id = None
+        if var.control_point_id:
+            cp_obj = cp_map.get(var.control_point_id)
+            if cp_obj:
+                cp_name = cp_obj.nome
+                stage_id = cp_obj.stage_id
+                stage_obj = stage_map.get(cp_obj.stage_id)
+                if stage_obj:
+                    etapa_name = stage_obj.nome
+        if not etapa_name:
+            etapa_name = var.etapa or ""
+        if not cp_name:
+            cp_name = var.ponto_controle or ""
+            
         vars_list.append({
             "id": var.id,
             "nome": var.nome,
@@ -126,14 +99,40 @@ def list_variables(db: Session) -> List[Dict[str, Any]]:
             "tipo": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
             "unidade": var.unidade,
             "status": var.status.value if hasattr(var.status, 'value') else str(var.status),
-            "etapa": var.etapa,
-            "ponto_controle": var.ponto_controle,
+            "etapa": etapa_name,
+            "ponto_controle": cp_name,
+            "control_point_id": var.control_point_id,
+            "stage_id": stage_id,
+            "ordem": var.ordem,
             "equation_value": eq_val,
             "casas_decimais": var.casas_decimais,
             "tipo_exibicao": var.tipo_exibicao,
             "percent_base": var.percent_base
         })
     return vars_list
+
+def _resolve_control_point(sector_id: str, etapa_str: str, pc_str: str, db: Session) -> ControlPoint:
+    stage_name = etapa_str.strip() if etapa_str else "GERAL"
+    stmt = select(Stage).where(Stage.sector_id == sector_id, Stage.nome == stage_name)
+    db_stage = db.exec(stmt).first()
+    if not db_stage:
+        all_orders = db.exec(select(Stage.ordem).where(Stage.sector_id == sector_id)).all()
+        next_ordem = max(all_orders) + 10 if all_orders else 10
+        db_stage = Stage(nome=stage_name, sector_id=sector_id, ordem=next_ordem)
+        db.add(db_stage)
+        db.flush()
+        
+    cp_name = pc_str.strip() if pc_str else "GERAL"
+    stmt = select(ControlPoint).where(ControlPoint.stage_id == db_stage.id, ControlPoint.nome == cp_name)
+    db_cp = db.exec(stmt).first()
+    if not db_cp:
+        all_orders = db.exec(select(ControlPoint.ordem).where(ControlPoint.stage_id == db_stage.id)).all()
+        next_ordem = max(all_orders) + 10 if all_orders else 10
+        db_cp = ControlPoint(nome=cp_name, stage_id=db_stage.id, ordem=next_ordem)
+        db.add(db_cp)
+        db.flush()
+        
+    return db_cp
 
 def create_variable(req, db: Session) -> Dict[str, Any]:
     existing = db.get(Variable, req.id)
@@ -150,7 +149,14 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         db.flush()
         
     tipo = VariableType(req.tipo.strip().upper())
+    db_cp = _resolve_control_point(sector_id, req.etapa, req.ponto_controle, db)
     
+    # Calculate variable ordem if not provided or 0
+    v_ordem = getattr(req, 'ordem', 0) or 0
+    if v_ordem <= 0:
+        all_var_orders = db.exec(select(Variable.ordem).where(Variable.control_point_id == db_cp.id)).all()
+        v_ordem = max(all_var_orders) + 10 if all_var_orders else 10
+        
     db_var = Variable(
         id=req.id.strip(),
         nome=req.nome.strip(),
@@ -159,8 +165,10 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         tipo=tipo,
         unidade=req.unidade.strip() if req.unidade else "",
         status=VariableStatus(req.status.strip() if req.status else "ativa"),
-        etapa=req.etapa.strip() if req.etapa else "",
-        ponto_controle=req.ponto_controle.strip() if req.ponto_controle else "",
+        etapa=db_cp.stage_id.hex, # dummy legacy value
+        ponto_controle=db_cp.id.hex, # dummy legacy value
+        control_point_id=db_cp.id,
+        ordem=v_ordem,
         casas_decimais=req.casas_decimais,
         tipo_exibicao=req.tipo_exibicao.strip() if req.tipo_exibicao else "NUMBER",
         percent_base=req.percent_base.strip() if req.percent_base else "DECIMAL"
@@ -184,8 +192,11 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         "tipo": db_var.tipo.value,
         "unidade": db_var.unidade,
         "status": db_var.status.value,
-        "etapa": db_var.etapa,
-        "ponto_controle": db_var.ponto_controle,
+        "etapa": req.etapa.strip() if req.etapa else "GERAL",
+        "ponto_controle": req.ponto_controle.strip() if req.ponto_controle else "GERAL",
+        "control_point_id": db_var.control_point_id,
+        "stage_id": db_cp.stage_id,
+        "ordem": db_var.ordem,
         "equation_value": eq_val,
         "casas_decimais": db_var.casas_decimais,
         "tipo_exibicao": db_var.tipo_exibicao,
@@ -207,15 +218,25 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
         db.flush()
         
     tipo = VariableType(req.tipo.strip().upper())
+    db_cp = _resolve_control_point(sector_id, req.etapa, req.ponto_controle, db)
     
+    # Calculate variable ordem if not provided or 0
+    v_ordem = getattr(req, 'ordem', 0) or 0
+    if v_ordem <= 0:
+        if db_var.control_point_id != db_cp.id:
+            all_var_orders = db.exec(select(Variable.ordem).where(Variable.control_point_id == db_cp.id)).all()
+            v_ordem = max(all_var_orders) + 10 if all_var_orders else 10
+        else:
+            v_ordem = db_var.ordem
+            
     db_var.nome = req.nome.strip()
     db_var.descricao = req.descricao.strip() if req.descricao else ""
     db_var.setor_id = sector_id
     db_var.tipo = tipo
     db_var.unidade = req.unidade.strip() if req.unidade else ""
     db_var.status = VariableStatus(req.status.strip() if req.status else "ativa")
-    db_var.etapa = req.etapa.strip() if req.etapa else ""
-    db_var.ponto_controle = req.ponto_controle.strip() if req.ponto_controle else ""
+    db_var.control_point_id = db_cp.id
+    db_var.ordem = v_ordem
     db_var.casas_decimais = req.casas_decimais
     db_var.tipo_exibicao = req.tipo_exibicao.strip() if req.tipo_exibicao else "NUMBER"
     db_var.percent_base = req.percent_base.strip() if req.percent_base else "DECIMAL"
@@ -240,8 +261,11 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
         "tipo": db_var.tipo.value,
         "unidade": db_var.unidade,
         "status": db_var.status.value,
-        "etapa": db_var.etapa,
-        "ponto_controle": db_var.ponto_controle,
+        "etapa": req.etapa.strip() if req.etapa else "GERAL",
+        "ponto_controle": req.ponto_controle.strip() if req.ponto_controle else "GERAL",
+        "control_point_id": db_var.control_point_id,
+        "stage_id": db_cp.stage_id,
+        "ordem": db_var.ordem,
         "equation_value": eq_val,
         "casas_decimais": db_var.casas_decimais,
         "tipo_exibicao": db_var.tipo_exibicao,

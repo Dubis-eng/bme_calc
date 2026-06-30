@@ -182,6 +182,37 @@ def delete_sector(id: str, db=Depends(get_session)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.patch("/api/sectors/{sector_id}/stages/reorder")
+def reorder_stages_endpoint(sector_id: str, req: List[uuid.UUID], db=Depends(get_session)):
+    try:
+        services.reorder_stages(sector_id, req, db)
+        return {"success": True, "message": "Estágios reordenados com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.patch("/api/stages/{stage_id}/control-points/reorder")
+def reorder_control_points_endpoint(stage_id: uuid.UUID, req: List[uuid.UUID], db=Depends(get_session)):
+    try:
+        services.reorder_control_points(stage_id, req, db)
+        return {"success": True, "message": "Pontos de controle reordenados com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.patch("/api/control-points/{cp_id}/variables/reorder")
+def reorder_variables_endpoint(cp_id: uuid.UUID, req: List[str], db=Depends(get_session)):
+    try:
+        services.reorder_variables(cp_id, req, db)
+        return {"success": True, "message": "Variáveis reordenadas com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Harvest Plan Endpoints
 @app.get("/api/harvest-plan/years", response_model=List[int])
 def list_harvest_plan_years(db=Depends(get_session)):
