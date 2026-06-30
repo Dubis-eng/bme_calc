@@ -57,6 +57,22 @@ class Sector(SQLModel, table=True):
     descricao: str = Field(default="")
     ordem: int = Field(default=0, index=True)
 
+class Stage(SQLModel, table=True):
+    __tablename__ = "stages"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    nome: str = Field(index=True)
+    sector_id: str = Field(foreign_key="sectors.id", index=True)
+    ordem: int = Field(default=0, index=True)
+
+class ControlPoint(SQLModel, table=True):
+    __tablename__ = "control_points"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    nome: str = Field(index=True)
+    stage_id: uuid.UUID = Field(foreign_key="stages.id", index=True)
+    ordem: int = Field(default=0, index=True)
+
 class Scenario(SQLModel, table=True):
     __tablename__ = "scenarios"
 
@@ -85,8 +101,10 @@ class Variable(SQLModel, table=True):
     tipo: VariableType = Field(default=VariableType.INPUT, sa_column_kwargs={"nullable": False})
     unidade: str = Field(default="")
     status: VariableStatus = Field(default=VariableStatus.ATIVA, sa_column_kwargs={"nullable": False})
-    etapa: str = Field(default="", index=True)
-    ponto_controle: str = Field(default="", index=True)
+    etapa: Optional[str] = Field(default="", index=True, sa_column_kwargs={"nullable": True})
+    ponto_controle: Optional[str] = Field(default="", index=True, sa_column_kwargs={"nullable": True})
+    control_point_id: Optional[uuid.UUID] = Field(default=None, foreign_key="control_points.id", index=True, sa_column_kwargs={"nullable": True})
+    ordem: int = Field(default=0, index=True)
     
     # Harvest Plan configurations
     in_harvest_plan: bool = Field(default=False)

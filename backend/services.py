@@ -3,14 +3,21 @@ from services_scenarios import (
     create_new_scenario,
     update_existing_scenario
 )
-from services_variables import (
+from services_sectors import (
     list_sectors,
     create_sector,
     update_sector,
-    delete_sector,
+    delete_sector
+)
+from services_variables import (
     list_variables,
     create_variable,
     update_variable
+)
+from services_reorder import (
+    reorder_stages,
+    reorder_control_points,
+    reorder_variables
 )
 from services_substitution import (
     get_substitution_preview,

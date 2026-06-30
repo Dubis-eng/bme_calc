@@ -3,7 +3,7 @@ import datetime
 from typing import List, Dict, Any
 from sqlmodel import select, Session
 from database import (
-    Scenario, Variable, Equation, Dependency, Result, Sector,
+    Scenario, Variable, Equation, Dependency, Result, Sector, Stage, ControlPoint,
     ScenarioStatus, VariableType, VariableStatus, ResultStatus
 )
 from schemas import ScenarioDetail
@@ -12,7 +12,20 @@ import engine
 def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str, Any]]:
     results = db.exec(select(Result).where(Result.scenario_id == scenario_id)).all()
     results_map = {r.variable_id: r for r in results}
-    db_vars = db.exec(select(Variable)).all()
+    
+    stages = db.exec(select(Stage)).all()
+    stage_map = {s.id: s for s in stages}
+    cps = db.exec(select(ControlPoint)).all()
+    cp_map = {c.id: c for c in cps}
+    
+    stmt = (
+        select(Variable)
+        .join(Sector, Variable.setor_id == Sector.id, isouter=True)
+        .join(ControlPoint, Variable.control_point_id == ControlPoint.id, isouter=True)
+        .join(Stage, ControlPoint.stage_id == Stage.id, isouter=True)
+        .order_by(Sector.ordem.asc(), Stage.ordem.asc(), ControlPoint.ordem.asc(), Variable.ordem.asc())
+    )
+    db_vars = db.exec(stmt).all()
     
     variables_list = []
     for var in db_vars:
@@ -26,11 +39,27 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
             if res and res.value is not None:
                 eq_val = str(res.value)
                 
+        etapa_name = ""
+        cp_name = ""
+        stage_id = None
+        if var.control_point_id:
+            cp_obj = cp_map.get(var.control_point_id)
+            if cp_obj:
+                cp_name = cp_obj.nome
+                stage_id = cp_obj.stage_id
+                stage_obj = stage_map.get(cp_obj.stage_id)
+                if stage_obj:
+                    etapa_name = stage_obj.nome
+        if not etapa_name:
+            etapa_name = var.etapa or ""
+        if not cp_name:
+            cp_name = var.ponto_controle or ""
+            
         variables_list.append({
             "ID - REF": var.id,
             "SETOR": var.setor_id,
-            "ETAPA": var.etapa,
-            "PONTO DE CONTROLE": var.ponto_controle,
+            "ETAPA": etapa_name,
+            "PONTO DE CONTROLE": cp_name,
             "DESCRIÇÃO": var.descricao,
             "TIPO": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
             "UNIDADE DE MEDIDA": var.unidade,
@@ -38,19 +67,63 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
             "STATUS": var.status.value if hasattr(var.status, 'value') else str(var.status),
             "casas_decimais": var.casas_decimais,
             "tipo_exibicao": var.tipo_exibicao,
-            "percent_base": var.percent_base
+            "percent_base": var.percent_base,
+            "control_point_id": var.control_point_id,
+            "stage_id": stage_id,
+            "ordem": var.ordem
         })
     return variables_list
+def _resolve_stage_and_cp(sector_id: str, etapa_name: str, cp_name: str, db: Session) -> uuid.UUID:
+    et = etapa_name.strip() if etapa_name else "GERAL"
+    cp = cp_name.strip() if cp_name else "GERAL"
+    
+    stmt_stage = select(Stage).where(Stage.sector_id == sector_id, Stage.nome == et)
+    stage_obj = db.exec(stmt_stage).first()
+    if not stage_obj:
+        stage_orders = db.exec(select(Stage.ordem).where(Stage.sector_id == sector_id)).all()
+        next_stage_order = max(stage_orders) + 10 if stage_orders else 10
+        stage_obj = Stage(nome=et, sector_id=sector_id, ordem=next_stage_order)
+        db.add(stage_obj)
+        db.flush()
+        
+    stmt_cp = select(ControlPoint).where(ControlPoint.stage_id == stage_obj.id, ControlPoint.nome == cp)
+    cp_obj = db.exec(stmt_cp).first()
+    if not cp_obj:
+        cp_orders = db.exec(select(ControlPoint.ordem).where(ControlPoint.stage_id == stage_obj.id)).all()
+        next_cp_order = max(cp_orders) + 10 if cp_orders else 10
+        cp_obj = ControlPoint(nome=cp, stage_id=stage_obj.id, ordem=next_cp_order)
+        db.add(cp_obj)
+        db.flush()
+        
+    return cp_obj.id
 
 def _ensure_variable(v: Dict[str, Any], db: Session) -> Variable:
     var_id = v["ID - REF"]
     db_var = db.get(Variable, var_id)
+    etapa_val = v.get("ETAPA", "").strip()
+    cp_val = v.get("PONTO DE CONTROLE", "").strip()
+    sector_str = v.get("SETOR", "OUTROS").strip().upper()
+    
+    db_sector = db.get(Sector, sector_str)
+    if not db_sector:
+        all_orders = db.exec(select(Sector.ordem)).all()
+        next_ordem = max(all_orders) + 10 if all_orders else 10
+        db_sector = Sector(id=sector_str, nome=sector_str.title(), descricao="Criado automaticamente no cenário", ordem=next_ordem)
+        db.add(db_sector)
+        db.flush()
+        
+    cp_id = _resolve_stage_and_cp(sector_str, etapa_val, cp_val, db)
+    
     if db_var:
-        if v.get("ETAPA"):
-            db_var.etapa = v["ETAPA"].strip()
-        if v.get("PONTO DE CONTROLE"):
-            db_var.ponto_controle = v["PONTO DE CONTROLE"].strip()
+        if etapa_val:
+            db_var.etapa = etapa_val
+        if cp_val:
+            db_var.ponto_controle = cp_val
+        db_var.control_point_id = cp_id
+        db.add(db_var)
+        db.flush()
         return db_var
+        
     tipo_str = v.get("TIPO", "INPUT")
     tipo = VariableType.INPUT
     if tipo_str == "OUTPUT": tipo = VariableType.OUTPUT
@@ -59,20 +132,14 @@ def _ensure_variable(v: Dict[str, Any], db: Session) -> Variable:
     if var_id in {"J3", "J16", "J20"}:
         tipo = VariableType.CENARIO
     nome = v.get("DESCRIÇÃO", "").strip() or var_id
-    sector_str = v.get("SETOR", "OUTROS").strip().upper()
-    db_sector = db.get(Sector, sector_str)
-    if not db_sector:
-        all_orders = db.exec(select(Sector.ordem)).all()
-        next_ordem = max(all_orders) + 10 if all_orders else 10
-        db_sector = Sector(id=sector_str, nome=sector_str.title(), descricao="Criado automaticamente no cenário", ordem=next_ordem)
-        db.add(db_sector)
-        db.flush()
+    
     db_var = Variable(
         id=var_id, nome=nome, descricao=v.get("DESCRIÇÃO", ""),
         setor_id=sector_str, tipo=tipo, unidade=v.get("UNIDADE DE MEDIDA", ""),
         status=VariableStatus.ATIVA,
-        etapa=v.get("ETAPA", "").strip() if v.get("ETAPA") else "",
-        ponto_controle=v.get("PONTO DE CONTROLE", "").strip() if v.get("PONTO DE CONTROLE") else ""
+        etapa=etapa_val,
+        ponto_controle=cp_val,
+        control_point_id=cp_id
     )
     db.add(db_var)
     db.flush()
@@ -96,9 +163,12 @@ def _ensure_equation(var_id: str, eq_val: str, db_var: Variable, db: Session):
     for idx, dep_id in enumerate(sorted(deps)):
         dep_var = db.get(Variable, dep_id)
         if not dep_var:
+            dep_cp_id = _resolve_stage_and_cp(db_var.setor_id, "GERAL", "GERAL", db)
             dep_var = Variable(
                 id=dep_id, nome=dep_id, descricao="Auto-criado por dependência",
-                setor_id=db_var.setor_id, tipo=VariableType.INPUT, status=VariableStatus.PENDENTE
+                setor_id=db_var.setor_id, tipo=VariableType.INPUT, status=VariableStatus.PENDENTE,
+                etapa="GERAL", ponto_controle="GERAL",
+                control_point_id=dep_cp_id
             )
             db.add(dep_var)
             db.flush()

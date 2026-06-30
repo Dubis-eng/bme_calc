@@ -149,5 +149,17 @@ graph TD
 
 * [x] **Tarefa 7.1** *(Criação do .gitignore)* — Criar o arquivo `.gitignore` na raiz do projeto com as regras para ignorar a pasta `.agent/`, bancos locais SQLite (`*.db`), backups SQL (`*.sql`), ambientes virtuais Python (`.venv`, `__pycache__`), diretórios do Node.js (`node_modules`, `dist`, `build`) e arquivos sensíveis (`.env*`).
 
+---
+
+### Épico 18: Ordenação em Cascata de Variáveis (CONCLUÍDO)
+
+* [x] **Tarefa 18.1** *(Modelagem e Migração)* — Criar tabelas `Stage` e `ControlPoint` no backend, adicionar `control_point_id` e `ordem` em `Variable`, e implementar a migração em `migrations.py` com baseline alfabético inicial (+10).
+* [x] **Tarefa 18.2** *(Schemas e Services)* — Adaptar schemas Pydantic em `schemas.py` e rotinas CRUD/leitura em `services_variables.py` para converter os relacionamentos em campos legados de etapa/ponto de controle.
+* [x] **Tarefa 18.3** *(Endpoints PATCH)* — Implementar rotas PATCH no backend para atualização em lote da ordenação de Etapas, Pontos de Controle e Variáveis.
+* [x] **Tarefa 18.4** *(Utilitário de Ordenação Frontend)* — Criar utilitário `frontend/src/utils/sorting.ts` para estruturar o agrupamento e ordenação da cascata mantendo o limite constitucional de 300 linhas em componentes.
+* [x] **Tarefa 18.5** *(Interface de Reordenação Drag-and-Drop & Acessibilidade)* — Implementar drag-and-drop HTML5 nativo no frontend e botões de subir/descer (WCAG) nos três níveis (Etapa, Ponto de Controle e Variável).
+* [x] **Tarefa 18.6** *(Testes e Validação)* — Adicionar suíte de testes unitários para reordenação no backend, atualizar exports de PDF/Excel e executar suite de verificação local com `checklist.py`.
+
+
 
 

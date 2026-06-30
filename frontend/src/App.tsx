@@ -241,6 +241,7 @@ function App() {
                     onNavigateToVariable={onScrollTo}
                     activeStatusFilter={activeStatusFilter}
                     setActiveStatusFilter={setActiveStatusFilter}
+                    onReorderSuccess={reloadCurrentScenario}
                   />
                 </div>
               </div>

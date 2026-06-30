@@ -11,6 +11,9 @@ export interface Variable {
     "casas_decimais"?: number | null;
     "tipo_exibicao"?: "NUMBER" | "PERCENTAGE";
     "percent_base"?: "DECIMAL" | "INTEGER";
+    "control_point_id"?: string;
+    "stage_id"?: string;
+    "ordem"?: number;
 }
 
 export interface Result {
@@ -35,6 +38,9 @@ export interface BackendVariable {
   setor_id: string;
   etapa: string;
   ponto_controle: string;
+  control_point_id?: string;
+  stage_id?: string;
+  ordem?: number;
   descricao: string;
   unidade: string;
   equation_value: string;

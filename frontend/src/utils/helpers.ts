@@ -41,5 +41,69 @@ export const mapBackendVariableToFrontend = (v: BackendVariable): Variable => ({
   'EQUAÇÕES E VALORES': v.equation_value,
   casas_decimais: v.casas_decimais,
   tipo_exibicao: v.tipo_exibicao,
-  percent_base: v.percent_base
+  percent_base: v.percent_base,
+  control_point_id: v.control_point_id,
+  stage_id: v.stage_id,
+  ordem: v.ordem
 });
+
+export const FUNCTIONS = new Set([
+  'SE', 'SEERRO', 'SOMA', 'PROCV', 'LN', 'SUBTOTAL', 'SOMASES',
+  'VAPOR_H', 'VAPOR_S', 'VAPOR_H_SAT', 'VAPOR_H_LIQ', 'VAPOR_H_PS', 'VAPOR_T_SAT', 'VAPOR_LATENT',
+  'TRUE', 'FALSE', 'VERDADEIRO', 'FALSO'
+]);
+
+export const formatVariableValue = (val: number, variable: Variable) => {
+  const isPercent = variable.tipo_exibicao === 'PERCENTAGE';
+  const base = variable.percent_base || 'DECIMAL';
+  const decimals = variable.casas_decimais !== undefined && variable.casas_decimais !== null 
+    ? variable.casas_decimais 
+    : (isPercent ? 2 : 4);
+  
+  let displayVal = val;
+  if (isPercent && base === 'DECIMAL') {
+    displayVal = val * 100;
+  }
+  
+  const numStr = displayVal.toLocaleString('pt-BR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+  
+  return isPercent ? `${numStr}%` : numStr;
+};
+
+export const getInputValue = (v: Variable) => {
+  const rawVal = v['EQUAÇÕES E VALORES'];
+  if (typeof rawVal === 'string' && rawVal.startsWith('=')) {
+    return rawVal;
+  }
+  if (v.tipo_exibicao === 'PERCENTAGE' && v.percent_base === 'DECIMAL') {
+    const num = Number(rawVal);
+    if (!isNaN(num) && rawVal !== '') {
+      return String(num * 100);
+    }
+  }
+  return String(rawVal);
+};
+
+export const cleanInputValue = (value: string, variable: Variable) => {
+  let finalValue = value;
+  if (variable.tipo_exibicao === 'PERCENTAGE' && variable.percent_base === 'DECIMAL') {
+    const cleaned = value.trim();
+    if (!cleaned.startsWith('=')) {
+      const num = Number(cleaned.replace(',', '.'));
+      if (!isNaN(num) && cleaned !== '') {
+        finalValue = String(num / 100);
+      }
+    }
+  }
+  return finalValue;
+};
+
+export const getDependencies = (formula: string, variables: Variable[]): string[] => {
+  if (!formula || !formula.startsWith('=')) return [];
+  const knownIds = new Set(variables.map(v => v['ID - REF'].toUpperCase()));
+  const tokens = formula.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
+  return Array.from(new Set(tokens.map(t => t.toUpperCase()).filter(t => knownIds.has(t) && !FUNCTIONS.has(t))));
+};

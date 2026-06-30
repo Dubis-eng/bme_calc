@@ -111,6 +111,42 @@
       "description": "Criar testes unitários/integração no backend e frontend para validar a precisão, conversão de percentuais, exportação e formatação decimal, executando o checklist.",
       "scope": "backend/test_variables_formatting.py",
       "status": "DONE"
+    },
+    {
+      "id": "TASK-1801",
+      "description": "Modelagem das tabelas Stage e ControlPoint no database.py, relacionamento em Variable com control_point_id, e script de migração no migrations.py (com baseline alfabético +10).",
+      "scope": "backend/database.py, backend/migrations.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1802",
+      "description": "Atualizar schemas Pydantic em schemas.py e lógica de criação/listagem em services_variables.py para resolver os relacionamentos de Etapa/Ponto de Controle.",
+      "scope": "backend/schemas.py, backend/services_variables.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1803",
+      "description": "Implementar endpoints PATCH de reordenação em lote para Stages, ControlPoints e Variables no backend com validações de escopo.",
+      "scope": "backend/main.py, backend/services_variables.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1804",
+      "description": "Criar utilitário de ordenação frontend/src/utils/sorting.ts para separar a lógica de agrupamento e ordenação da UI de SectorModules.tsx.",
+      "scope": "frontend/src/utils/sorting.ts",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1805",
+      "description": "Desenvolver interface visual de Drag-and-Drop nativo e botões de reordenação (WCAG) nos três níveis do painel reativo (SectorModules.tsx).",
+      "scope": "frontend/src/components/SectorModules.tsx",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-1806",
+      "description": "Criar suíte de testes unitários para a reordenação no backend, ajustar ordenação do gerador de PDF/Excel em exports.py e executar o checklist.py.",
+      "scope": "backend/test_cascade_sorting.py, backend/exports.py",
+      "status": "TODO"
     }
   ]
 }

@@ -1,78 +1,118 @@
-# Specification: Decimal Rounding and Percentage Standardization in Variables
+# Specification: Cascade Ordering of Variables (Sector -> Stage -> Control Point -> Variable)
 
 ## 1. Overview
-Currently, the Energy and Mass Balance Calculator does not enforce a standardized number of decimal places or format type (percentage vs. raw numbers) on variables. This results in inconsistent visual representations across the Frontend interface, Excel exports, and PDF reports.
-Additionally, variables expressing percentages (%) are represented inconsistently in equations (some as decimal values like `0.10` representing `10%`, others as integer values like `10` because equations divide them by `100`).
+This specification details the implementation of a professional, fully normalized database structure and frontend interface for sorting and reordering process sectors, stages (etapas), control points (pontos de controle), and variables in a cascade fashion.
 
-This specification defines a metadata-driven approach to:
-1. Allow users to define a custom number of decimal rounding places for each variable's display representation.
-2. Standardize percentage representation visually on the frontend and export modules without modifying existing calculation formulas or breaking mathematical expressions.
+Currently:
+* **Sectors** have an explicit `ordem` field.
+* **Stages** and **Control Points** are stored as raw text strings directly on each variable. There is no normalized entity or custom sorting mechanism.
+* **Variables** are displayed in their database insertion order.
 
----
-
-## 2. Requirements & Design Decisions
-
-### 2.1. Decimal Rounding
-* **Database Representation**: Values are stored with full floating-point precision (raw floats) in the `results` table. No rounding is applied when writing to the database or during AST calculation loops.
-* **Variable Metadata**:
-  * Add a `casas_decimais` (integer, nullable) field to the `variables` table.
-  * If `casas_decimais` is `null`, fallback to a system default (e.g., `2` decimal places).
-  * Minimum value: `0`. Maximum value: `6`.
-* **Visual Formatting**: Rounding is applied strictly when rendering values in UI inputs, tables, dashboard charts, PDF reports, and Excel sheets.
-
-### 2.2. Percentage (%) Representation
-* **Variable Metadata**:
-  * Add a `tipo_exibicao` field (string/enum: `NUMBER` or `PERCENTAGE`) to the `variables` table.
-  * Add a `percent_base` field (string/enum: `DECIMAL` or `INTEGER`) to the `variables` table, applicable only when `tipo_exibicao` is `PERCENTAGE`.
-* **Behavior by Base Type**:
-  * **`DECIMAL` Base**:
-    * Calculated/Stored value in DB: e.g., `0.10`.
-    * Formatted UI/Export representation: `10.00%` (using the specified `casas_decimais` scaled).
-    * UI Input behavior: The user types `10`, the input shows `10%`, and the system automatically saves `0.10` to the database.
-  * **`INTEGER` Base**:
-    * Calculated/Stored value in DB: e.g., `10`.
-    * Formatted UI/Export representation: `10.00%`.
-    * UI Input behavior: The user types `10`, the input shows `10%`, and the system saves `10` to the database.
+This feature will:
+1. Normalize the database schema by introducing `Stage` and `ControlPoint` tables.
+2. Maintain backward-compatible API payloads by dynamically resolving `etapa` and `ponto_controle` names on variable details.
+3. Add bulk reordering endpoints to the API.
+4. Implement a clean, accessible (WCAG-compliant) sorting interface in the frontend using "Move Up" / "Move Down" controls for stages, control points, and variables.
 
 ---
 
-## 3. Proposed Changes
+## 2. Database Schema & Normalization
 
-### 3.1. Backend Updates (`backend/`)
-* **`backend/database.py`**:
-  * Add columns to `Variable`:
-    * `casas_decimais: Optional[int] = Field(default=None, sa_column_kwargs={"nullable": True})`
-    * `tipo_exibicao: str = Field(default="NUMBER", sa_column_kwargs={"nullable": False})`
-    * `percent_base: str = Field(default="DECIMAL", sa_column_kwargs={"nullable": False})`
-  * Add corresponding schema migration in `backend/migrations.py` to add these columns and assign default values (`casas_decimais = null`, `tipo_exibicao = 'NUMBER'`, `percent_base = 'DECIMAL'`).
-* **`backend/schemas.py`**:
-  * Add `casas_decimais`, `tipo_exibicao`, and `percent_base` to `VariableCreate`, `VariableUpdate`, and `VariableDetail`.
-* **`backend/seeding.py` / Initial Seed Data**: Ensure metadata fields are seeded appropriately.
-* **`backend/exports.py`**:
-  * Format values in PDF and Excel sheets using the custom rounding rules and suffixing `%` for variables with `tipo_exibicao == 'PERCENTAGE'`.
+### 2.1. New Tables
+We introduce two new SQLModel tables:
 
-### 3.2. Frontend Updates (`frontend/src/`)
-* **Variable Registration Component (`VariableModal.tsx`)**:
-  * Add fields to edit `casas_decimais` (number input, 0-6), `tipo_exibicao` (dropdown: Número / Percentual), and `percent_base` (dropdown: Decimal (0.10) / Inteiro (10) - visible only if Percentual is selected).
-* **Scenario Grid & Input fields (`SectorModules.tsx` / `App.tsx`)**:
-  * Format cells/inputs according to variable configuration:
-    * If `PERCENTAGE` with `DECIMAL` base: display `value * 100`, edit as `value * 100` and send `value / 100` to backend.
-    * If `PERCENTAGE` with `INTEGER` base: display `value`, edit as `value` and send `value` to backend.
-    * Append `%` badge or text to the field.
-    * Apply `casas_decimais` rounding using `.toFixed(casas_decimais ?? 2)`.
+1. **`Stage` (Etapa)**:
+   * `id`: `uuid.UUID` (Primary Key)
+   * `nome`: `str` (Stage name, indexed)
+   * `sector_id`: `str` (Foreign Key to `sectors.id`, indexed)
+   * `ordem`: `int` (Ordering index, indexed, default `0`)
+
+2. **`ControlPoint` (Ponto de Controle)**:
+   * `id`: `uuid.UUID` (Primary Key)
+   * `nome`: `str` (Control point name, indexed)
+   * `stage_id`: `uuid.UUID` (Foreign Key to `stages.id`, indexed)
+   * `ordem`: `int` (Ordering index, indexed, default `0`)
+
+### 2.2. Modified Table
+We update the **`Variable`** table:
+* Add `control_point_id`: `Optional[uuid.UUID]` (Foreign Key to `control_points.id`, indexed)
+* Add `ordem`: `int` (Ordering index, indexed, default `0`)
+* Deprecate/make nullable the old `etapa` and `ponto_controle` columns (retained as nullable to ensure safe backward-compatibility).
 
 ---
 
-## 4. Verification Plan
+## 3. Migration Plan
 
-### 4.1. Automated Tests
-* Create unit/integration tests in `backend/test_variables_formatting.py` (or existing test files) verifying:
-  * Variable creation with `casas_decimais`, `tipo_exibicao`, and `percent_base`.
-  * Export formatting maps apply correct rounding and % suffix.
-  * Formula execution persists full floating-point accuracy despite rounding configurations.
+At startup, the system will run a schema and data migration:
+1. Create `stages` and `control_points` tables.
+2. Migrate existing variables:
+   * Read the variable's `setor_id`, `etapa` (fallback to `"GERAL"` if empty), and `ponto_controle` (fallback to `"GERAL"` if empty).
+   * Find or create the corresponding `Stage` for the sector.
+   * Find or create the corresponding `ControlPoint` for the stage.
+   * Associate the variable with the control point via `control_point_id`.
+3. Auto-populate baseline `ordem` values:
+   * Sort stages alphabetically within their sector, then assign `ordem = 10, 20, 30...`
+   * Sort control points alphabetically within their stage, then assign `ordem = 10, 20, 30...`
+   * Sort variables alphabetically by ID/ref within their control point, then assign `ordem = 10, 20, 30...`
 
-### 4.2. Manual Verification
-* Access Variable modal, update a variable to display as PERCENTAGE (Decimal) with 3 decimal places.
-* Open the scenario page, modify the variable to 12.345%, verify that it displays formatted correctly.
-* Run calculations and check if other dependent variables receive the correct decimal representation (`0.12345`).
-* Export PDF/Excel and check visual compliance.
+---
+
+## 4. Backend Updates
+
+### 4.1. Variable CRUD & Auto-Creation
+When creating or updating a variable via the API, the backend will:
+1. Ensure the Sector exists (already implemented).
+2. Check if a `Stage` with the given `etapa` name exists under the sector. If not, create it and auto-calculate its `ordem` (`max(ordem) + 10`).
+3. Check if a `ControlPoint` with the given `ponto_controle` name exists under that stage. If not, create it and auto-calculate its `ordem`.
+4. Associate the variable with the `ControlPoint` ID and auto-calculate its variable `ordem` if not specified.
+
+### 4.2. API Response Serialization
+The `VariableDetail` schema returned by variables endpoints will fetch the stage name and control point name via relationships and populate `etapa` and `ponto_controle` fields. This ensures all existing frontend pages continue to work without breaking.
+
+### 4.3. Reordering Endpoints
+To support sorting in the UI, we implement three transaction-safe bulk reorder endpoints:
+* **`PATCH /api/sectors/{sector_id}/stages/reorder`**: Receives an ordered list of Stage IDs (`List[uuid.UUID]`) and reassigns their `ordem` field consecutively (10, 20, 30...).
+* **`PATCH /api/stages/{stage_id}/control-points/reorder`**: Receives an ordered list of Control Point IDs (`List[uuid.UUID]`) and reassigns their `ordem` consecutively.
+* **`PATCH /api/control-points/{cp_id}/variables/reorder`**: Receives an ordered list of Variable IDs (`List[str]`) and reassigns their `ordem` consecutively.
+
+---
+
+## 5. Frontend Updates
+
+### 5.1. UI Reordering Controls (Sleek Drag-and-Drop + WCAG-Compliant Buttons)
+To ensure both rapid reordering for lists of +1000 variables and complete accessibility (WCAG) compliance, we implement a dual-reordering interface:
+
+1. **Native HTML5 Drag-and-Drop**:
+   * Drag handles (using a sleek vertical grip icon `⋮⋮` and `cursor-grab`) will be added to the Stage headers, Control Point bars, and Variable table rows.
+   * Elements will be marked as `draggable`. Using native React event handlers (`onDragStart`, `onDragOver`, `onDragLeave`, `onDrop`), users can drag and drop to reorder elements:
+     * **Stages** within the active Sector.
+     * **Control Points** within a Stage.
+     * **Variables** within a Control Point.
+   * Dropping an element will trigger a reordering transaction: the frontend will instantly calculate the new sequence of IDs, perform a re-render for zero-latency visual feedback, and call the respective backend `PATCH` endpoint to save the persistent order.
+
+2. **Keyboard-Accessible Control Buttons (WCAG Fallback)**:
+   * Accessible Up/Down arrow buttons (hidden from screen reader visual display or with descriptive `aria-label` tags) will sit next to the drag handles.
+   * These buttons allow users to reorder using keyboard triggers (`Enter` / `Space` key handlers) and serve as a reliable fallback for mouse-free navigation.
+
+### 5.2. Query Sorting
+The variables list page will request variables sorted by hierarchy:
+1. Sector Order (`Sector.ordem`)
+2. Stage Order (`Stage.ordem`)
+3. Control Point Order (`ControlPoint.ordem`)
+4. Variable Order (`Variable.ordem`)
+
+---
+
+## 6. Verification Plan
+
+### 6.1. Automated Tests
+* Add pytest unit tests verifying:
+  * Database schema migrations.
+  * Auto-creation of Stage/ControlPoint entities during variable CRUD.
+  * Reordering endpoints behavior and validation (e.g. ensuring only stages belonging to the same sector can be reordered).
+  * Hierarchy queries output items in correct order.
+
+### 6.2. Manual Verification
+* Create variables in new/existing stages, verify DB entities are populated.
+* Click "Move Up" / "Move Down" on a Stage, verify order persistence and re-render.
+* Verify Excel/PDF exports reflect the configured cascade order.

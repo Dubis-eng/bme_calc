@@ -94,6 +94,8 @@ class VariableCreate(BaseModel):
     status: Optional[str] = "ativa"
     etapa: Optional[str] = ""
     ponto_controle: Optional[str] = ""
+    control_point_id: Optional[uuid.UUID] = None
+    ordem: Optional[int] = 0
     equation_value: Optional[str] = ""
     casas_decimais: Optional[int] = None
     tipo_exibicao: Optional[str] = "NUMBER"
@@ -108,6 +110,8 @@ class VariableUpdate(BaseModel):
     status: Optional[str] = "ativa"
     etapa: Optional[str] = ""
     ponto_controle: Optional[str] = ""
+    control_point_id: Optional[uuid.UUID] = None
+    ordem: Optional[int] = 0
     equation_value: Optional[str] = ""
     casas_decimais: Optional[int] = None
     tipo_exibicao: Optional[str] = "NUMBER"
@@ -123,6 +127,9 @@ class VariableDetail(BaseModel):
     status: str
     etapa: str
     ponto_controle: str
+    control_point_id: Optional[uuid.UUID] = None
+    stage_id: Optional[uuid.UUID] = None
+    ordem: int
     equation_value: str
     casas_decimais: Optional[int] = None
     tipo_exibicao: str
