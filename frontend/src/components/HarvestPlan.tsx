@@ -6,6 +6,7 @@ import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
 import { useHarvestPlanState } from '../hooks/useHarvestPlanState';
 
 interface HarvestPlanProps { sectors: Sector[]; }
+const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 export function HarvestPlan({ sectors }: HarvestPlanProps) {
   const {
