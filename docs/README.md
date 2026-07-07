@@ -26,6 +26,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Tarefa 10.5 (Tratamento Fail-Fast de Conexão)** — Implementar banner de aviso offline, travamento de interface no frontend e desabilitar fallbacks silenciosos.
 * **[DONE] Épico 18: Ordenação em Cascata de Variáveis** — Ordenação em três níveis com drag-and-drop e botões (WCAG).
 * **[DONE] Épico 19: Unificação de Configurações e Sincronização de Ciclo** — Unificação de endpoints de configurações no backend, transação/idempotência de reordenamento de meses, e aviso visual com botão de recálculo manual para cenários com ciclo desatualizado.
+* **[DONE] Épico 20: Correção de Digitação de Percentuais e Decimais** — Componente `FormattedVariableInput` para digitação fluida de decimais (ponto/vírgula) e normalização entre frontend e backend para todas as variáveis percentuais e numéricas.
 
 ---
 

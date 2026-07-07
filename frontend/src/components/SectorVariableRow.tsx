@@ -1,7 +1,9 @@
 import React from 'react';
 import { Variable } from '../types';
 import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
-import { formatVariableValue, getInputValue, cleanInputValue } from '../utils/helpers';
+import { formatVariableValue } from '../utils/helpers';
+import { FormattedVariableInput } from './FormattedVariableInput';
+
 
 interface SectorVariableRowProps {
   variable: Variable;
@@ -76,13 +78,11 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
         {isInput ? (
           <div className="flex justify-end items-center gap-1.5">
             <label htmlFor={`input-val-${id}`} className="sr-only">Valor para {id}</label>
-            <input
+            <FormattedVariableInput
               id={`input-val-${id}`}
-              type="text"
-              aria-label={`Valor para ${id}`}
-              disabled={isLocked || isInactive}
-              value={getInputValue(v)}
-              onChange={e => onVariableChange(id, cleanInputValue(e.target.value, v))}
+              variable={v}
+              isLocked={isLocked}
+              onVariableChange={onVariableChange}
               className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800`}
             />
             {v.tipo_exibicao === 'PERCENTAGE' && (

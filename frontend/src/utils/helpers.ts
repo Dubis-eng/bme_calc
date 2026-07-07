@@ -78,28 +78,46 @@ export const getInputValue = (v: Variable) => {
   if (typeof rawVal === 'string' && rawVal.startsWith('=')) {
     return rawVal;
   }
-  if (v.tipo_exibicao === 'PERCENTAGE' && v.percent_base === 'DECIMAL') {
-    const num = Number(rawVal);
-    if (!isNaN(num) && rawVal !== '') {
-      return String(num * 100);
+  const isPercent = v.tipo_exibicao === 'PERCENTAGE';
+  const num = Number(typeof rawVal === 'string' ? rawVal.replace(',', '.') : rawVal);
+  if (!isNaN(num) && rawVal !== '' && rawVal !== null && rawVal !== undefined) {
+    if (isPercent) {
+      const multiplier = v.percent_base === 'DECIMAL' ? 100 : 1;
+      const displayVal = Number((num * multiplier).toFixed(12));
+      return String(displayVal).replace('.', ',');
+    } else {
+      return String(num).replace('.', ',');
     }
   }
-  return String(rawVal);
+  return rawVal !== null && rawVal !== undefined ? String(rawVal) : '';
 };
 
 export const cleanInputValue = (value: string, variable: Variable) => {
   let finalValue = value;
-  if (variable.tipo_exibicao === 'PERCENTAGE' && variable.percent_base === 'DECIMAL') {
-    const cleaned = value.trim();
-    if (!cleaned.startsWith('=')) {
-      const num = Number(cleaned.replace(',', '.'));
-      if (!isNaN(num) && cleaned !== '') {
-        finalValue = String(num / 100);
+  const isPercent = variable.tipo_exibicao === 'PERCENTAGE';
+  let cleaned = value.trim();
+  if (!cleaned.startsWith('=')) {
+    if (cleaned.startsWith('.') || cleaned.startsWith(',')) {
+      cleaned = '0' + cleaned;
+    }
+    const dotValue = cleaned.replace(',', '.');
+    const num = Number(dotValue);
+    if (!isNaN(num) && cleaned !== '') {
+      if (isPercent) {
+        const divisor = variable.percent_base === 'DECIMAL' ? 100 : 1;
+        finalValue = String(Number((num / divisor).toFixed(14)));
+      } else {
+        finalValue = String(num);
       }
+    } else {
+      finalValue = dotValue;
     }
   }
   return finalValue;
 };
+
+
+
 
 export const getDependencies = (formula: string, variables: Variable[]): string[] => {
   if (!formula || !formula.startsWith('=')) return [];

@@ -5,7 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.1] - 2026-07-07
+
+### Fixed
+- **Prevenção de Perda de Precisão IEEE-754 e Proteção de Foco na Digitação (Épico 20)**:
+  - Mitigação de problemas de arredondamento binário do JavaScript (ex: `13.02` tornando-se `13.019999999999998` e `.7` tornando-se `7.000000000000001`) aplicando arredondamento por `.toFixed()` nas multiplicações e divisões centesimais.
+  - Implementação de proteção por foco ativo no `useEffect` de `FormattedVariableInput.tsx`: enquanto o campo de entrada está focado pelo usuário, a sincronização de estado com o valor do parent é pausada para preservar exatamente os caracteres intermediários em digitação (ex: o caractere de ponto/vírgula inicial `.5` ou `,5`).
+  - Tratamento robusto para manter ponto e vírgula funcionando uniformemente em ambas as bases percentuais (Decimal e Inteira).
+  - Extensão da formatação com vírgula (padrão brasileiro pt-BR) para todas as variáveis com formato de exibição padrão de número (`NUMBER`), mantendo a digitação fluida e o tratamento de foco unificado.
+
+## [2.15.0] - 2026-07-07
+
+### Fixed
+- **Correção na Digitação de Percentuais/Decimais no Frontend (Épico 20)**:
+  - Desenvolvimento do componente `FormattedVariableInput.tsx` que gerencia o estado da digitação intermediária (ponto, vírgula, decimais parciais e sinais negativos) localmente para evitar perdas ou redefinições indesejadas no grid reativo.
+  - Sincronização robusta bidirecional com o estado global sem re-renderizações obstrutivas, resolvendo o bug onde o cursor pulava ou decimais eram apagados instantaneamente.
+  - Implementação de normalização inteligente de separadores decimais no frontend (padrão brasileiro `,`) e backend (padrão americano `.`).
+  - Tratamento aprimorado de perda de foco (`onBlur`) para formatar entradas numéricas parciais (ex: `5.` para `5`, `.5` para `0,5` no frontend).
+  - Integração do novo input formatado em `SectorVariableRow.tsx` e `ScenarioPremises.tsx` com renderização dinâmica do indicador `%` e correções de acessibilidade (`<label>` associados).
+
 ## [2.14.0] - 2026-07-06
+
 
 ### Added
 - **Unificação de Configurações e Sincronização de Ciclo (Épico 19)**:

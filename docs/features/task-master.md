@@ -169,7 +169,11 @@ graph TD
 * [x] **Tarefa 19.3** *(Integração Frontend e Warnings)* — Atualizar o frontend para as novas URLs, enviar o array completo de meses no swap e mostrar aviso visual de ciclo desatualizado com botão de recálculo manual.
 * [x] **Tarefa 19.4** *(Testes Unitários)* — Corrigir e criar testes unitários no backend validando as rotas de configurações unificadas, ordenação transacional e persistência do ciclo.
 
+---
 
+### Épico 20: Correção de Digitação de Percentuais (CONCLUÍDO)
 
-
+* [x] **Tarefa 20.1** *(Componente de Input de Variável)* — Desenvolver o componente `FormattedVariableInput.tsx` encapsulando estado de digitação intermediário para evitar a perda de decimais (ponto e vírgula).
+* [x] **Tarefa 20.2** *(Integração nos Módulos e Premissas)* — Substituir a entrada direta em `SectorVariableRow.tsx` e `ScenarioPremises.tsx` pelo novo componente e formatar visualmente com `%` no painel de premissas.
+* [x] **Tarefa 20.3** *(Validação)* — Executar suite de checagem com `checklist.py`, testar fluxos de digitação e verificar conformidade de limites de arquivos e aninhamento.
 
