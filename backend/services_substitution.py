@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
 from database import (
     Variable, Equation, Dependency, Sector,
-    VariableType, VariableStatus
+    VariableType, VariableStatus, HarvestPlanOrderedItem
 )
 from services_variables import _update_variable_equation
 import engine
@@ -186,6 +186,10 @@ def confirm_variable_substitution(target_var_id: str, recursive: bool, action_un
                 db_var.harvest_plan_op = None
                 db_var.harvest_plan_weight_var_id = None
                 db.add(db_var)
+                # Remove from harvest plan ordered list
+                stmt_del = select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == db_var.id)
+                for item in db.exec(stmt_del).all():
+                    db.delete(item)
                 active_eqs = db.exec(select(Equation).where(Equation.variable_id == target_var_id, Equation.status == "ativa")).all()
                 for eq in active_eqs:
                     eq.status = "desativada"
@@ -193,6 +197,7 @@ def confirm_variable_substitution(target_var_id: str, recursive: bool, action_un
                     db.add(eq)
         elif action == "delete":
             from sqlalchemy import text
+            db.execute(text("DELETE FROM harvest_plan_ordered_items WHERE variable_id = :var_id"), {"var_id": target_var_id})
             db.execute(text("UPDATE variables SET harvest_plan_weight_var_id = NULL WHERE harvest_plan_weight_var_id = :var_id"), {"var_id": target_var_id})
             db.execute(text("DELETE FROM dependencies WHERE dependency_var_id = :var_id"), {"var_id": target_var_id})
             db.execute(text("DELETE FROM dependencies WHERE equation_id IN (SELECT id FROM equations WHERE variable_id = :var_id)"), {"var_id": target_var_id})

@@ -12,8 +12,9 @@ bme_calc/
 │   ├── database.py       # Conexão SQLModel e esquema da tabela scenarios
 │   ├── engine.py         # Interpretador de fórmulas AST e solucionador de ciclos
 │   ├── goalseek.py       # Solver scipy.optimize.root_scalar para busca de metas
-│   ├── exports.py        # Módulos de exportação de relatórios PDF e Excel
-│   ├── main.py           # Endpoints de API e roteamento de requisições
+│   ├── router_settings.py # Rotas de configurações unificadas sob /api/settings
+│   ├── services_*.py     # Serviços de negócios (cenários, safra, reordenação)
+│   ├── main.py           # Endpoints principais da API FastAPI
 │   └── test_*.py         # Testes de integração e motores matemáticos
 ├── docs/                 # Documentação técnica e governança do projeto
 │   ├── features/         # Histórico de entregas (task-master.md)
@@ -58,3 +59,5 @@ Persiste os dados de maneira estruturada e relacional através do PostgreSQL nor
   * `WEIGHTED_AVERAGE`: Média ponderada baseada em outra variável de peso (como volume de moenda).
   * `CALCULATE`: Avaliação da fórmula matemática usando como entradas os valores já consolidados de suas variáveis dependentes.
 * **Ordenação de Meses Dinâmica**: Reordena a exibição e os cálculos de forma lógica e sequencial a partir do mês de início do ciclo configurado na tabela `harvest_plan_settings`.
+* **Estrutura Ordenada e Divisores**: Suporte a ordenação arbitrária por drag-and-drop e a inserção de divisores de agrupamento. A estrutura e ordem de exibição são persistidas na tabela `harvest_plan_ordered_items`.
+* **Exportação de Relatórios**: Geração de PDFs estruturados em formato paisagem (ReportLab) e planilhas Excel (OpenPyXL) que replicam fielmente a ordenação e os divisores destacados.

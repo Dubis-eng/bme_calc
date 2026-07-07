@@ -1,7 +1,7 @@
 import pytest
 from sqlmodel import Session, select
 from sqlalchemy import text
-from database import engine, Variable, Equation, Dependency, Result, Sector, VariableType, VariableStatus, create_db_and_tables
+from database import engine, Variable, Equation, Dependency, Result, Sector, VariableType, VariableStatus, create_db_and_tables, HarvestPlanOrderedItem
 from engine import substitute_variable_in_formula
 from services_substitution import get_substitution_preview, confirm_variable_substitution
 
@@ -146,6 +146,11 @@ def test_substitution_confirm_delete():
         session.add_all([dep1, dep2])
         session.flush()
 
+        # Add to harvest plan ordered items to verify foreign key check and deletion
+        ord_item = HarvestPlanOrderedItem(ordem=1, tipo="variable", variable_id="TD_J168")
+        session.add(ord_item)
+        session.flush()
+
         # Confirm substitution with recursive=False and action_unused="delete"
         count = confirm_variable_substitution("TD_J168", False, "delete", session)
         assert count == 1
@@ -153,6 +158,10 @@ def test_substitution_confirm_delete():
         # Verify target is physically deleted
         db_j168 = session.get(Variable, "TD_J168")
         assert db_j168 is None
+
+        # Verify it was deleted from harvest_plan_ordered_items
+        stmt_chk = select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == "TD_J168")
+        assert session.exec(stmt_chk).first() is None
 
         # Clear test entities
         session.execute(text("DELETE FROM dependencies WHERE dependency_var_id IN ('TD_J34', 'TD_J168', 'TD_J167')"))

@@ -56,9 +56,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   const fetchYearsAndMonths = async () => {
     try {
-      const yrRes = await axios.get('http://localhost:8000/api/harvest-years');
+      const yrRes = await axios.get('http://localhost:8000/api/settings/years');
       setYears(yrRes.data);
-      const moRes = await axios.get('http://localhost:8000/api/harvest-months');
+      const moRes = await axios.get('http://localhost:8000/api/settings/months');
       setMonths(moRes.data);
     } catch (err) {
       handleApiError(err);
@@ -83,26 +83,17 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
               onLoadScenario(detailRes.data.variables, latest);
               setLoading(false);
             })
-            .catch(err => {
-              handleApiError(err);
-              setLoading(false);
-            });
+            .catch(err => { handleApiError(err); setLoading(false); });
         } else {
           loadLocalFallback();
         }
       })
-      .catch(err => {
-        handleApiError(err);
-        setLoading(false);
-      });
+      .catch(err => { handleApiError(err); setLoading(false); });
   }, []);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -111,10 +102,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
 
   const handleChange = (id: string, value: string) => {
-    if (!isLocked && !isOffline) {
-      setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
-      setHasUnsavedChanges(true);
-    }
+    if (isLocked || isOffline) return;
+    setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
+    setHasUnsavedChanges(true);
   };
 
   const triggerCalculate = async (varsList: Variable[], tolVal?: number) => {
@@ -164,7 +154,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       });
       setCurrentScenario({
         id: res.data.id, year_harvest: res.data.year_harvest, reference_month: res.data.reference_month,
-        version: res.data.version, status: res.data.status
+        version: res.data.version, status: res.data.status, cycle_start_month: res.data.cycle_start_month
       });
       setHasUnsavedChanges(false);
       alert(`Cenário salvo com sucesso! Versão: v${res.data.version}`);
@@ -181,10 +171,20 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     if (!currentScenario || isOffline) return;
     setSavingActive(true);
     try {
-      await axios.put(`http://localhost:8000/api/scenarios/${currentScenario.id}`, {
+      const res = await axios.put(`http://localhost:8000/api/scenarios/${currentScenario.id}`, {
         year_harvest: anoSafra, reference_month: mesReferencia, variables, status: currentScenario.status
       });
       setHasUnsavedChanges(false);
+      if (res.data) {
+        setCurrentScenario({
+          id: res.data.id,
+          year_harvest: res.data.year_harvest,
+          reference_month: res.data.reference_month,
+          version: res.data.version,
+          status: res.data.status,
+          cycle_start_month: res.data.cycle_start_month
+        });
+      }
       alert('Alterações salvas com sucesso!');
     } catch (err) {
       handleApiError(err);
@@ -267,23 +267,16 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
             } else {
               loadLocalFallback();
             }
-          } catch (fallbackErr) {
-            loadLocalFallback();
-          }
+          } catch (fallbackErr) { loadLocalFallback(); }
         }
-      } finally {
-        setLoading(false);
-      }
+      } finally { setLoading(false); }
     } else {
       try {
         const res = await axios.get('http://localhost:8000/api/variables');
         const mapped: Variable[] = res.data.map((v: BackendVariable) => mapBackendVariableToFrontend(v));
         setVariables(mapped);
         triggerCalculate(mapped);
-      } catch (err) {
-        console.error(err);
-        handleApiError(err);
-      }
+      } catch (err) { console.error(err); handleApiError(err); }
     }
   };
 

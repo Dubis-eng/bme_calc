@@ -36,7 +36,8 @@ from schemas import (
     SubstitutionPreviewRequest,
     SubstitutionPreviewResponse,
     SubstitutionConfirmRequest,
-    SubstitutionConfirmResponse
+    SubstitutionConfirmResponse,
+    HarvestPlanStructureUpdate
 )
 
 app = FastAPI()
@@ -54,6 +55,9 @@ app.include_router(variables_router)
 
 from router_settings import router as settings_router
 app.include_router(settings_router)
+
+from router_harvest_plan import router as harvest_plan_router
+app.include_router(harvest_plan_router)
 
 @app.on_event("startup")
 def on_startup():
@@ -101,7 +105,7 @@ def list_scenarios(db=Depends(get_session)):
 def get_scenario(id: uuid.UUID, db=Depends(get_session)):
     db_scenario = db.get(Scenario, id)
     if not db_scenario: raise HTTPException(status_code=404, detail="Cenário não encontrado")
-    return ScenarioDetail(id=db_scenario.id, nome=db_scenario.nome, year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month, version=db_scenario.version, status=db_scenario.status, variables=services.get_scenario_variables(id, db), created_at=db_scenario.created_at, updated_at=db_scenario.updated_at)
+    return ScenarioDetail(id=db_scenario.id, nome=db_scenario.nome, year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month, version=db_scenario.version, status=db_scenario.status, variables=services.get_scenario_variables(id, db), created_at=db_scenario.created_at, updated_at=db_scenario.updated_at, cycle_start_month=db_scenario.cycle_start_month)
 
 @app.patch("/api/scenarios/{id}/status", response_model=Scenario)
 def update_scenario_status(id: uuid.UUID, req: StatusUpdate, db=Depends(get_session)):
@@ -213,77 +217,7 @@ def reorder_variables_endpoint(cp_id: uuid.UUID, req: List[str], db=Depends(get_
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Harvest Plan Endpoints
-@app.get("/api/harvest-plan/years", response_model=List[int])
-def list_harvest_plan_years(db=Depends(get_session)):
-    try:
-        return services.get_harvest_years(db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/harvest-plan/settings")
-def get_harvest_plan_settings_endpoint(db=Depends(get_session)):
-    try:
-        setting = services.get_harvest_plan_settings(db)
-        return {"start_month": setting.start_month}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.put("/api/harvest-plan/settings")
-def update_harvest_plan_settings_endpoint(req: HarvestPlanSettingUpdate, db=Depends(get_session)):
-    try:
-        setting = services.update_harvest_plan_settings(req.start_month, db)
-        return {"start_month": setting.start_month}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/harvest-plan/config")
-def get_harvest_plan_config_endpoint(db=Depends(get_session)):
-    try:
-        return services.get_variables_harvest_config(db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/harvest-plan/config/bulk")
-def update_harvest_plan_config_endpoint(req: BulkHarvestPlanConfigUpdate, db=Depends(get_session)):
-    try:
-        # Convert configs to list of dicts for service
-        configs_list = [c.dict() for c in req.configs]
-        services.update_variables_harvest_config(configs_list, db)
-        return {"success": True, "message": "Configurações atualizadas com sucesso."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/harvest-plan/config")
-def update_harvest_plan_config_direct_endpoint(req: List[VariableHarvestPlanConfig], db=Depends(get_session)):
-    try:
-        # Convert configs to list of dicts for service
-        configs_list = [c.dict() for c in req]
-        services.update_variables_harvest_config(configs_list, db)
-        return {"success": True, "message": "Configurações atualizadas com sucesso."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/harvest-plan/consolidation")
-def get_harvest_plan_consolidation_endpoint(year_harvest: str, db=Depends(get_session)):
-    try:
-        return services.calculate_harvest_plan_consolidation(year_harvest, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/harvest-plan/selections", response_model=HarvestPlanSelectionsResponse)
-def get_harvest_plan_selections_endpoint(year_harvest: int, db=Depends(get_session)):
-    try:
-        return services.get_harvest_plan_selections(year_harvest, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/harvest-plan/selections")
-def update_harvest_plan_selection_endpoint(req: HarvestPlanSelectionUpdate, year_harvest: int, db=Depends(get_session)):
-    try:
-        return services.update_harvest_plan_selection(year_harvest, req.month, req.scenario_id, req.exclude, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 

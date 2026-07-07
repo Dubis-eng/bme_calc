@@ -8,7 +8,7 @@ from sqlalchemy import text, inspect
 from database import (
     engine, ScenarioStatus, VariableType, VariableStatus, ResultStatus,
     Scenario, Variable, Sector, Equation, Dependency, Result, HarvestPlanSetting, parse_year,
-    Stage, ControlPoint
+    Stage, ControlPoint, HarvestPlanOrderedItem
 )
 
 from migrations_legacy import migrate_legacy_data, heal_missing_control_points
@@ -42,6 +42,12 @@ def migrate_database_schema(session: Session):
             if session.bind.dialect.name == "postgresql":
                 session.execute(text("ALTER TABLE scenarios ALTER COLUMN year_harvest TYPE INTEGER USING (year_harvest::integer)"))
                 session.commit()
+        
+        # Check if cycle_start_month column exists, add it if missing
+        cols = inspector.get_columns("scenarios")
+        if not any(c["name"] == "cycle_start_month" for c in cols):
+            session.execute(text("ALTER TABLE scenarios ADD COLUMN cycle_start_month VARCHAR(50) DEFAULT 'Abril'"))
+            session.commit()
 
     # 2. Seed harvest_years
     if "harvest_years" in tables and session.execute(text("SELECT COUNT(*) FROM harvest_years")).scalar() == 0:
@@ -258,3 +264,22 @@ def migrate_database_schema(session: Session):
             session.commit()
         except Exception as e:
             print(f"Error updating variables status to INATIVA: {e}")
+
+    # Seed harvest_plan_ordered_items if it exists and is empty
+    tables_updated = inspect(session.bind).get_table_names()
+    if "harvest_plan_ordered_items" in tables_updated:
+        try:
+            count = session.execute(text("SELECT COUNT(*) FROM harvest_plan_ordered_items")).scalar()
+            if count == 0:
+                db_vars = session.exec(select(Variable).where(Variable.in_harvest_plan == True).order_by(Variable.setor_id, Variable.id)).all()
+                for idx, var in enumerate(db_vars):
+                    item = HarvestPlanOrderedItem(
+                        ordem=idx,
+                        tipo="variable",
+                        variable_id=var.id
+                    )
+                    session.add(item)
+                session.commit()
+        except Exception as e:
+            print(f"Error seeding harvest_plan_ordered_items: {e}")
+

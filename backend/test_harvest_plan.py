@@ -78,23 +78,23 @@ def test_global_variable_crud():
 
 def test_harvest_plan_settings():
     # 1. Get default settings
-    res = client.get("/api/harvest-plan/settings")
+    res = client.get("/api/settings/cycle")
     assert res.status_code == 200
     assert res.json()["start_month"] == "Abril"
 
     # 2. Update settings to Janeiro
-    res_up = client.put("/api/harvest-plan/settings", json={"start_month": "Janeiro"})
+    res_up = client.put("/api/settings/cycle", json={"start_month": "Janeiro"})
     assert res_up.status_code == 200
     assert res_up.json()["start_month"] == "Janeiro"
 
     # 3. Verify it is saved
-    res_verify = client.get("/api/harvest-plan/settings")
+    res_verify = client.get("/api/settings/cycle")
     assert res_verify.status_code == 200
     assert res_verify.json()["start_month"] == "Janeiro"
 
 def test_harvest_plan_consolidation_calculation():
     # 1. Set settings start_month to Abril
-    client.put("/api/harvest-plan/settings", json={"start_month": "Abril"})
+    client.put("/api/settings/cycle", json={"start_month": "Abril"})
 
     # 2. Create global variables
     v1 = {
@@ -185,7 +185,7 @@ def test_harvest_plan_consolidation_calculation():
 
 def test_harvest_plan_selections():
     # 1. Set settings start_month to Abril
-    client.put("/api/harvest-plan/settings", json={"start_month": "Abril"})
+    client.put("/api/settings/cycle", json={"start_month": "Abril"})
     
     # Create variables
     v1 = {

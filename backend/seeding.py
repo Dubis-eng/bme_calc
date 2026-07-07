@@ -162,6 +162,7 @@ def seed_initial_data():
             reference_month="Abril",
             version=1,
             status=ScenarioStatus.EM_EDICAO,
+            cycle_start_month="Abril",
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow()
         )

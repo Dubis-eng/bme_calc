@@ -50,6 +50,7 @@ class ScenarioDetail(BaseModel):
     variables: List[Dict[str, Any]]
     created_at: datetime.datetime
     updated_at: datetime.datetime
+    cycle_start_month: Optional[str] = None
 
 class GoalSeekRequest(BaseModel):
     variables: List[Dict[str, Any]]
@@ -161,6 +162,15 @@ class AvailableScenarioInfo(BaseModel):
 class HarvestPlanSelectionsResponse(BaseModel):
     selections: List[Dict[str, Any]]
     available_scenarios: Dict[str, List[AvailableScenarioInfo]]
+
+class HarvestPlanStructureItem(BaseModel):
+    tipo: str
+    variable_id: Optional[str] = None
+    label: Optional[str] = None
+
+class HarvestPlanStructureUpdate(BaseModel):
+    items: List[HarvestPlanStructureItem]
+
 
 class SubstitutionPreviewRequest(BaseModel):
     recursive: bool

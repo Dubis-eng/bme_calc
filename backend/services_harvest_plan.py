@@ -1,10 +1,11 @@
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
 from database import (
-    Variable, Equation, Dependency, Scenario, Result, HarvestPlanSetting,
-    ScenarioStatus, VariableType, ResultStatus, VariableStatus
+    Variable, Equation, Dependency, Scenario, HarvestPlanSetting,
+    ScenarioStatus, VariableType, ResultStatus, VariableStatus, HarvestPlanOrderedItem
 )
 import engine
+from services_harvest_plan_calc import calculate_harvest_plan_consolidation
 
 ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
@@ -40,6 +41,16 @@ def update_harvest_plan_settings(start_month: str, db: Session) -> HarvestPlanSe
     if start_month in ALL_MONTHS:
         setting.start_month = start_month
         db.add(setting)
+        
+        idx = ALL_MONTHS.index(start_month)
+        ordered_names = ALL_MONTHS[idx:] + ALL_MONTHS[:idx]
+        from database import HarvestMonth
+        db_months = db.exec(select(HarvestMonth)).all()
+        for m in db_months:
+            if m.name in ordered_names:
+                m.order_index = ordered_names.index(m.name)
+                db.add(m)
+                
         db.commit()
         db.refresh(setting)
     return setting
@@ -62,21 +73,56 @@ def get_variables_harvest_config(db: Session) -> List[Dict[str, Any]]:
         })
     return configs
 
+def _sync_harvest_plan_ordered_item(var_id: str, added: bool, db: Session):
+    if not added:
+        stmt_del = select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == var_id)
+        for item in db.exec(stmt_del).all():
+            db.delete(item)
+        return
+
+    exists = db.exec(select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == var_id)).first()
+    if exists:
+        return
+
+    has_divider = db.exec(select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.tipo == "divider")).first()
+    max_ord = db.exec(select(HarvestPlanOrderedItem.ordem).order_by(HarvestPlanOrderedItem.ordem.desc())).first()
+    max_ord = max_ord if max_ord is not None else -1
+
+    current_ord = max_ord + 1
+    if has_divider:
+        ungrouped_div = db.exec(select(HarvestPlanOrderedItem).where(
+            HarvestPlanOrderedItem.tipo == "divider",
+            HarvestPlanOrderedItem.label == "Itens sem Agrupamento"
+        )).first()
+        if not ungrouped_div:
+            div_item = HarvestPlanOrderedItem(tipo="divider", label="Itens sem Agrupamento", ordem=current_ord)
+            db.add(div_item)
+            current_ord += 1
+
+    item = HarvestPlanOrderedItem(tipo="variable", variable_id=var_id, ordem=current_ord)
+    db.add(item)
+
 def update_variables_harvest_config(configs: List[Dict[str, Any]], db: Session):
     for config in configs:
         var_id = config.get("id")
         db_var = db.get(Variable, var_id)
-        if db_var:
-            db_var.in_harvest_plan = config.get("in_harvest_plan", False)
-            db_var.harvest_plan_op = config.get("harvest_plan_op")
-            db_var.harvest_plan_weight_var_id = config.get("harvest_plan_weight_var_id")
-            db.add(db_var)
+        if not db_var:
+            continue
+            
+        old_val = db_var.in_harvest_plan
+        new_val = config.get("in_harvest_plan", False)
+        db_var.in_harvest_plan = new_val
+        db_var.harvest_plan_op = config.get("harvest_plan_op")
+        db_var.harvest_plan_weight_var_id = config.get("harvest_plan_weight_var_id")
+        db.add(db_var)
+        
+        if old_val != new_val:
+            _sync_harvest_plan_ordered_item(var_id, new_val, db)
     db.commit()
 
 def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any]:
     from database import HarvestPlanSelection, Scenario, ScenarioStatus
     
-    # 1. Fetch current selections from database
     selections = db.exec(select(HarvestPlanSelection).where(HarvestPlanSelection.year_harvest == year_harvest)).all()
     selections_list = []
     for sel in selections:
@@ -86,7 +132,6 @@ def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any
             "exclude": sel.exclude
         })
         
-    # 2. Fetch available scenarios per month (must be approved/final)
     stmt = select(Scenario).where(
         Scenario.year_harvest == year_harvest,
         Scenario.status.in_([ScenarioStatus.APROVADO, ScenarioStatus.FINAL])
@@ -132,168 +177,96 @@ def update_harvest_plan_selection(year_harvest: int, month: str, scenario_id: Op
     db.commit()
     return {"success": True}
 
-def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict[str, Any]:
-    from database import parse_year, HarvestPlanSelection
-    if isinstance(year_harvest, str):
-        year_harvest_int = parse_year(year_harvest)
-    else:
-        year_harvest_int = int(year_harvest)
-        
-    setting = get_harvest_plan_settings(db)
-    harvest_months = get_ordered_months(setting.start_month, db)
-    
-    # 1. Fetch custom selections for this year
-    selections = db.exec(select(HarvestPlanSelection).where(HarvestPlanSelection.year_harvest == year_harvest_int)).all()
-    selections_map = {sel.month: sel for sel in selections}
-    
-    # 2. Get all variables
-    stmt_vars = select(Variable)
-    db_vars = db.exec(stmt_vars).all()
-    vars_map = {v.id: v for v in db_vars}
-    
-    # 3. Get all approved/final scenarios for the harvest year
-    stmt_scenarios = select(Scenario).where(
-        Scenario.year_harvest == year_harvest_int,
-        Scenario.status.in_([ScenarioStatus.APROVADO, ScenarioStatus.FINAL])
+def get_harvest_plan_structure(db: Session) -> List[Dict[str, Any]]:
+    # 1. Fetch active variables in harvest plan
+    active_vars_stmt = select(Variable).where(
+        Variable.in_harvest_plan == True,
+        Variable.status != VariableStatus.INATIVA
     )
-    scenarios = db.exec(stmt_scenarios).all()
+    active_vars = db.exec(active_vars_stmt).all()
+    active_var_ids = {v.id for v in active_vars}
+    vars_map = {v.id: v for v in active_vars}
     
-    # Group all available scenarios by month and version
-    scenarios_by_month_all = {}
-    for sc in scenarios:
-        scenarios_by_month_all.setdefault(sc.reference_month, []).append(sc)
+    # 2. Fetch existing ordered items
+    ordered_stmt = select(HarvestPlanOrderedItem).order_by(HarvestPlanOrderedItem.ordem.asc())
+    ordered_items = db.exec(ordered_stmt).all()
+    
+    # Find variables that are in the plan but missing from ordered items
+    ordered_var_ids = {item.variable_id for item in ordered_items if item.tipo == "variable"}
+    missing_var_ids = active_var_ids - ordered_var_ids
+    
+    # Sync missing variables (append them)
+    if missing_var_ids:
+        max_ord = db.exec(select(HarvestPlanOrderedItem.ordem).order_by(HarvestPlanOrderedItem.ordem.desc())).first()
+        max_ord = max_ord if max_ord is not None else -1
         
-    # Resolve active scenarios per month based on selections
-    scenarios_by_month = {}
-    active_months = []
-    
-    for month in harvest_months:
-        sel = selections_map.get(month)
-        sc = None
+        # Check if there is already an "Itens sem Agrupamento" divider
+        ungrouped_divider = db.exec(select(HarvestPlanOrderedItem).where(
+            HarvestPlanOrderedItem.tipo == "divider",
+            HarvestPlanOrderedItem.label == "Itens sem Agrupamento"
+        )).first()
         
-        # Resolve according to selection settings
-        if sel:
-            if sel.exclude:
-                # Explicitly excluded, so skip/do not activate this month
-                continue
-            elif sel.scenario_id:
-                # Specific scenario selected, let's find it
-                sc = next((s for s in scenarios if s.id == sel.scenario_id), None)
+        current_ord = max_ord + 1
+        if not ungrouped_divider:
+            new_div = HarvestPlanOrderedItem(
+                tipo="divider",
+                label="Itens sem Agrupamento",
+                ordem=current_ord
+            )
+            db.add(new_div)
+            current_ord += 1
+            
+        for idx, m_id in enumerate(sorted(list(missing_var_ids))):
+            new_item = HarvestPlanOrderedItem(
+                tipo="variable",
+                variable_id=m_id,
+                ordem=current_ord + idx
+            )
+            db.add(new_item)
+        db.commit()
+        ordered_items = db.exec(ordered_stmt).all()
         
-        # If no explicit selection/scenario resolved yet, fallback to highest version
-        if not sc:
-            avail_scs = scenarios_by_month_all.get(month, [])
-            if avail_scs:
-                # sort by version descending and take first
-                avail_scs_sorted = sorted(avail_scs, key=lambda s: s.version, reverse=True)
-                sc = avail_scs_sorted[0]
-                
-        # If we have a resolved scenario for this month, add it
-        if sc:
-            scenarios_by_month[month] = sc
-            active_months.append(month)
-            
-    # Load results for each of these active scenarios
-    monthly_results = {} # {month: {variable_id: float_value}}
-    monthly_statuses = {} # {month: {variable_id: str_status}}
-    
-    for month in active_months:
-        sc = scenarios_by_month[month]
-        stmt_results = select(Result).where(Result.scenario_id == sc.id)
-        results = db.exec(stmt_results).all()
-        monthly_results[month] = {r.variable_id: r.value for r in results}
-        monthly_statuses[month] = {r.variable_id: r.status.value if hasattr(r.status, 'value') else str(r.status) for r in results}
-
-    # Build input variables list for calculation of accumulated column
-    engine_vars = []
-    
-    # Fetch active global equations
-    eq_stmt = select(Equation).where(Equation.status == "ativa")
-    active_eqs = db.exec(eq_stmt).all()
-    eq_map = {eq.variable_id: eq.expression_original for eq in active_eqs}
-    
-    for var_id, var in vars_map.items():
-        op = var.harvest_plan_op
-        if op is None:
-            expr = eq_map.get(var_id)
-            op = "CALCULATE" if expr else "SUM"
-            
-        expr = eq_map.get(var_id)
-        
-        # Calculate monthly values list for operations using ONLY active_months
-        monthly_vals = []
-        for m in active_months:
-            val = monthly_results[m].get(var_id)
-            if val is not None:
-                monthly_vals.append(val)
-                
-        accum_val = None
-        if op == "SUM":
-            accum_val = sum(monthly_vals) if monthly_vals else 0.0
-        elif op == "AVERAGE":
-            accum_val = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
-        elif op == "WEIGHTED_AVERAGE":
-            weight_id = var.harvest_plan_weight_var_id
-            num = 0.0
-            den = 0.0
-            has_w = False
-            for m in active_months:
-                v_val = monthly_results[m].get(var_id)
-                w_val = monthly_results[m].get(weight_id) if weight_id else None
-                if v_val is not None and w_val is not None:
-                    num += v_val * w_val
-                    den += w_val
-                    has_w = True
-            if has_w and den != 0.0:
-                accum_val = num / den
-            else:
-                accum_val = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
-        elif op == "CALCULATE":
-            pass
-            
-        t_val = str(accum_val) if accum_val is not None else "0"
-        t_type = "INPUT"
-        if op == "CALCULATE":
-            t_val = expr if expr else "0"
-            t_type = var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo)
-
-        engine_vars.append({
-            "ID - REF": var_id,
-            "SETOR": var.setor_id,
-            "TIPO": t_type,
-            "UNIDADE DE MEDIDA": var.unidade,
-            "DESCRIÇÃO": var.nome,
-            "EQUAÇÕES E VALORES": t_val
-        })
-            
-    calc_results = engine.calculate_state(engine_vars)
-    accumulated_results = calc_results["results"]
-    
-    data_list = []
-    for var_id, var in vars_map.items():
-        if var.in_harvest_plan:
-            month_vals_dict = {m: monthly_results[m].get(var_id) for m in active_months}
-            month_statuses_dict = {m: monthly_statuses[m].get(var_id, "PENDING") for m in active_months}
-            accum_res = accumulated_results.get(var_id, {"value": None, "status": "PENDING", "error_message": ""})
-            
-            data_list.append({
-                "variable_id": var_id,
-                "nome": var.nome,
-                "descricao": var.descricao,
-                "setor_id": var.setor_id,
-                "unidade": var.unidade,
-                "tipo": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
-                "harvest_plan_op": var.harvest_plan_op,
-                "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
-                "monthly_values": month_vals_dict,
-                "monthly_statuses": month_statuses_dict,
-                "accumulated": accum_res,
-                "casas_decimais": var.casas_decimais,
-                "tipo_exibicao": var.tipo_exibicao,
-                "percent_base": var.percent_base
+    result = []
+    for item in ordered_items:
+        if item.tipo == "variable":
+            v_id = item.variable_id
+            if v_id in active_var_ids:
+                var = vars_map[v_id]
+                result.append({
+                    "id": str(item.id),
+                    "tipo": "variable",
+                    "variable_id": v_id,
+                    "label": None,
+                    "ordem": item.ordem,
+                    "nome": var.nome,
+                    "unidade": var.unidade,
+                    "setor_id": var.setor_id
+                })
+        else:
+            result.append({
+                "id": str(item.id),
+                "tipo": "divider",
+                "variable_id": None,
+                "label": item.label,
+                "ordem": item.ordem,
+                "nome": None,
+                "unidade": None,
+                "setor_id": None
             })
-        
-    return {
-        "months": active_months,
-        "data": data_list
-    }
+    return result
+
+def save_harvest_plan_structure(items: List[Dict[str, Any]], db: Session):
+    db_items = db.exec(select(HarvestPlanOrderedItem)).all()
+    for db_it in db_items:
+        db.delete(db_it)
+    db.commit()
+    
+    for idx, item in enumerate(items):
+        new_item = HarvestPlanOrderedItem(
+            tipo=item.get("tipo", "variable"),
+            variable_id=item.get("variable_id"),
+            label=item.get("label"),
+            ordem=idx
+        )
+        db.add(new_item)
+    db.commit()

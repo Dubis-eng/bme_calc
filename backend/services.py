@@ -32,5 +32,7 @@ from services_harvest_plan import (
     update_variables_harvest_config,
     get_harvest_plan_selections,
     update_harvest_plan_selection,
-    calculate_harvest_plan_consolidation
+    calculate_harvest_plan_consolidation,
+    get_harvest_plan_structure,
+    save_harvest_plan_structure
 )

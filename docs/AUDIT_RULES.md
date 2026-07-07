@@ -45,3 +45,13 @@ python .agent/scripts/checklist.py .
 python .agent/scripts/verify_all.py . --url http://localhost:3000
 ```
 > **Nota**: Garanta que tanto o frontend quanto o backend estejam rodando localmente antes de disparar a suite completa.
+
+---
+
+## 🐛 Lições Aprendidas e Proteção contra Regressões
+1. **Segurança de Strings em Filtros (React)**:
+   - Sempre utilize fallbacks de string vazia (`val || ''`) antes de chamar métodos de string (como `.toLowerCase()`, `.includes()`, `.replace()`) em filtros ou funções de pesquisa, evitando crashes por valores nulos ou indefinidos vindos do banco de dados.
+2. **Sincronização de Estado Pós-Escrita**:
+   - Após qualquer operação de escrita bem-sucedida (salvamento, reordenação ou atualização de configuração), force o recarregamento do estado (`fetchConfigs()`, etc.) a partir da API. Isso previne que o frontend mantenha estados locais inconsistentes ou dessincronizados (ex: variáveis desmarcadas por filtros ativos).
+3. **Cascatas de Exclusão Física no Banco**:
+   - Ao implementar exclusões físicas de entidades primárias (como Variáveis ou Setores), certifique-se de limpar de forma atômica (ou via cascade `ON DELETE CASCADE`) todas as tabelas de junção, ordenação ou configurações que possuam chaves estrangeiras associadas, prevenindo falhas de `ForeignKeyViolation`.

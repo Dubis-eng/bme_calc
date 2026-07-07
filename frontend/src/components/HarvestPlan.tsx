@@ -1,138 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { Sector } from '../types';
 import { BmeIcon } from '../theme/design-system';
-import { HarvestPlanTable, ConsolidatedItem } from './HarvestPlanTable';
-import { HarvestPlanConfigTable, VariableConfig } from './HarvestPlanConfigTable';
+import { HarvestPlanTable } from './HarvestPlanTable';
+import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
+import { useHarvestPlanState } from '../hooks/useHarvestPlanState';
 
 interface HarvestPlanProps { sectors: Sector[]; }
 const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 export function HarvestPlan({ sectors }: HarvestPlanProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'visualizacao' | 'configuracao'>('visualizacao');
-  const [years, setYears] = useState<string[]>([]);
-  const [selectedYear, setSelectedYear] = useState<string>('');
-  const [startMonth, setStartMonth] = useState<string>('Abril');
-  const [months, setMonths] = useState<string[]>([]);
-  const [variablesConfig, setVariablesConfig] = useState<VariableConfig[]>([]);
-  const [consolidationData, setConsolidationData] = useState<ConsolidatedItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [selections, setSelections] = useState<Array<{ month: string; scenario_id: string | null; exclude: boolean }>>([]);
-  const [availableScenarios, setAvailableScenarios] = useState<Record<string, Array<{ id: string; nome: string; version: number; status: string }>>>({});
-  const [savingConfig, setSavingConfig] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedSector, setSelectedSector] = useState<string>('TODOS');
-  const [activeTypeFilter, setActiveTypeFilter] = useState<string>('ALL');
-  const [focusedVarId, setFocusedVarId] = useState<string | null>(null);
-  const [weightSearchQuery, setWeightSearchQuery] = useState<string>('');
-
-  const fetchSelections = () => {
-    if (!selectedYear) return;
-    const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    axios.get(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`)
-      .then(res => {
-        setSelections(res.data.selections || []);
-        setAvailableScenarios(res.data.available_scenarios || {});
-      }).catch(err => console.error('Erro ao carregar seleções de cenários:', err));
-  };
-
-  const handleSelectScenario = (month: string, scenarioId: string | null, exclude: boolean) => {
-    if (!selectedYear) return;
-    setLoading(true);
-    const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    axios.post(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`, { month, scenario_id: scenarioId, exclude })
-      .then(async () => {
-        await fetchConsolidation();
-        fetchSelections();
-      }).catch(err => {
-        console.error('Erro ao salvar seleção de cenário:', err);
-        alert('Erro ao atualizar seleção de cenário do mês.');
-      }).finally(() => setLoading(false));
-  };
-
-  const fetchSettingsAndYears = () => {
-    setLoading(true);
-    axios.get('http://localhost:8000/api/harvest-plan/settings')
-      .then(settingsRes => {
-        setStartMonth(settingsRes.data.start_month);
-        return axios.get('http://localhost:8000/api/harvest-plan/years');
-      })
-      .then(yearsRes => {
-        const yearStrings = yearsRes.data.map((y: string | number) => String(y));
-        setYears(yearStrings);
-        if (yearStrings.length > 0) setSelectedYear(yearStrings[0]);
-      }).catch(err => console.error('Erro ao carregar anos/configurações:', err)).finally(() => setLoading(false));
-  };
-
-  const fetchConfigs = () => {
-    axios.get('http://localhost:8000/api/harvest-plan/config')
-      .then(res => setVariablesConfig(res.data))
-      .catch(err => console.error('Erro ao carregar configurações de variáveis:', err));
-  };
-
-  const fetchConsolidation = async () => {
-    if (!selectedYear) return;
-    try {
-      setLoading(true);
-      const res = await axios.get(`http://localhost:8000/api/harvest-plan/consolidation?year_harvest=${selectedYear}`);
-      setMonths(res.data.months);
-      setConsolidationData(res.data.data);
-    } catch (err) {
-      console.error('Erro ao calcular consolidação:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSettingsAndYears();
-    fetchConfigs();
-  }, []);
-
-  useEffect(() => {
-    if (selectedYear) {
-      fetchConsolidation();
-      fetchSelections();
-    }
-  }, [selectedYear]);
-
-  const handleStartMonthChange = (val: string) => {
-    setLoading(true);
-    axios.post('http://localhost:8000/api/harvest-plan/settings', { start_month: val })
-      .then(async () => {
-        setStartMonth(val);
-        await fetchConsolidation();
-      }).catch(err => {
-        console.error('Erro ao salvar início do ciclo:', err);
-        alert('Erro ao atualizar mês de início.');
-      }).finally(() => setLoading(false));
-  };
-
-  const handleConfigChange = (id: string, key: keyof VariableConfig, val: string | boolean | null) => {
-    setVariablesConfig(prev => prev.map(item => item.id === id ? ({ ...item, [key]: val } as VariableConfig) : item));
-  };
-
-  const handleSaveConfigs = () => {
-    setSavingConfig(true);
-    axios.post('http://localhost:8000/api/harvest-plan/config', variablesConfig)
-      .then(async () => {
-        alert('Configurações salvas com sucesso!');
-        await fetchConsolidation();
-      }).catch(err => {
-        console.error('Erro ao salvar configurações:', err);
-        alert('Erro ao salvar as configurações.');
-      }).finally(() => setSavingConfig(false));
-  };
+  const {
+    activeSubTab, setActiveSubTab,
+    years, selectedYear, setSelectedYear,
+    startMonth, months, variablesConfig,
+    consolidationData, loading, selections, availableScenarios,
+    savingConfig, searchQuery, setSearchQuery,
+    selectedSector, setSelectedSector,
+    activeTypeFilter, setActiveTypeFilter,
+    focusedVarId, setFocusedVarId,
+    weightSearchQuery, setWeightSearchQuery,
+    isEditing, newDividerLabel, setNewDividerLabel,
+    handleSelectScenario, handleStartMonthChange,
+    handleConfigChange, handleSaveConfigs,
+    handleToggleEdit, handleDragStart,
+    handleDragOver, handleDrop,
+    handleMoveUp, handleMoveDown,
+    handleDeleteDivider, handleRenameDivider,
+    handleAddDivider
+  } = useHarvestPlanState();
 
   const filteredConsolidated = consolidationData.filter(item => {
-    const matchesSearch = item.variable_id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
+    if (item.tipo_item === 'divider') return true;
+    const varId = item.variable_id || '';
+    const nome = item.nome || '';
+    const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
     const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
     return matchesSearch && matchesSector && matchesType;
   });
 
   const filteredConfigs = variablesConfig.filter(item => {
-    const matchesSearch = item.id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
+    const varId = item.id || '';
+    const nome = item.nome || '';
+    const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
     const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
     return matchesSearch && matchesSector && matchesType;
@@ -140,8 +50,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
   return (
     <div className="flex flex-col h-full glass-card overflow-hidden animate-fade-in">
-      {/* Upper Control Bar */}
-      <div className="bg-slate-900/40 text-white px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800/60 space-y-4 md:space-y-0">
+      <div className="bg-slate-900/40 text-white px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-880 space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <div className="h-9 w-9 bg-slate-800 border border-slate-700/60 rounded-lg flex items-center justify-center font-bold text-teal-400 shadow-sm text-sm">
             <BmeIcon name="default" size={14} />
@@ -171,7 +80,6 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
         </div>
       </div>
 
-      {/* Tab Switcher & Search Bar */}
       <div className="bg-slate-950/60 px-6 py-3 border-b border-slate-800/60 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
         <div className="flex space-x-1.5 p-1 bg-slate-900 border border-slate-800/60 rounded-lg">
           <button onClick={() => setActiveSubTab('visualizacao')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'visualizacao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
@@ -182,25 +90,56 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
           </button>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          {/* Type Filter pills */}
+          {activeSubTab === 'visualizacao' && (
+            <button
+              onClick={handleToggleEdit}
+              className={`btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5 ${isEditing ? 'bg-amber-600 hover:bg-amber-500 text-white' : ''}`}
+            >
+              {isEditing ? <span>💾 Salvar Organização</span> : <span>🔓 Editar Estrutura</span>}
+            </button>
+          )}
+
+          {activeSubTab === 'visualizacao' && !isEditing && selectedYear && (
+            <div className="flex items-center gap-1.5">
+              <a
+                href={`http://localhost:8000/api/harvest-plan/export/pdf?year_harvest=${selectedYear}`}
+                className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-teal-450 hover:text-teal-350 border border-slate-800/60 rounded text-xs font-bold transition-all flex items-center gap-1 animate-fade-in"
+                title="Exportar PDF"
+              >
+                📄 PDF
+              </a>
+              <a
+                href={`http://localhost:8000/api/harvest-plan/export/xlsx?year_harvest=${selectedYear}`}
+                className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-teal-450 hover:text-teal-350 border border-slate-800/60 rounded text-xs font-bold transition-all flex items-center gap-1 animate-fade-in"
+                title="Exportar Excel"
+              >
+                📊 Excel
+              </a>
+            </div>
+          )}
+
+          {isEditing && activeSubTab === 'visualizacao' && (
+            <div className="flex items-center space-x-2 bg-slate-900/60 p-1 border border-slate-800/60 rounded-lg animate-fade-in">
+              <input
+                type="text"
+                placeholder="Título do divisor..."
+                value={newDividerLabel}
+                onChange={(e) => setNewDividerLabel(e.target.value)}
+                className="px-2 py-0.5 input-field text-[11px] w-36 focus:outline-none"
+              />
+              <button onClick={handleAddDivider} className="px-2 py-0.5 bg-teal-600 hover:bg-teal-500 text-[9px] font-bold rounded uppercase">
+                ➕ Divisor
+              </button>
+            </div>
+          )}
+
           <div className="flex items-center gap-1 bg-slate-900/60 p-1 border border-slate-800/60 rounded-lg">
-            {([
-              { id: 'ALL', label: 'Todos' },
-              { id: 'INPUT', label: 'INPUT' },
-              { id: 'OUTPUT', label: 'OUTPUT' },
-              { id: 'CENARIO', label: 'Cenário' },
-              { id: 'DERIVADA', label: 'Derivada' }
-            ] as const).map(opt => (
+            {[{ id: 'ALL', label: 'Todos' }, { id: 'INPUT', label: 'INPUT' }, { id: 'OUTPUT', label: 'OUTPUT' }].map(opt => (
               <button
                 key={opt.id}
                 onClick={() => setActiveTypeFilter(opt.id)}
-                className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase transition-all ${
-                  activeTypeFilter === opt.id
-                    ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'
-                }`}
+                className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase transition-all ${activeTypeFilter === opt.id ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm' : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'}`}
               >
                 {opt.label}
               </button>
@@ -209,26 +148,13 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
           <div className="relative flex-1 md:flex-initial">
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]">🔍</span>
-            <input type="search" placeholder="Pesquisar variável..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 pr-3 py-1 input-field w-full md:w-48 focus:outline-none" />
+            <input type="search" placeholder="Pesquisar..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 pr-3 py-1 input-field w-full md:w-48 focus:outline-none" />
           </div>
 
           <select value={selectedSector} onChange={(e) => setSelectedSector(e.target.value)} className="input-field px-2.5 py-1 focus:outline-none">
             <option value="TODOS">Todos os Setores</option>
             {sectors.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
           </select>
-
-          {(() => {
-            const inactiveMonths = Object.keys(availableScenarios).filter(m => !months.includes(m));
-            if (activeSubTab === 'visualizacao' && inactiveMonths.length > 0) {
-              return (
-                <select value="" onChange={(e) => { const m = e.target.value; if (m) handleSelectScenario(m, null, false); }} className="bg-teal-950/45 text-teal-400 border border-teal-800/40 rounded px-2.5 py-1 text-xs font-bold hover:bg-teal-950/60 cursor-pointer focus:outline-none">
-                  <option value="">➕ Adicionar Mês</option>
-                  {inactiveMonths.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-              );
-            }
-            return null;
-          })()}
 
           {activeSubTab === 'configuracao' && (
             <button onClick={handleSaveConfigs} disabled={savingConfig} className="btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5">
@@ -238,15 +164,28 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex-1 overflow-auto min-h-0 bg-slate-950/10 p-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-500">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500 mb-4"></div>
-            <p className="text-xs font-semibold">Processando cálculos e consolidação...</p>
+            <p className="text-xs font-semibold">Carregando dados do plano...</p>
           </div>
         ) : activeSubTab === 'visualizacao' ? (
-          <HarvestPlanTable months={months} filteredConsolidated={filteredConsolidated} selections={selections} availableScenarios={availableScenarios} handleSelectScenario={handleSelectScenario} />
+          <HarvestPlanTable
+            months={months}
+            filteredConsolidated={filteredConsolidated}
+            selections={selections}
+            availableScenarios={availableScenarios}
+            handleSelectScenario={handleSelectScenario}
+            isEditing={isEditing}
+            onMoveUp={handleMoveUp}
+            onMoveDown={handleMoveDown}
+            onDeleteDivider={handleDeleteDivider}
+            onRenameDivider={handleRenameDivider}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          />
         ) : (
           <HarvestPlanConfigTable filteredConfigs={filteredConfigs} variablesConfig={variablesConfig} focusedVarId={focusedVarId} weightSearchQuery={weightSearchQuery} setFocusedVarId={setFocusedVarId} setWeightSearchQuery={setWeightSearchQuery} handleConfigChange={handleConfigChange} />
         )}

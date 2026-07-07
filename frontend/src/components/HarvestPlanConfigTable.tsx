@@ -105,7 +105,14 @@ export const HarvestPlanConfigTable: React.FC<HarvestPlanConfigTableProps> = ({
                       {focusedVarId === item.id && (
                         <div className="absolute left-0 right-0 mt-1 bg-slate-900 border border-slate-800/60 rounded shadow-lg max-h-32 overflow-y-auto z-20">
                           {variablesConfig
-                            .filter(v => v.id !== item.id && (v.id.toLowerCase().includes(weightSearchQuery.toLowerCase()) || v.nome.toLowerCase().includes(weightSearchQuery.toLowerCase())))
+                            .filter(v => {
+                              const varId = v.id || '';
+                              const nome = v.nome || '';
+                              return v.id !== item.id && (
+                                varId.toLowerCase().includes(weightSearchQuery.toLowerCase()) ||
+                                nome.toLowerCase().includes(weightSearchQuery.toLowerCase())
+                              );
+                            })
                             .slice(0, 10)
                             .map(v => (
                               <button

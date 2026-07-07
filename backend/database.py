@@ -82,6 +82,7 @@ class Scenario(SQLModel, table=True):
     reference_month: str = Field(index=True)
     version: int = Field(default=1, index=True)
     status: ScenarioStatus = Field(default=ScenarioStatus.EM_EDICAO, sa_column_kwargs={"nullable": False})
+    cycle_start_month: Optional[str] = Field(default=None, sa_column_kwargs={"nullable": True})
     created_at: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow,
         sa_column_kwargs={"nullable": False}
@@ -163,6 +164,17 @@ class HarvestPlanSelection(SQLModel, table=True):
     month: str = Field(index=True, sa_column_kwargs={"nullable": False})
     scenario_id: Optional[uuid.UUID] = Field(default=None, foreign_key="scenarios.id", sa_column_kwargs={"nullable": True})
     exclude: bool = Field(default=False, sa_column_kwargs={"nullable": False})
+
+# ── HARVEST PLAN ORDERED ITEMS ────────────────────────────────────────────
+
+class HarvestPlanOrderedItem(SQLModel, table=True):
+    __tablename__ = "harvest_plan_ordered_items"
+    
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    ordem: int = Field(default=0, index=True)
+    tipo: str = Field(default="variable", sa_column_kwargs={"nullable": False}) # "variable" or "divider"
+    variable_id: Optional[str] = Field(default=None, foreign_key="variables.id", sa_column_kwargs={"nullable": True})
+    label: Optional[str] = Field(default=None, sa_column_kwargs={"nullable": True})
 
 # ── DATABASE CREATION & SESSION ────────────────────────────────────────────
 

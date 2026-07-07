@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.1] - 2026-07-07
+
+### Fixed
+- **Correção de Filtros e Sincronização no Plano de Safra**:
+  - Implementação de fallbacks seguros de string vazia (`item.id || ''` e `item.nome || ''`) na pesquisa e filtragem de variáveis na aba de consolidação e configurações para evitar o erro `TypeError: Cannot read properties of null (reading 'toLowerCase')`.
+  - Sincronização automática do estado local `variablesConfig` no frontend chamando `fetchConfigs()` logo após o salvamento bem-sucedido de alterações no Plano de Safra, evitando a desmarcação indesejada de variáveis quando filtros de busca estavam ativos.
+  - Correção do erro de exclusão de variáveis (`ForeignKeyViolation` na tabela `harvest_plan_ordered_items`) garantindo que, ao excluir uma variável pelo fluxo de substituição, os itens ordenados associados no plano de safra também sejam limpos automaticamente do banco de dados.
+
+## [2.16.0] - 2026-07-07
+
+### Added
+- **Ordenação Personalizada e Linhas de Divisores no Plano de Safra (Épico 21)**:
+  - Adição da tabela `harvest_plan_ordered_items` no banco de dados para salvar a ordenação customizada e os cabeçalhos de divisores.
+  - Implementação de endpoints `/api/harvest-plan/structure` (GET e POST) para gerenciar a estrutura ordenada do plano.
+  - Refatoração dos endpoints de plano de safra de `main.py` para `router_harvest_plan.py` para conformidade de densidade de arquivos (SRP e limite de 300 linhas físicas).
+  - Implementação de ordenação visual no frontend por Drag-and-Drop (HTML5 nativo) e botões rápidos (Subir/Descer) com acessibilidade (WCAG).
+  - Agrupamento automático de variáveis sem divisor sob a seção virtual `"Itens sem Agrupamento"`.
+  - Remoção automática de variáveis inativadas da ordenação do plano de safra.
+  - Implementação de relatórios exportados do Plano de Safra (PDF e Excel) em `exports_harvest_plan.py` com renderização fiel dos divisores como linhas mescladas e destacadas.
+  - Criação de suíte de testes de integração (`test_harvest_plan_structure.py`) cobrindo toda a lógica de ordenação, divisores e exportações.
+
+## [2.15.1] - 2026-07-07
+
+### Fixed
+- **Prevenção de Perda de Precisão IEEE-754 e Proteção de Foco na Digitação (Épico 20)**:
+  - Mitigação de problemas de arredondamento binário do JavaScript (ex: `13.02` tornando-se `13.019999999999998` e `.7` tornando-se `7.000000000000001`) aplicando arredondamento por `.toFixed()` nas multiplicações e divisões centesimais.
+  - Implementação de proteção por foco ativo no `useEffect` de `FormattedVariableInput.tsx`: enquanto o campo de entrada está focado pelo usuário, a sincronização de estado com o valor do parent é pausada para preservar exatamente os caracteres intermediários em digitação (ex: o caractere de ponto/vírgula inicial `.5` ou `,5`).
+  - Tratamento robusto para manter ponto e vírgula funcionando uniformemente em ambas as bases percentuais (Decimal e Inteira).
+  - Extensão da formatação com vírgula (padrão brasileiro pt-BR) para todas as variáveis com formato de exibição padrão de número (`NUMBER`), mantendo a digitação fluida e o tratamento de foco unificado.
+
+## [2.15.0] - 2026-07-07
+
+### Fixed
+- **Correção na Digitação de Percentuais/Decimais no Frontend (Épico 20)**:
+  - Desenvolvimento do componente `FormattedVariableInput.tsx` que gerencia o estado da digitação intermediária (ponto, vírgula, decimais parciais e sinais negativos) localmente para evitar perdas ou redefinições indesejadas no grid reativo.
+  - Sincronização robusta bidirecional com o estado global sem re-renderizações obstrutivas, resolvendo o bug onde o cursor pulava ou decimais eram apagados instantaneamente.
+  - Implementação de normalização inteligente de separadores decimais no frontend (padrão brasileiro `,`) e backend (padrão americano `.`).
+  - Tratamento aprimorado de perda de foco (`onBlur`) para formatar entradas numéricas parciais (ex: `5.` para `5`, `.5` para `0,5` no frontend).
+  - Integração do novo input formatado em `SectorVariableRow.tsx` e `ScenarioPremises.tsx` com renderização dinâmica do indicador `%` e correções de acessibilidade (`<label>` associados).
+
+## [2.14.0] - 2026-07-06
+
+
+### Added
+- **Unificação de Configurações e Sincronização de Ciclo (Épico 19)**:
+  - Centralização de todas as rotas de configuração sob `/api/settings` no backend (`router_settings.py`), eliminando rotas duplicadas e obsoletas em `main.py` e reduzindo sua densidade.
+  - Implementação do endpoint transacional e idempotente `PATCH /settings/months/reorder` com validações rigorosas de integridade (tamanho do array e correspondência exata de IDs ativos).
+  - Adição da coluna `cycle_start_month` na tabela `Scenario` para reter o snapshot do ciclo comercial ativo no momento do cálculo/cadastro.
+  - Implementação de um banner visual no frontend (`App.tsx`) para avisar quando um cenário possui um "Ciclo desatualizado" em comparação às configurações globais do sistema.
+  - Inclusão de botão "Recalcular Cenário com o Novo Ciclo" no banner para acionar o solver manual.
+  - Atualização e expansão da suíte de testes unitários (`test_scenarios.py` e `test_harvest_plan.py`) com cobertura completa para as novas rotas.
+
 ## [2.13.0] - 2026-06-29
 
 ### Added

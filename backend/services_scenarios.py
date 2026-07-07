@@ -203,6 +203,7 @@ def _upsert_result(var_id: str, scenario_id: uuid.UUID, eq_val: Any, var_calc: D
 
 def create_new_scenario(req, db: Session) -> ScenarioDetail:
     from database import parse_year
+    from services_harvest_plan import get_harvest_plan_settings
     year_harvest_int = parse_year(req.year_harvest)
     stmt = select(Scenario.version).where(
         Scenario.year_harvest == year_harvest_int,
@@ -211,28 +212,20 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
     versions = db.exec(stmt).all()
     next_version = (versions[0] + 1) if versions else 1
     scenario_id = uuid.uuid4()
+    setting = get_harvest_plan_settings(db)
     db_scenario = Scenario(
         id=scenario_id,
         nome=f"Cenário {year_harvest_int} - {req.reference_month} (v{next_version})",
         year_harvest=year_harvest_int,
         reference_month=req.reference_month,
         version=next_version,
-        status=req.status or ScenarioStatus.EM_EDICAO
+        status=req.status or ScenarioStatus.EM_EDICAO,
+        cycle_start_month=setting.start_month
     )
     db.add(db_scenario)
     db.flush()
     
-    # Force global active formulas from DB
-    db_equations = {eq.variable_id: eq.expression_original for eq in db.exec(select(Equation).where(Equation.status == "ativa")).all()}
-    for v in req.variables:
-        var_id = v["ID - REF"]
-        db_var = db.get(Variable, var_id)
-        if db_var and db_var.tipo in {VariableType.OUTPUT, VariableType.DERIVADA}:
-            v["EQUAÇÕES E VALORES"] = db_equations.get(var_id, "")
-        elif not db_var:
-            tipo_str = v.get("TIPO", "INPUT")
-            if tipo_str in {"OUTPUT", "DERIVADA"} and var_id in db_equations:
-                v["EQUAÇÕES E VALORES"] = db_equations[var_id]
+    _force_global_formulas(req.variables, db)
                 
     calc_res = engine.calculate_state(req.variables)
     results_map = calc_res["results"]
@@ -249,7 +242,8 @@ def create_new_scenario(req, db: Session) -> ScenarioDetail:
         year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month,
         version=db_scenario.version, status=db_scenario.status,
         variables=get_scenario_variables(scenario_id, db),
-        created_at=db_scenario.created_at, updated_at=db_scenario.updated_at
+        created_at=db_scenario.created_at, updated_at=db_scenario.updated_at,
+        cycle_start_month=db_scenario.cycle_start_month
     )
 
 def update_existing_scenario(scenario_id: uuid.UUID, req, db: Session) -> ScenarioDetail:
@@ -259,19 +253,14 @@ def update_existing_scenario(scenario_id: uuid.UUID, req, db: Session) -> Scenar
     if db_scenario.status in {ScenarioStatus.APROVADO, ScenarioStatus.FINAL}:
         raise ValueError("Cenário bloqueado para edições")
     db_scenario.updated_at = datetime.datetime.utcnow()
+    
+    from services_harvest_plan import get_harvest_plan_settings
+    setting = get_harvest_plan_settings(db)
+    db_scenario.cycle_start_month = setting.start_month
+    
     db.add(db_scenario)
     
-    # Force global active formulas from DB
-    db_equations = {eq.variable_id: eq.expression_original for eq in db.exec(select(Equation).where(Equation.status == "ativa")).all()}
-    for v in req.variables:
-        var_id = v["ID - REF"]
-        db_var = db.get(Variable, var_id)
-        if db_var and db_var.tipo in {VariableType.OUTPUT, VariableType.DERIVADA}:
-            v["EQUAÇÕES E VALORES"] = db_equations.get(var_id, "")
-        elif not db_var:
-            tipo_str = v.get("TIPO", "INPUT")
-            if tipo_str in {"OUTPUT", "DERIVADA"} and var_id in db_equations:
-                v["EQUAÇÕES E VALORES"] = db_equations[var_id]
+    _force_global_formulas(req.variables, db)
                 
     calc_res = engine.calculate_state(req.variables)
     results_map = calc_res["results"]
@@ -288,5 +277,18 @@ def update_existing_scenario(scenario_id: uuid.UUID, req, db: Session) -> Scenar
         year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month,
         version=db_scenario.version, status=db_scenario.status,
         variables=get_scenario_variables(scenario_id, db),
-        created_at=db_scenario.created_at, updated_at=db_scenario.updated_at
+        created_at=db_scenario.created_at, updated_at=db_scenario.updated_at,
+        cycle_start_month=db_scenario.cycle_start_month
     )
+
+def _force_global_formulas(variables: List[Dict[str, Any]], db: Session):
+    db_equations = {eq.variable_id: eq.expression_original for eq in db.exec(select(Equation).where(Equation.status == "ativa")).all()}
+    for v in variables:
+        var_id = v["ID - REF"]
+        db_var = db.get(Variable, var_id)
+        if db_var and db_var.tipo in {VariableType.OUTPUT, VariableType.DERIVADA}:
+            v["EQUAÇÕES E VALORES"] = db_equations.get(var_id, "")
+        elif not db_var:
+            tipo_str = v.get("TIPO", "INPUT")
+            if tipo_str in {"OUTPUT", "DERIVADA"} and var_id in db_equations:
+                v["EQUAÇÕES E VALORES"] = db_equations[var_id]
