@@ -165,6 +165,17 @@ class HarvestPlanSelection(SQLModel, table=True):
     scenario_id: Optional[uuid.UUID] = Field(default=None, foreign_key="scenarios.id", sa_column_kwargs={"nullable": True})
     exclude: bool = Field(default=False, sa_column_kwargs={"nullable": False})
 
+# ── HARVEST PLAN ORDERED ITEMS ────────────────────────────────────────────
+
+class HarvestPlanOrderedItem(SQLModel, table=True):
+    __tablename__ = "harvest_plan_ordered_items"
+    
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    ordem: int = Field(default=0, index=True)
+    tipo: str = Field(default="variable", sa_column_kwargs={"nullable": False}) # "variable" or "divider"
+    variable_id: Optional[str] = Field(default=None, foreign_key="variables.id", sa_column_kwargs={"nullable": True})
+    label: Optional[str] = Field(default=None, sa_column_kwargs={"nullable": True})
+
 # ── DATABASE CREATION & SESSION ────────────────────────────────────────────
 
 def create_db_and_tables():

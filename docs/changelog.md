@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.0] - 2026-07-07
+
+### Added
+- **Ordenação Personalizada e Linhas de Divisores no Plano de Safra (Épico 21)**:
+  - Adição da tabela `harvest_plan_ordered_items` no banco de dados para salvar a ordenação customizada e os cabeçalhos de divisores.
+  - Implementação de endpoints `/api/harvest-plan/structure` (GET e POST) para gerenciar a estrutura ordenada do plano.
+  - Refatoração dos endpoints de plano de safra de `main.py` para `router_harvest_plan.py` para conformidade de densidade de arquivos (SRP e limite de 300 linhas físicas).
+  - Implementação de ordenação visual no frontend por Drag-and-Drop (HTML5 nativo) e botões rápidos (Subir/Descer) com acessibilidade (WCAG).
+  - Agrupamento automático de variáveis sem divisor sob a seção virtual `"Itens sem Agrupamento"`.
+  - Remoção automática de variáveis inativadas da ordenação do plano de safra.
+  - Implementação de relatórios exportados do Plano de Safra (PDF e Excel) em `exports_harvest_plan.py` com renderização fiel dos divisores como linhas mescladas e destacadas.
+  - Criação de suíte de testes de integração (`test_harvest_plan_structure.py`) cobrindo toda a lógica de ordenação, divisores e exportações.
+
 ## [2.15.1] - 2026-07-07
 
 ### Fixed

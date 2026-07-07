@@ -1,12 +1,12 @@
 {
   "$schema": "antigravity_sdd_v2",
   "project_status": {
-    "current_phase": "4_SURGICAL_EXECUTION",
+    "current_phase": "5_VERIFICATION",
     "execution_locked": false
   },
   "phase_gates": {
     "discovery_completed": true,
-    "socratic_questions_answered": 3,
+    "socratic_questions_answered": 4,
     "human_review_token": "APPROVED",
     "architecture_approved": true
   },
@@ -188,6 +188,42 @@
       "id": "TASK-2003",
       "description": "Validar a conformidade de linter, limites de linha (300 linhas) e testes através do checklist.py.",
       "scope": "frontend/src/components/*",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2101",
+      "description": "Criar a tabela harvest_plan_ordered_items no banco de dados e atualizar migrations.py.",
+      "scope": "backend/database.py, backend/migrations.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2102",
+      "description": "Implementar endpoints GET/POST /api/harvest-plan/structure e serviços associados para persistência e ordenação ordenada no backend.",
+      "scope": "backend/router_harvest_plan.py, backend/services_harvest_plan.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2103",
+      "description": "Atualizar a consolidação do plano de safra para refletir a ordenação e os divisores.",
+      "scope": "backend/services_harvest_plan_calc.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2104",
+      "description": "Desenvolver controles de cadeado de edição, drag-and-drop e botões rápidos (WCAG) no frontend.",
+      "scope": "frontend/src/components/HarvestPlan.tsx, frontend/src/components/HarvestPlanTable.tsx, frontend/src/hooks/useHarvestPlanState.ts",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2105",
+      "description": "Implementar a geração de relatórios PDF (ReportLab) e Excel (OpenPyXL) que replicam a estrutura ordenada.",
+      "scope": "backend/exports_harvest_plan.py",
+      "status": "DONE"
+    },
+    {
+      "id": "TASK-2106",
+      "description": "Criar suíte de testes test_harvest_plan_structure.py no backend e validar através do checklist.py.",
+      "scope": "backend/test_harvest_plan_structure.py",
       "status": "DONE"
     }
   ]

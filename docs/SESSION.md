@@ -3,8 +3,8 @@
 > Last updated: 2026-07-07
 
 ## Last Task Completed
-- Feature/fix: Correção de Digitação de Percentuais/Decimais no Frontend (Épico 20)
-- Branch: main
+- Feature/fix: Ordenação Personalizada e Linhas de Divisores no Plano de Safra (Épico 21)
+- Branch: feature/harvest-plan-sorting
 - Status: ACCEPTED
 
 ## Open Issues / Blockers
@@ -12,6 +12,3 @@
 
 ## Next Steps
 1. Próximos épicos de melhorias e novas implementações indicados pelo usuário.
-
-
-

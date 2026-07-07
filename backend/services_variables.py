@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
 from database import (
     Variable, Equation, Dependency, Sector,
-    VariableType, VariableStatus, Stage, ControlPoint
+    VariableType, VariableStatus, Stage, ControlPoint, HarvestPlanOrderedItem
 )
 import engine
 
@@ -235,6 +235,14 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
     db_var.tipo = tipo
     db_var.unidade = req.unidade.strip() if req.unidade else ""
     db_var.status = VariableStatus(req.status.strip() if req.status else "ativa")
+    if db_var.status == VariableStatus.INATIVA:
+        db_var.in_harvest_plan = False
+        db_var.harvest_plan_op = None
+        db_var.harvest_plan_weight_var_id = None
+        # Remove from harvest plan ordered list
+        stmt_del = select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == db_var.id)
+        for item in db.exec(stmt_del).all():
+            db.delete(item)
     db_var.control_point_id = db_cp.id
     db_var.ordem = v_ordem
     db_var.casas_decimais = req.casas_decimais

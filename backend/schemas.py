@@ -163,6 +163,15 @@ class HarvestPlanSelectionsResponse(BaseModel):
     selections: List[Dict[str, Any]]
     available_scenarios: Dict[str, List[AvailableScenarioInfo]]
 
+class HarvestPlanStructureItem(BaseModel):
+    tipo: str
+    variable_id: Optional[str] = None
+    label: Optional[str] = None
+
+class HarvestPlanStructureUpdate(BaseModel):
+    items: List[HarvestPlanStructureItem]
+
+
 class SubstitutionPreviewRequest(BaseModel):
     recursive: bool
     replacement_expr: Optional[str] = None
