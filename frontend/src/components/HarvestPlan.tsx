@@ -30,10 +30,13 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   } = useHarvestPlanState();
 
   const filteredConsolidated = consolidationData.filter(item => {
-    const matchesSearch = item.variable_id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
+    if (item.tipo_item === 'divider') return true;
+    const varId = item.variable_id || '';
+    const nome = item.nome || '';
+    const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
     const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
-    return item.tipo_item === 'divider' || (matchesSearch && matchesSector && matchesType);
+    return matchesSearch && matchesSector && matchesType;
   });
 
   const filteredConfigs = variablesConfig.filter(item => {
