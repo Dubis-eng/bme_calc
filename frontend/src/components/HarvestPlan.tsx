@@ -40,7 +40,9 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   });
 
   const filteredConfigs = variablesConfig.filter(item => {
-    const matchesSearch = item.id.toLowerCase().includes(searchQuery.toLowerCase()) || item.nome.toLowerCase().includes(searchQuery.toLowerCase());
+    const varId = item.id || '';
+    const nome = item.nome || '';
+    const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
     const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
     return matchesSearch && matchesSector && matchesType;

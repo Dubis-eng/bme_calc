@@ -116,6 +116,7 @@ export function useHarvestPlanState() {
     axios.post('http://localhost:8000/api/harvest-plan/config', variablesConfig)
       .then(async () => {
         alert('Configurações salvas com sucesso!');
+        fetchConfigs();
         await fetchConsolidation();
       }).catch(err => {
         console.error('Erro ao salvar configurações:', err);

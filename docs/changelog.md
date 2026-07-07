@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.1] - 2026-07-07
+
+### Fixed
+- **Correção de Filtros e Sincronização no Plano de Safra**:
+  - Implementação de fallbacks seguros de string vazia (`item.id || ''` e `item.nome || ''`) na pesquisa e filtragem de variáveis na aba de consolidação e configurações para evitar o erro `TypeError: Cannot read properties of null (reading 'toLowerCase')`.
+  - Sincronização automática do estado local `variablesConfig` no frontend chamando `fetchConfigs()` logo após o salvamento bem-sucedido de alterações no Plano de Safra, evitando a desmarcação indesejada de variáveis quando filtros de busca estavam ativos.
+  - Correção do erro de exclusão de variáveis (`ForeignKeyViolation` na tabela `harvest_plan_ordered_items`) garantindo que, ao excluir uma variável pelo fluxo de substituição, os itens ordenados associados no plano de safra também sejam limpos automaticamente do banco de dados.
+
 ## [2.16.0] - 2026-07-07
 
 ### Added
