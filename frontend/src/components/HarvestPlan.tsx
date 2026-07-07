@@ -52,7 +52,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
   const fetchSettingsAndYears = () => {
     setLoading(true);
-    axios.get('http://localhost:8000/api/harvest-plan/settings')
+    axios.get('http://localhost:8000/api/settings/cycle')
       .then(settingsRes => {
         setStartMonth(settingsRes.data.start_month);
         return axios.get('http://localhost:8000/api/harvest-plan/years');
@@ -98,7 +98,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
   const handleStartMonthChange = (val: string) => {
     setLoading(true);
-    axios.post('http://localhost:8000/api/harvest-plan/settings', { start_month: val })
+    axios.post('http://localhost:8000/api/settings/cycle', { start_month: val })
       .then(async () => {
         setStartMonth(val);
         await fetchConsolidation();

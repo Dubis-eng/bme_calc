@@ -50,6 +50,7 @@ class ScenarioDetail(BaseModel):
     variables: List[Dict[str, Any]]
     created_at: datetime.datetime
     updated_at: datetime.datetime
+    cycle_start_month: Optional[str] = None
 
 class GoalSeekRequest(BaseModel):
     variables: List[Dict[str, Any]]

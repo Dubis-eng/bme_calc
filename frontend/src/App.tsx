@@ -41,40 +41,26 @@ function App() {
   useEffect(() => { fetchSectors(); }, []);
 
   const {
-    reloadCurrentScenario,
-    variables, results, loading, calculating, convergenceError, iterations,
-    activeSector, setActiveSector,
-    currentScenario, setCurrentScenario,
+    reloadCurrentScenario, variables, results, loading, calculating, convergenceError, iterations,
+    activeSector, setActiveSector, currentScenario, setCurrentScenario,
     saving, anoSafra, setAnoSafra, mesReferencia, setMesReferencia,
-    hasUnsavedChanges, savingActive,
-    handleChange, handleCalculate, onLoadScenario, handleSaveNew,
+    hasUnsavedChanges, setHasUnsavedChanges, savingActive, handleChange, handleCalculate, onLoadScenario, handleSaveNew,
     handleSaveActive, onApplyOptimalValue, handleSaveVariable, isLocked,
-    years, months, fetchYearsAndMonths,
-    residual, tolerance, updateTolerance,
-    isOffline, checkConnection
+    years, months, fetchYearsAndMonths, residual, tolerance, updateTolerance, isOffline, checkConnection
   } = useScenario(sectors, fetchSectors);
 
   const search = useSearch(variables);
   const searchResults = useVariableSearch(variables, search.debouncedQuery);
 
-  const handleEditVariable = (v: Variable) => {
-    setVariableToEdit(v);
-    setIsVariableModalOpen(true);
-  };
-
+  const handleEditVariable = (v: Variable) => { setVariableToEdit(v); setIsVariableModalOpen(true); };
   const onScrollTo = (id: string) => {
     const tv = variables.find(v => v['ID - REF'] === id);
     if (tv) setActiveSector(tv.SETOR);
     search.handleScrollTo(id);
   };
-
   const onSearchEdit = (id: string) => search.handleSearchEdit(id, handleEditVariable);
-
   const handleAddVariable = (sec: string, etapaName: string) => {
-    setVariableToEdit(null);
-    setPrefilledSector(sec);
-    setPrefilledEtapa(etapaName);
-    setIsVariableModalOpen(true);
+    setVariableToEdit(null); setPrefilledSector(sec); setPrefilledEtapa(etapaName); setIsVariableModalOpen(true);
   };
 
   const handleSaveVariableWrapped = async (newVar: Variable, isEdit: boolean, origId?: string) => {
@@ -107,10 +93,7 @@ function App() {
     );
   }
 
-  const uniqueSectors = Array.from(new Set([
-    ...sectors.map(s => s.id),
-    ...variables.map(v => v.SETOR),
-  ]));
+  const uniqueSectors = Array.from(new Set([...sectors.map(s => s.id), ...variables.map(v => v.SETOR)]));
   const scenarioVars = variables.filter(v => v.TIPO === 'CENARIO');
   const resultsMap = results as Record<string, { value: number | null; status: string }>;
 
@@ -131,17 +114,10 @@ function App() {
         </div>
       )}
       <Header
-        searchQuery={search.searchQuery}
-        onSearchInput={search.handleSearchInput}
-        iterations={iterations}
-        handleCalculate={handleCalculate}
-        calculating={calculating}
-        isLocked={isLocked || isOffline}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        residual={residual}
-        tolerance={tolerance}
-        isOffline={isOffline}
+        searchQuery={search.searchQuery} onSearchInput={search.handleSearchInput}
+        iterations={iterations} handleCalculate={handleCalculate} calculating={calculating}
+        isLocked={isLocked || isOffline} activeTab={activeTab} setActiveTab={setActiveTab}
+        residual={residual} tolerance={tolerance} isOffline={isOffline}
       />
 
       {activeTab === 'flowchart' && (
@@ -206,6 +182,33 @@ function App() {
                   <div className="mb-3 px-4 py-2.5 bg-amber-950/40 border border-amber-800/40 rounded-lg text-amber-400 text-xs flex items-center gap-2">
                     <span>⚠️</span>
                     <span>Resultado não convergiu. Limite de 100 ciclos atingido. Revise os dados de entrada.</span>
+                  </div>
+                )}
+                {currentScenario && currentScenario.cycle_start_month && months.length > 0 &&
+                 currentScenario.cycle_start_month !== (months.find(m => m.order_index === 0)?.name || 'Abril') && (
+                  <div className="mb-3 px-4 py-2.5 bg-amber-950/40 border border-amber-800/40 rounded-lg text-amber-400 text-xs flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <span>⚠️</span>
+                      <span>
+                        Ciclo desatualizado: Este cenário foi calculado usando o ciclo comercial iniciado em{' '}
+                        <strong>{currentScenario.cycle_start_month}</strong>, mas o ciclo atual inicia em{' '}
+                        <strong>{months.find(m => m.order_index === 0)?.name || 'Abril'}</strong>.
+                      </span>
+                    </div>
+                    {!isLocked && !isOffline && (
+                      <button
+                        onClick={async () => {
+                          handleCalculate();
+                          const currentCycleMonth = months.find(m => m.order_index === 0)?.name || 'Abril';
+                          setCurrentScenario(prev => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
+                          setHasUnsavedChanges(true);
+                        }}
+                        className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold transition-all uppercase tracking-wider whitespace-nowrap"
+                        aria-label="Recalcular cenário com o novo ciclo comercial"
+                      >
+                        Recalcular Cenário com o Novo Ciclo
+                      </button>
+                    )}
                   </div>
                 )}
 

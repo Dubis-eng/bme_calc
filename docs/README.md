@@ -24,6 +24,8 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 
 * **[DONE] Épico 17: Arredondamento e Exibição de Percentual Dinâmico** — Metadados de formatação de variáveis, controles no modal de cadastro, suporte reativo a inputs percentuais com base decimal/inteiro no grid de cenários e Plano de Safra, e formatação dinâmica nas exportações PDF/Excel.
 * **[DONE] Tarefa 10.5 (Tratamento Fail-Fast de Conexão)** — Implementar banner de aviso offline, travamento de interface no frontend e desabilitar fallbacks silenciosos.
+* **[DONE] Épico 18: Ordenação em Cascata de Variáveis** — Ordenação em três níveis com drag-and-drop e botões (WCAG).
+* **[DONE] Épico 19: Unificação de Configurações e Sincronização de Ciclo** — Unificação de endpoints de configurações no backend, transação/idempotência de reordenamento de meses, e aviso visual com botão de recálculo manual para cenários com ciclo desatualizado.
 
 ---
 

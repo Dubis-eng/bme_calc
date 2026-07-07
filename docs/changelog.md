@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0] - 2026-07-06
+
+### Added
+- **Unificação de Configurações e Sincronização de Ciclo (Épico 19)**:
+  - Centralização de todas as rotas de configuração sob `/api/settings` no backend (`router_settings.py`), eliminando rotas duplicadas e obsoletas em `main.py` e reduzindo sua densidade.
+  - Implementação do endpoint transacional e idempotente `PATCH /settings/months/reorder` com validações rigorosas de integridade (tamanho do array e correspondência exata de IDs ativos).
+  - Adição da coluna `cycle_start_month` na tabela `Scenario` para reter o snapshot do ciclo comercial ativo no momento do cálculo/cadastro.
+  - Implementação de um banner visual no frontend (`App.tsx`) para avisar quando um cenário possui um "Ciclo desatualizado" em comparação às configurações globais do sistema.
+  - Inclusão de botão "Recalcular Cenário com o Novo Ciclo" no banner para acionar o solver manual.
+  - Atualização e expansão da suíte de testes unitários (`test_scenarios.py` e `test_harvest_plan.py`) com cobertura completa para as novas rotas.
+
 ## [2.13.0] - 2026-06-29
 
 ### Added

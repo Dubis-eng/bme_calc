@@ -10,6 +10,7 @@ export interface ScenarioMetadata {
     reference_month: string;
     version: number;
     status: 'Em Edição' | 'Aprovado' | 'Final';
+    cycle_start_month?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -80,7 +81,8 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                 year_harvest: scenario.year_harvest,
                 reference_month: scenario.reference_month,
                 version: scenario.version,
-                status: scenario.status
+                status: scenario.status,
+                cycle_start_month: scenario.cycle_start_month
             };
             onLoadScenario(scenario.variables, meta);
         } catch (err) {

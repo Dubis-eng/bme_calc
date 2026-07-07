@@ -82,6 +82,7 @@ class Scenario(SQLModel, table=True):
     reference_month: str = Field(index=True)
     version: int = Field(default=1, index=True)
     status: ScenarioStatus = Field(default=ScenarioStatus.EM_EDICAO, sa_column_kwargs={"nullable": False})
+    cycle_start_month: Optional[str] = Field(default=None, sa_column_kwargs={"nullable": True})
     created_at: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow,
         sa_column_kwargs={"nullable": False}

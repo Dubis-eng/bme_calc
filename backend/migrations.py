@@ -42,6 +42,12 @@ def migrate_database_schema(session: Session):
             if session.bind.dialect.name == "postgresql":
                 session.execute(text("ALTER TABLE scenarios ALTER COLUMN year_harvest TYPE INTEGER USING (year_harvest::integer)"))
                 session.commit()
+        
+        # Check if cycle_start_month column exists, add it if missing
+        cols = inspector.get_columns("scenarios")
+        if not any(c["name"] == "cycle_start_month" for c in cols):
+            session.execute(text("ALTER TABLE scenarios ADD COLUMN cycle_start_month VARCHAR(50) DEFAULT 'Abril'"))
+            session.commit()
 
     # 2. Seed harvest_years
     if "harvest_years" in tables and session.execute(text("SELECT COUNT(*) FROM harvest_years")).scalar() == 0:

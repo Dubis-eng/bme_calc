@@ -40,6 +40,17 @@ def update_harvest_plan_settings(start_month: str, db: Session) -> HarvestPlanSe
     if start_month in ALL_MONTHS:
         setting.start_month = start_month
         db.add(setting)
+        
+        # Automatically reorder all months sequentially starting from start_month
+        idx = ALL_MONTHS.index(start_month)
+        ordered_names = ALL_MONTHS[idx:] + ALL_MONTHS[:idx]
+        from database import HarvestMonth
+        db_months = db.exec(select(HarvestMonth)).all()
+        for m in db_months:
+            if m.name in ordered_names:
+                m.order_index = ordered_names.index(m.name)
+                db.add(m)
+                
         db.commit()
         db.refresh(setting)
     return setting
@@ -134,10 +145,7 @@ def update_harvest_plan_selection(year_harvest: int, month: str, scenario_id: Op
 
 def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict[str, Any]:
     from database import parse_year, HarvestPlanSelection
-    if isinstance(year_harvest, str):
-        year_harvest_int = parse_year(year_harvest)
-    else:
-        year_harvest_int = int(year_harvest)
+    year_harvest_int = parse_year(year_harvest) if isinstance(year_harvest, str) else int(year_harvest)
         
     setting = get_harvest_plan_settings(db)
     harvest_months = get_ordered_months(setting.start_month, db)
@@ -172,13 +180,10 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
         sc = None
         
         # Resolve according to selection settings
-        if sel:
-            if sel.exclude:
-                # Explicitly excluded, so skip/do not activate this month
-                continue
-            elif sel.scenario_id:
-                # Specific scenario selected, let's find it
-                sc = next((s for s in scenarios if s.id == sel.scenario_id), None)
+        if sel and sel.exclude:
+            continue
+        if sel and sel.scenario_id:
+            sc = next((s for s in scenarios if s.id == sel.scenario_id), None)
         
         # If no explicit selection/scenario resolved yet, fallback to highest version
         if not sc:
@@ -194,15 +199,12 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
             active_months.append(month)
             
     # Load results for each of these active scenarios
-    monthly_results = {} # {month: {variable_id: float_value}}
-    monthly_statuses = {} # {month: {variable_id: str_status}}
-    
+    monthly_results = {}
+    monthly_statuses = {}
     for month in active_months:
-        sc = scenarios_by_month[month]
-        stmt_results = select(Result).where(Result.scenario_id == sc.id)
-        results = db.exec(stmt_results).all()
-        monthly_results[month] = {r.variable_id: r.value for r in results}
-        monthly_statuses[month] = {r.variable_id: r.status.value if hasattr(r.status, 'value') else str(r.status) for r in results}
+        sc_results = db.exec(select(Result).where(Result.scenario_id == scenarios_by_month[month].id)).all()
+        monthly_results[month] = {r.variable_id: r.value for r in sc_results}
+        monthly_statuses[month] = {r.variable_id: (r.status.value if hasattr(r.status, 'value') else str(r.status)) for r in sc_results}
 
     # Build input variables list for calculation of accumulated column
     engine_vars = []
@@ -227,29 +229,16 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
             if val is not None:
                 monthly_vals.append(val)
                 
-        accum_val = None
+        avg = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
         if op == "SUM":
             accum_val = sum(monthly_vals) if monthly_vals else 0.0
         elif op == "AVERAGE":
-            accum_val = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
+            accum_val = avg
         elif op == "WEIGHTED_AVERAGE":
-            weight_id = var.harvest_plan_weight_var_id
-            num = 0.0
-            den = 0.0
-            has_w = False
-            for m in active_months:
-                v_val = monthly_results[m].get(var_id)
-                w_val = monthly_results[m].get(weight_id) if weight_id else None
-                if v_val is not None and w_val is not None:
-                    num += v_val * w_val
-                    den += w_val
-                    has_w = True
-            if has_w and den != 0.0:
-                accum_val = num / den
-            else:
-                accum_val = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
-        elif op == "CALCULATE":
-            pass
+            w_id = var.harvest_plan_weight_var_id
+            w_pairs = [(monthly_results[m].get(var_id), monthly_results[m].get(w_id)) for m in active_months if w_id]
+            valid_w = [(v, w) for v, w in w_pairs if v is not None and w is not None]
+            accum_val = sum(v * w for v, w in valid_w) / sum(w for _, w in valid_w) if valid_w and sum(w for _, w in valid_w) != 0 else avg
             
         t_val = str(accum_val) if accum_val is not None else "0"
         t_type = "INPUT"
@@ -277,20 +266,11 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
             accum_res = accumulated_results.get(var_id, {"value": None, "status": "PENDING", "error_message": ""})
             
             data_list.append({
-                "variable_id": var_id,
-                "nome": var.nome,
-                "descricao": var.descricao,
-                "setor_id": var.setor_id,
-                "unidade": var.unidade,
+                "variable_id": var_id, "nome": var.nome, "descricao": var.descricao, "setor_id": var.setor_id, "unidade": var.unidade,
                 "tipo": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
-                "harvest_plan_op": var.harvest_plan_op,
-                "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
-                "monthly_values": month_vals_dict,
-                "monthly_statuses": month_statuses_dict,
-                "accumulated": accum_res,
-                "casas_decimais": var.casas_decimais,
-                "tipo_exibicao": var.tipo_exibicao,
-                "percent_base": var.percent_base
+                "harvest_plan_op": var.harvest_plan_op, "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
+                "monthly_values": month_vals_dict, "monthly_statuses": month_statuses_dict, "accumulated": accum_res,
+                "casas_decimais": var.casas_decimais, "tipo_exibicao": var.tipo_exibicao, "percent_base": var.percent_base
             })
         
     return {

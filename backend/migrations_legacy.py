@@ -46,6 +46,7 @@ def migrate_legacy_data(session: Session):
             year_harvest=parsed_year,
             reference_month=reference_month,
             status=status,
+            cycle_start_month="Abril",
             created_at=created_at,
             updated_at=updated_at
         )

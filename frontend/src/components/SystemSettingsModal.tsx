@@ -79,11 +79,17 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
     if (targetIndex < 0 || targetIndex >= months.length) return;
 
+    const reorderedMonths = [...months];
+    const temp = reorderedMonths[currentIndex];
+    reorderedMonths[currentIndex] = reorderedMonths[targetIndex];
+    reorderedMonths[targetIndex] = temp;
+
+    const payload = reorderedMonths.map((m, idx) => ({
+      id: m.id,
+      order_index: idx
+    }));
+
     try {
-      const payload = [
-        { id: months[currentIndex].id, order_index: targetIndex },
-        { id: months[targetIndex].id, order_index: currentIndex }
-      ];
       await axios.patch('http://localhost:8000/api/settings/months/reorder', {
         reorderings: payload
       });

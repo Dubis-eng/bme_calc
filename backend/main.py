@@ -101,7 +101,7 @@ def list_scenarios(db=Depends(get_session)):
 def get_scenario(id: uuid.UUID, db=Depends(get_session)):
     db_scenario = db.get(Scenario, id)
     if not db_scenario: raise HTTPException(status_code=404, detail="Cenário não encontrado")
-    return ScenarioDetail(id=db_scenario.id, nome=db_scenario.nome, year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month, version=db_scenario.version, status=db_scenario.status, variables=services.get_scenario_variables(id, db), created_at=db_scenario.created_at, updated_at=db_scenario.updated_at)
+    return ScenarioDetail(id=db_scenario.id, nome=db_scenario.nome, year_harvest=db_scenario.year_harvest, reference_month=db_scenario.reference_month, version=db_scenario.version, status=db_scenario.status, variables=services.get_scenario_variables(id, db), created_at=db_scenario.created_at, updated_at=db_scenario.updated_at, cycle_start_month=db_scenario.cycle_start_month)
 
 @app.patch("/api/scenarios/{id}/status", response_model=Scenario)
 def update_scenario_status(id: uuid.UUID, req: StatusUpdate, db=Depends(get_session)):
@@ -218,22 +218,6 @@ def reorder_variables_endpoint(cp_id: uuid.UUID, req: List[str], db=Depends(get_
 def list_harvest_plan_years(db=Depends(get_session)):
     try:
         return services.get_harvest_years(db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/harvest-plan/settings")
-def get_harvest_plan_settings_endpoint(db=Depends(get_session)):
-    try:
-        setting = services.get_harvest_plan_settings(db)
-        return {"start_month": setting.start_month}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.put("/api/harvest-plan/settings")
-def update_harvest_plan_settings_endpoint(req: HarvestPlanSettingUpdate, db=Depends(get_session)):
-    try:
-        setting = services.update_harvest_plan_settings(req.start_month, db)
-        return {"start_month": setting.start_month}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

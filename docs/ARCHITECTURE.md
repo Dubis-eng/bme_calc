@@ -12,8 +12,9 @@ bme_calc/
 │   ├── database.py       # Conexão SQLModel e esquema da tabela scenarios
 │   ├── engine.py         # Interpretador de fórmulas AST e solucionador de ciclos
 │   ├── goalseek.py       # Solver scipy.optimize.root_scalar para busca de metas
-│   ├── exports.py        # Módulos de exportação de relatórios PDF e Excel
-│   ├── main.py           # Endpoints de API e roteamento de requisições
+│   ├── router_settings.py # Rotas de configurações unificadas sob /api/settings
+│   ├── services_*.py     # Serviços de negócios (cenários, safra, reordenação)
+│   ├── main.py           # Endpoints principais da API FastAPI
 │   └── test_*.py         # Testes de integração e motores matemáticos
 ├── docs/                 # Documentação técnica e governança do projeto
 │   ├── features/         # Histórico de entregas (task-master.md)

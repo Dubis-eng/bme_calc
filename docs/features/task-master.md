@@ -160,6 +160,16 @@ graph TD
 * [x] **Tarefa 18.5** *(Interface de Reordenação Drag-and-Drop & Acessibilidade)* — Implementar drag-and-drop HTML5 nativo no frontend e botões de subir/descer (WCAG) nos três níveis (Etapa, Ponto de Controle e Variável).
 * [x] **Tarefa 18.6** *(Testes e Validação)* — Adicionar suíte de testes unitários para reordenação no backend, atualizar exports de PDF/Excel e executar suite de verificação local com `checklist.py`.
 
+---
+
+### Épico 19: Unificação de Configurações e Sincronização de Ciclo (CONCLUÍDO)
+
+* [x] **Tarefa 19.1** *(Modelagem e Migração)* — Adicionar coluna `cycle_start_month` à tabela `Scenario` no `database.py` e ajustar a inicialização em `seeding.py`, `migrations_legacy.py` e rotinas de migração em `migrations.py`.
+* [x] **Tarefa 19.2** *(Roteamento Centralizado)* — Migrar os endpoints de configuração para a rota central `/api/settings` em `router_settings.py` e excluir os endpoints obsoletos em `main.py`. Implementar `PATCH /settings/months/reorder` com validação de array completo, transação atômica e idempotência.
+* [x] **Tarefa 19.3** *(Integração Frontend e Warnings)* — Atualizar o frontend para as novas URLs, enviar o array completo de meses no swap e mostrar aviso visual de ciclo desatualizado com botão de recálculo manual.
+* [x] **Tarefa 19.4** *(Testes Unitários)* — Corrigir e criar testes unitários no backend validando as rotas de configurações unificadas, ordenação transacional e persistência do ciclo.
+
+
 
 
 
