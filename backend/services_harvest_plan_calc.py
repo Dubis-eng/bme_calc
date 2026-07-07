@@ -89,6 +89,7 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
                 monthly_vals.append(val)
                 
         avg = sum(monthly_vals) / len(monthly_vals) if monthly_vals else 0.0
+        accum_val = None
         if op == "SUM":
             accum_val = sum(monthly_vals) if monthly_vals else 0.0
         elif op == "AVERAGE":
