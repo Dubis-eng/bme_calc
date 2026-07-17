@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.D.1 — Instalar Vite, criar vite.config.ts e main.tsx
+current_task: 22.D.4 — Instalar Jotai, criar state/atoms.ts com atomFamily
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Domínio C Concluído → Executando Domínio D (Frontend Stack)
-- **Próxima tarefa:** TASK-2240 (Instalar Vite, criar vite.config.ts e main.tsx)
+- **Fase:** Migração Vite Concluída → Executando Jotai State Management
+- **Próxima tarefa:** TASK-2250 (Instalar Jotai, criar state/atoms.ts com atomFamily)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio C (Engine Decimal)
-- Branch: `task/22.C.1-engine-decimal-parity`
+- Épico 22 — Domínio D (Migração Vite)
+- Branch: `task/22.D.1-migrate-vite`
 
 ## 📋 Progresso do Épico 22
 
@@ -47,9 +47,9 @@ current_task: 22.D.1 — Instalar Vite, criar vite.config.ts e main.tsx
 - [x] TASK-2233 Re-executar todos os testes de backend
 
 ### Domínio D — Frontend Stack
-- [ ] TASK-2240 Instalar Vite, criar `vite.config.ts` e `main.tsx`
-- [ ] TASK-2241 Validar build Vite com todos os componentes existentes
-- [ ] TASK-2242 Remover CRA (`react-scripts`) após validação
+- [x] TASK-2240 Instalar Vite, criar `vite.config.ts` e `main.tsx`
+- [x] TASK-2241 Validar build Vite com todos os componentes existentes
+- [x] TASK-2242 Remover CRA (`react-scripts`) após validação
 - [ ] TASK-2250 Instalar Jotai, criar `state/atoms.ts` com `atomFamily`
 - [ ] TASK-2251 Migrar state global do App.tsx para atoms
 - [ ] TASK-2252 Migrar SectorModules para consumir atoms

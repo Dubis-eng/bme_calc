@@ -472,15 +472,15 @@ graph TD
 
 #### Domínio D — Frontend Stack (Migração Gradual CRA → Vite + Jotai + TanStack)
 
-* [ ] **Tarefa 22.D.1** *(Instalar Vite e criar `vite.config.ts`)* — Instalar `vite`, `@vitejs/plugin-react`, `@types/node`. Criar `frontend/vite.config.ts` com proxy para backend. Criar `frontend/src/main.tsx` como novo entry point. Manter `react-scripts` ativo. **Critério:** `vite dev` inicia e renderiza o App sem erros.
+* [x] **Tarefa 22.D.1** *(Instalar Vite e criar `vite.config.ts`)* — Instalar `vite`, `@vitejs/plugin-react`, `@types/node`. Criar `frontend/vite.config.ts` com proxy para backend. Criar `frontend/src/main.tsx` como novo entry point. Manter `react-scripts` ativo. **Critério:** `vite dev` inicia e renderiza o App sem erros.
   - Dependências: 22.0.6
   - Prioridade: 🟡 Média | Complexidade: 4
 
-* [ ] **Tarefa 22.D.2** *(Validar e migrar build completo para Vite)* — Corrigir incompatibilidades (variáveis `process.env` → `import.meta.env`, imports `~` etc.). Garantir que todos os 29 componentes renderizam. Executar `vite build` sem erros. **Critério:** Build de produção com Vite funciona; app idêntico ao anterior.
+* [x] **Tarefa 22.D.2** *(Validar e migrar build completo para Vite)* — Corrigir incompatibilidades (variáveis `process.env` → `import.meta.env`, imports `~` etc.). Garantir que todos os 29 componentes renderizam. Executar `vite build` sem erros. **Critério:** Build de produção com Vite funciona; app idêntico ao anterior.
   - Dependências: 22.D.1
   - Prioridade: 🟡 Média | Complexidade: 5
 
-* [ ] **Tarefa 22.D.3** *(Remover `react-scripts` e CRA)* — Remover `react-scripts` do `package.json`. Remover `react-app-env.d.ts` e `reportWebVitals.ts` legados. Atualizar scripts npm: `dev`, `build`, `preview`. **Critério:** `npm run dev` e `npm run build` funcionam exclusivamente via Vite.
+* [x] **Tarefa 22.D.3** *(Remover `react-scripts` e CRA)* — Remover `react-scripts` do `package.json`. Remover `react-app-env.d.ts` e `reportWebVitals.ts` legados. Atualizar scripts npm: `dev`, `build`, `preview`. **Critério:** `npm run dev` and `npm run build` funcionam exclusivamente via Vite.
   - Dependências: 22.D.2
   - Prioridade: 🟡 Média | Complexidade: 2
 
