@@ -4,7 +4,7 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.0.2 — Isolar testes em backend/tests/
+current_task: 22.0.3 — Isolar scripts em backend/scripts/
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
@@ -12,17 +12,17 @@ current_task: 22.0.2 — Isolar testes em backend/tests/
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
 - **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2202 (Mover testes para tests/)
+- **Próxima tarefa:** TASK-2203 (Mover scripts para scripts/)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.1 (Reestruturação Backend)
-- Branch: `task/22.0.1-backend-restructuring`
+- Épico 22 — Tarefa 22.0.2 (Isolar testes em backend/tests/)
+- Branch: `task/22.0.2-backend-tests-isolation`
 
 ## 📋 Progresso do Épico 22
 
 ### Domínio 0 — Reestruturação de Diretórios
 - [x] TASK-2201 Backend: criar estrutura `src/`, mover arquivos por categoria
-- [/] TASK-2202 Backend: mover testes para `tests/`, scripts para `scripts/`, dados para `data/`
+- [x] TASK-2202 Backend: mover testes para `tests/`, scripts para `scripts/`, dados para `data/`
 - [ ] TASK-2203 Frontend: criar subpastas de componentes por domínio
 - [ ] TASK-2204 Frontend: criar pastas `state/`, `api/`, `hooks/`, `styles/`
 - [ ] TASK-2205 Atualizar todos os imports após movimentação

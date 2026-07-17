@@ -388,7 +388,7 @@ graph TD
   - Dependências: —
   - Prioridade: 🔴 Alta | Complexidade: 6
 
-* [ ] **Tarefa 22.0.2** *(Backend: Isolar testes em `backend/tests/`)* — Mover os 7 arquivos `test_*.py` para `backend/tests/`. Criar `backend/tests/conftest.py` com fixtures compartilhadas (cliente HTTP de teste, banco SQLite in-memory). Atualizar imports relativos. **Critério:** `pytest backend/tests/` verde.
+* [x] **Tarefa 22.0.2** *(Backend: Isolar testes em `backend/tests/`)* — Mover os 7 arquivos `test_*.py` para `backend/tests/`. Criar `backend/tests/conftest.py` com fixtures compartilhadas (cliente HTTP de teste, banco SQLite in-memory). Atualizar imports relativos. **Critério:** `pytest backend/tests/` verde.
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 4
 
