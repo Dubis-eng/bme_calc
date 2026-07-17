@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.F.1 — Instalar Vitest + @testing-library/react, criar vitest.config.ts
+current_task: 22.F.3 — Instalar Playwright e criar playwright.config.ts
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Domínio E (Backend Tooling) Concluído → Executando Domínio F (Testes Frontend)
-- **Próxima tarefa:** TASK-2280 (Instalar Vitest + @testing-library/react, criar vitest.config.ts)
+- **Fase:** Vitest Concluído → Executando Playwright E2E
+- **Próxima tarefa:** TASK-2282 (Instalar Playwright, criar playwright.config.ts)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio E (Backend Tooling)
-- Branch: `task/22.E.1-backend-tooling`
+- Épico 22 — Domínio F (Vitest Smoke Tests)
+- Branch: `task/22.F.1-frontend-testing`
 
 ## 📋 Progresso do Épico 22
 
@@ -62,8 +62,8 @@ current_task: 22.F.1 — Instalar Vitest + @testing-library/react, criar vitest.
 - [x] TASK-2272 Gerar `uv.lock`
 
 ### Domínio F — Testes Frontend
-- [ ] TASK-2280 Instalar Vitest + `@testing-library/react`, criar `vitest.config.ts`
-- [ ] TASK-2281 Criar testes smoke para componentes críticos
+- [x] TASK-2280 Instalar Vitest + `@testing-library/react`, criar `vitest.config.ts`
+- [x] TASK-2281 Criar testes smoke para componentes críticos
 - [ ] TASK-2282 Instalar Playwright, criar `playwright.config.ts`
 - [ ] TASK-2283 Criar teste E2E: carrega app → seleciona cenário → calcula → valida output
 

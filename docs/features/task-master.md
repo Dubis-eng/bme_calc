@@ -520,11 +520,11 @@ graph TD
 
 #### Domínio F — Testes Frontend
 
-* [ ] **Tarefa 22.F.1** *(Instalar Vitest e criar `vitest.config.ts`)* — Instalar `vitest`, `@vitest/ui`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`. Criar `frontend/vitest.config.ts`. Criar teste smoke do App (renderiza sem crash). **Critério:** `npm run test:unit` passa com pelo menos 1 teste.
+* [x] **Tarefa 22.F.1** *(Instalar Vitest e criar `vitest.config.ts`)* — Instalar `vitest`, `@vitest/ui`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`. Criar `frontend/vitest.config.ts`. Criar teste smoke do App (renderiza sem crash). **Critério:** `npm run test:unit` passa com pelo menos 1 teste.
   - Dependências: 22.D.1
   - Prioridade: 🟡 Média | Complexidade: 3
 
-* [ ] **Tarefa 22.F.2** *(Criar testes smoke para componentes críticos)* — Testes de renderização sem crash para: `ScenarioManager`, `SectorModules`, `HarvestPlan`, `GoalSeekModal`. **Critério:** `npm run test:unit` com 4+ testes passando.
+* [x] **Tarefa 22.F.2** *(Criar testes smoke para componentes críticos)* — Testes de renderização sem crash para: `ScenarioManager`, `SectorModules`, `HarvestPlan`, `GoalSeekModal`. **Critério:** `npm run test:unit` com 4+ testes passando.
   - Dependências: 22.F.1, 22.D.4
   - Prioridade: 🟡 Média | Complexidade: 4
 
