@@ -396,11 +396,11 @@ graph TD
   - Dependências: 22.0.1
   - Prioridade: 🟡 Média | Complexidade: 2
 
-* [/] **Tarefa 22.0.4** *(Backend: Isolar dados de referência em `backend/data/`)* — Mover `memorial_de_calculo_balanco.json` para `backend/data/`. Mover `MEMORIAL CALCULO.xlsx` para `backend/data/reference/`. Mover `migrations_legacy.py` para `backend/legacy/`. Atualizar todos os caminhos hardcoded que referenciam esses arquivos. **Critério:** motor de cálculo carrega memorial sem erro no startup.
+* [x] **Tarefa 22.0.4** *(Backend: Isolar dados de referência em `backend/data/`)* — Mover `memorial_de_calculo_balanco.json` para `backend/data/`. Mover `MEMORIAL CALCULO.xlsx` para `backend/data/reference/`. Mover `migrations_legacy.py` para `backend/legacy/`. Atualizar todos os caminhos hardcoded que referenciam esses arquivos. **Critério:** motor de cálculo carrega memorial sem erro no startup.
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 3
 
-* [ ] **Tarefa 22.0.5** *(Frontend: Criar subpastas de componentes por domínio)* — Criar subpastas `components/ui/`, `components/layout/`, `components/calculator/`, `components/scenario/`, `components/harvest-plan/`, `components/variables/`, `components/settings/`, `components/sectors/`, `components/search/`, `components/goalseek/`. Mover cada componente para seu domínio conforme mapa. **Critério:** `npm run build` sem erros de importação.
+* [/] **Tarefa 22.0.5** *(Frontend: Criar subpastas de componentes por domínio)* — Criar subpastas `components/ui/`, `components/layout/`, `components/calculator/`, `components/scenario/`, `components/harvest-plan/`, `components/variables/`, `components/settings/`, `components/sectors/`, `components/search/`, `components/goalseek/`. Mover cada componente para seu domínio conforme mapa. **Critério:** `npm run build` sem erros de importação.
   - Dependências: —
   - Prioridade: 🔴 Alta | Complexidade: 7
 

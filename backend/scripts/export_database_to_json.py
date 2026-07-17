@@ -62,7 +62,7 @@ def save_json_to_targets(json_data: list):
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(scripts_dir))
     targets = [
-        os.path.join(project_root, "backend", "memorial_de_calculo_balanco.json"),
+        os.path.join(project_root, "backend", "data", "memorial_de_calculo_balanco.json"),
         os.path.join(project_root, "docs", "memorial_de_calculo_balanco.json"),
         os.path.join(project_root, "frontend", "public", "memorial_de_calculo_balanco.json")
     ]

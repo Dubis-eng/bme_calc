@@ -14,7 +14,7 @@ def clean_value(val):
 def convert_xlsx_to_json():
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(scripts_dir))
-    xlsx_path = os.path.join(project_root, "backend", "MEMORIAL CALCULO.xlsx")
+    xlsx_path = os.path.join(project_root, "backend", "data", "reference", "MEMORIAL CALCULO.xlsx")
 
     wb = openpyxl.load_workbook(xlsx_path, data_only=False)
     sheet = wb.active
@@ -73,7 +73,7 @@ def convert_xlsx_to_json():
         
     # Write to target files
     targets = [
-        os.path.join(project_root, "backend", "memorial_de_calculo_balanco.json"),
+        os.path.join(project_root, "backend", "data", "memorial_de_calculo_balanco.json"),
         os.path.join(project_root, "docs", "memorial_de_calculo_balanco.json"),
         os.path.join(project_root, "frontend", "public", "memorial_de_calculo_balanco.json")
     ]

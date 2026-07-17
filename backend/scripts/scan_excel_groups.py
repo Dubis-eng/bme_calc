@@ -1,7 +1,11 @@
+import os
 import openpyxl
 
 def main():
-    wb = openpyxl.load_workbook("MEMORIAL CALCULO.xlsx", read_only=True)
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(scripts_dir))
+    xlsx_path = os.path.join(project_root, "backend", "data", "reference", "MEMORIAL CALCULO.xlsx")
+    wb = openpyxl.load_workbook(xlsx_path, read_only=True)
     sheet = wb["MEMORIAL CALCULO"]
     print("Scanning cells for turbine groups...")
     found_groups = set()

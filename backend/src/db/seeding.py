@@ -145,7 +145,9 @@ def seed_initial_data():
     from sqlmodel import SQLModel
     SQLModel.metadata.create_all(engine)
 
-    json_path = os.path.join(os.path.dirname(__file__), "memorial_de_calculo_balanco.json")
+    db_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.dirname(os.path.dirname(db_dir))
+    json_path = os.path.join(backend_dir, "data", "memorial_de_calculo_balanco.json")
     if not os.path.exists(json_path):
         print(f"Initial data JSON not found at: {json_path}")
         return
