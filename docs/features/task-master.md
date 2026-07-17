@@ -528,7 +528,7 @@ graph TD
   - Dependências: 22.F.1, 22.D.4
   - Prioridade: 🟡 Média | Complexidade: 4
 
-* [ ] **Tarefa 22.F.3** *(Instalar Playwright e criar `playwright.config.ts`)* — Instalar `@playwright/test`. Criar `frontend/playwright.config.ts` apontando para `http://localhost:5173`. Criar `frontend/e2e/calculator.spec.ts` com fluxo: carrega app → seleciona cenário → edita input → clica Calcular → valida output. **Critério:** `npm run test:e2e` com teste E2E passando contra servidor Vite em execução.
+* [x] **Tarefa 22.F.3** *(Instalar Playwright e criar `playwright.config.ts`)* — Instalar `@playwright/test`. Criar `frontend/playwright.config.ts` apontando para `http://localhost:5173`. Criar `frontend/e2e/calculator.spec.ts` com fluxo: carrega app → seleciona cenário → edita input → clica Calcular → valida output. **Critério:** `npm run test:e2e` com teste E2E passando contra servidor Vite em execução.
   - Dependências: 22.F.1, 22.D.3
   - Prioridade: 🟢 Baixa | Complexidade: 5
 

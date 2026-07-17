@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.F.3 — Instalar Playwright e criar playwright.config.ts
+current_task: 22.Z.1 — Executar checklist.py de verificação final e gerar PR
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Vitest Concluído → Executando Playwright E2E
-- **Próxima tarefa:** TASK-2282 (Instalar Playwright, criar playwright.config.ts)
+- **Fase:** Domínio F (Testes Frontend) Concluído → Verificação Final
+- **Próxima tarefa:** TASK-2290 (Executar checklist de verificação final)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio F (Vitest Smoke Tests)
-- Branch: `task/22.F.1-frontend-testing`
+- Épico 22 — Domínio F (Playwright E2E Tests)
+- Branch: `task/22.F.3-playwright-e2e`
 
 ## 📋 Progresso do Épico 22
 
@@ -64,8 +64,8 @@ current_task: 22.F.3 — Instalar Playwright e criar playwright.config.ts
 ### Domínio F — Testes Frontend
 - [x] TASK-2280 Instalar Vitest + `@testing-library/react`, criar `vitest.config.ts`
 - [x] TASK-2281 Criar testes smoke para componentes críticos
-- [ ] TASK-2282 Instalar Playwright, criar `playwright.config.ts`
-- [ ] TASK-2283 Criar teste E2E: carrega app → seleciona cenário → calcula → valida output
+- [x] TASK-2282 Instalar Playwright, criar `playwright.config.ts`
+- [x] TASK-2283 Criar teste E2E: carrega app → seleciona cenário → calcula → valida output
 
 ## ⚠️ Blockers / Open Issues
 - Nenhum no momento.
