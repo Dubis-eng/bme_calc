@@ -408,11 +408,11 @@ graph TD
   - Dependências: 22.0.5
   - Prioridade: 🔴 Alta | Complexidade: 5
 
-* [/] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
+* [x] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
   - Dependências: 22.0.1, 22.0.4
   - Prioridade: 🔴 Alta | Complexidade: 3
 
-* [ ] **Tarefa 22.0.8** *(Atualizar README.md e docs/ARCHITECTURE.md)* — Reescrever seção "Mapa de Diretórios" do `docs/ARCHITECTURE.md` com a nova estrutura. Atualizar `README.md` do projeto com novos caminhos de execução e setup. **Critério:** Estrutura documentada reflete o sistema de arquivos real.
+* [/] **Tarefa 22.0.8** *(Atualizar README.md e docs/ARCHITECTURE.md)* — Reescrever seção "Mapa de Diretórios" do `docs/ARCHITECTURE.md` com a nova estrutura. Atualizar `README.md` do projeto com novos caminhos de execução e setup. **Critério:** Estrutura documentada reflete o sistema de arquivos real.
   - Dependências: 22.0.7
   - Prioridade: 🟡 Média | Complexidade: 2
 

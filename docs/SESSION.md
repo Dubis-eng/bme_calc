@@ -4,7 +4,7 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.0.7 — Atualizar Docker e CI para nova estrutura
+current_task: 22.0.8 — Atualizar README.md e docs/ARCHITECTURE.md
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
@@ -12,11 +12,11 @@ current_task: 22.0.7 — Atualizar Docker e CI para nova estrutura
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
 - **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2206 (Atualizar docker-compose.yml e Dockerfile para nova estrutura)
+- **Próxima tarefa:** TASK-2207 (Atualizar README.md e docs/ARCHITECTURE.md)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.6 (Frontend: criar pastas state/, api/, hooks/, styles/, pages/)
-- Branch: `task/22.0.6-frontend-folders-creation`
+- Épico 22 — Tarefa 22.0.7 (Atualizar Docker e CI para nova estrutura)
+- Branch: `task/22.0.7-docker-config-update`
 
 ## 📋 Progresso do Épico 22
 
@@ -26,7 +26,8 @@ current_task: 22.0.7 — Atualizar Docker e CI para nova estrutura
 - [x] TASK-2203 Frontend: criar subpastas de componentes por domínio
 - [x] TASK-2204 Frontend: criar pastas `state/`, `api/`, `hooks/`, `styles/`
 - [x] TASK-2205 Atualizar todos os imports após movimentação
-- [/] TASK-2206 Atualizar docker-compose.yml e Dockerfile para nova estrutura
+- [x] TASK-2206 Atualizar docker-compose.yml e Dockerfile para nova estrutura
+- [/] TASK-2207 Atualizar README.md e docs/ARCHITECTURE.md
 
 ### Domínio A — Design System
 - [ ] TASK-2210 Atualizar `index.css` com paleta Studio Dark + tabular numbers
