@@ -1,11 +1,11 @@
 import datetime
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
-from database import (
+from src.db.database import (
     Variable, Equation, Dependency, Sector,
     VariableType, VariableStatus, Stage, ControlPoint, HarvestPlanOrderedItem
 )
-import engine
+from src.core import engine
 
 def _update_variable_equation(var_id: str, new_eq_val: str, db_var: Variable, db: Session):
     stmt = select(Equation).where(Equation.variable_id == var_id, Equation.status == "ativa")

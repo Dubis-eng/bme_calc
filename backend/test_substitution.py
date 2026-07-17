@@ -1,9 +1,9 @@
 import pytest
 from sqlmodel import Session, select
 from sqlalchemy import text
-from database import engine, Variable, Equation, Dependency, Result, Sector, VariableType, VariableStatus, create_db_and_tables, HarvestPlanOrderedItem
-from engine import substitute_variable_in_formula
-from services_substitution import get_substitution_preview, confirm_variable_substitution
+from src.db.database import engine, Variable, Equation, Dependency, Result, Sector, VariableType, VariableStatus, create_db_and_tables, HarvestPlanOrderedItem
+from src.core.engine import substitute_variable_in_formula
+from src.services.services_substitution import get_substitution_preview, confirm_variable_substitution
 
 def test_ast_substitution_precedence():
     # Test cases for operators precedence

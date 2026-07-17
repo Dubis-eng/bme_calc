@@ -6,7 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from openpyxl import Workbook
-import engine
+from src.core import engine
 
 def generate_scenario_pdf(scenario_data) -> BytesIO:
     """

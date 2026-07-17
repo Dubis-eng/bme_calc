@@ -1,6 +1,6 @@
 import json
 from decimal import Decimal
-from engine import calculate_state, normalize_formula, parse_equation, FormulaEvaluator
+from src.core.engine import calculate_state, normalize_formula, parse_equation
 
 def test_formula_normalization():
     # Test sheet prefix removal

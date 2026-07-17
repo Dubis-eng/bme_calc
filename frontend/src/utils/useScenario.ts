@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Variable, Sector, BackendVariable } from '../types';
 import { ScenarioMetadata } from '../components/ScenarioManager';
-import { formatHarvestYear, parseHarvestYear, mapBackendVariableToFrontend } from './helpers';
+import { parseHarvestYear, mapBackendVariableToFrontend } from './helpers';
 
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [variables, setVariables] = useState<Variable[]>([]);
@@ -22,11 +22,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
   const [isOffline, setIsOffline] = useState(false);
   const [residual, setResidual] = useState<number>(0);
-  const [tolerance, setTolerance] = useState<number>(() => {
-    return parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5');
-  });
+  const [tolerance, setTolerance] = useState<number>(() => parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5'));
 
-  const checkConnection = async () => {
+  const checkConnection = useCallback(async () => {
     try {
       await axios.get('http://localhost:8000/api/scenarios', { timeout: 2000 });
       setIsOffline(false);
@@ -35,16 +33,16 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       setIsOffline(true);
       return false;
     }
-  };
+  }, []);
 
-  const handleApiError = (err: unknown) => {
+  const handleApiError = useCallback((err: unknown) => {
     const error = err as { response?: { status: number }; code?: string; message?: string };
     if (!error.response || error.code === 'ERR_NETWORK' || error.message === 'Network Error' || (error.response && error.response.status >= 500)) {
       setIsOffline(true);
     }
-  };
+  }, []);
 
-  const loadLocalFallback = () => {
+  const loadLocalFallback = useCallback(() => {
     fetch('/memorial_de_calculo_balanco.json')
       .then(res => res.json())
       .then(data => {
@@ -52,9 +50,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         if (data.length > 0) setActiveSector(data[0].SETOR);
       })
       .finally(() => setLoading(false));
-  };
+  }, []);
 
-  const fetchYearsAndMonths = async () => {
+  const fetchYearsAndMonths = useCallback(async () => {
     try {
       const yrRes = await axios.get('http://localhost:8000/api/settings/years');
       setYears(yrRes.data);
@@ -63,51 +61,9 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     } catch (err) {
       handleApiError(err);
     }
-  };
+  }, [handleApiError]);
 
-  useEffect(() => {
-    if (!isOffline) return;
-    const interval = setInterval(checkConnection, 5000);
-    return () => clearInterval(interval);
-  }, [isOffline]);
-
-  useEffect(() => {
-    fetchYearsAndMonths();
-    axios.get('http://localhost:8000/api/scenarios')
-      .then(res => {
-        setIsOffline(false);
-        if (res.data?.length > 0) {
-          const latest = res.data[0];
-          axios.get(`http://localhost:8000/api/scenarios/${latest.id}`)
-            .then(detailRes => {
-              onLoadScenario(detailRes.data.variables, latest);
-              setLoading(false);
-            })
-            .catch(err => { handleApiError(err); setLoading(false); });
-        } else {
-          loadLocalFallback();
-        }
-      })
-      .catch(err => { handleApiError(err); setLoading(false); });
-  }, []);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
-  const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
-
-  const handleChange = (id: string, value: string) => {
-    if (isLocked || isOffline) return;
-    setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
-    setHasUnsavedChanges(true);
-  };
-
-  const triggerCalculate = async (varsList: Variable[], tolVal?: number) => {
+  const triggerCalculate = useCallback(async (varsList: Variable[], tolVal?: number) => {
     if (isOffline) return;
     setCalculating(true);
     setConvergenceError(false);
@@ -127,6 +83,56 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     } finally {
       setCalculating(false);
     }
+  }, [isOffline, tolerance, handleApiError]);
+
+  const onLoadScenario = useCallback((loadedVars: Variable[], meta: ScenarioMetadata) => {
+    setVariables(loadedVars); setCurrentScenario(meta);
+    const parsedYear = typeof meta.year_harvest === 'string' ? parseHarvestYear(meta.year_harvest) : meta.year_harvest;
+    setAnoSafra(parsedYear); setMesReferencia(meta.reference_month); setHasUnsavedChanges(false);
+    if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
+    triggerCalculate(loadedVars);
+  }, [triggerCalculate]);
+
+  useEffect(() => {
+    if (!isOffline) return;
+    const interval = setInterval(checkConnection, 5000);
+    return () => clearInterval(interval);
+  }, [isOffline, checkConnection]);
+
+  useEffect(() => {
+    fetchYearsAndMonths();
+    axios.get('http://localhost:8000/api/scenarios')
+      .then(res => {
+        setIsOffline(false);
+        if (res.data?.length > 0) {
+          const latest = res.data[0];
+          axios.get(`http://localhost:8000/api/scenarios/${latest.id}`)
+            .then(detailRes => {
+              onLoadScenario(detailRes.data.variables, latest);
+              setLoading(false);
+            })
+            .catch(err => { handleApiError(err); setLoading(false); });
+        } else {
+          loadLocalFallback();
+        }
+      })
+      .catch(err => { handleApiError(err); setLoading(false); });
+  }, [fetchYearsAndMonths, onLoadScenario, handleApiError, loadLocalFallback]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const isLocked = currentScenario ? (currentScenario.status === 'Aprovado' || currentScenario.status === 'Final') : false;
+
+  const handleChange = (id: string, value: string) => {
+    if (isLocked || isOffline) return;
+    setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
+    setHasUnsavedChanges(true);
   };
 
   const updateTolerance = (val: number) => {
@@ -136,14 +142,6 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   };
 
   const handleCalculate = () => triggerCalculate(variables);
-
-  const onLoadScenario = (loadedVars: Variable[], meta: ScenarioMetadata) => {
-    setVariables(loadedVars); setCurrentScenario(meta);
-    const parsedYear = typeof meta.year_harvest === 'string' ? parseHarvestYear(meta.year_harvest) : meta.year_harvest;
-    setAnoSafra(parsedYear); setMesReferencia(meta.reference_month); setHasUnsavedChanges(false);
-    if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
-    triggerCalculate(loadedVars);
-  };
 
   const handleSaveNew = async () => {
     if (isOffline) return;

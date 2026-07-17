@@ -1,24 +1,44 @@
-# HITL Review — Especificação de Ordenação Personalizada e Divisores no Plano de Safra
+# 📋 HITL Review — /specify EPIC-022
 
-Este documento resume as decisões e o escopo acordado para a implementação da funcionalidade de Ordenação Personalizada e Divisores no Plano de Safra (Épico 21).
+> **Data:** 2026-07-16 | **Branch:** `feature/architecture-improvements`
+> **Status aguardado:** APROVADO / REJEITADO / AJUSTES
 
-## 📋 Resumo das Decisões do Usuário
+---
 
-1. **Modelagem de Dados Normalizada:**
-   * Criação da tabela `harvest_plan_ordered_items` no PostgreSQL/SQLite.
-   * A tabela armazenará tanto variáveis (`tipo = "variable"`) quanto divisores (`tipo = "divider"`).
-   * **Nova Variável:** Adicionada no final da lista quando marcada no plano.
-   * **Variáveis Não Agrupadas (Fallback):** Qualquer variável ativa no plano de safra que não possuir registro correspondente na tabela de ordenação ou que esteja órfã de agrupamento será exibida no final sob o cabeçalho virtual `"Variáveis Sem Agrupamento"`.
-   * **Inativação:** Ao inativar uma variável no sistema, seu registro de ordenação é removido.
+## Decisões Capturadas na Entrevista
 
-2. **Interface Visual (UI/UX) Unificada:**
-   * Unificação das funções de visualização e organização na sub-aba **Visualização Consolidada**.
-   * Adição de um botão de **Cadeado (🔓 Modo Edição / 🔒 Visualização)**.
-   * **Modo Edição (Cadeado Aberto):** Habilita reordenação via drag-and-drop e botões discretos (Sobe/Desce para acessibilidade WCAG) e permite adicionar divisores.
-   * **Modo Visualização (Cadeado Fechado):** Exibe a tabela consolidada normal com divisores renderizados como linhas mescladas de largura total com visual destacado Maestro UI (fundo slate, bordas teal, texto em caixa alta e negrito).
+| # | Pergunta | Resposta |
+|---|---|---|
+| 1 | Domínios a incluir | Todos os 6 domínios (Design, CORS, Decimal, Vite+Jotai, uv+Alembic, Testes) |
+| 2 | Prioridade máxima | Tudo em conjunto — planejar o épico completo primeiro |
+| 3 | Estratégia de migração frontend | Gradual — manter CRA funcionando, migrar componente por componente |
+| 4 | Testes de paridade Decimal/float | Sim — cada tarefa com seus próprios testes antes de avançar |
 
-3. **Consistência nas Exportações:**
-   * O relatório PDF e a planilha Excel exportados refletirão fielmente a ordenação e os divisores configurados na tela, renderizando as divisórias como linhas mescladas com destaque visual.
+---
 
-## 🚀 Próximos Passos
-- Avançar para a fase de planejamento (/plan), gerando o grafo de tarefas detalhado no `task-master.md` e o plano de implementação (`implementation_plan.md`).
+## Riscos Identificados
+
+| Risco | Probabilidade | Mitigação |
+|---|---|---|
+| Decimal quebra convergência do engine | Médio | Testes de paridade obrigatórios (TASK-A pré-requisito) |
+| Migração Vite quebra componentes existentes | Médio | Manter CRA paralelo até validação completa |
+| Jotai incompatível com GoalSeekModal ou HarvestPlan | Baixo | Migração gradual por componente |
+| Alembic conflita com migrations.py custom | Baixo | Manter migrations.py como fallback durante transição |
+
+---
+
+## Funcionalidades Protegidas (Invioláveis)
+
+1. Motor de cálculo com convergência iterativa
+2. Goal Seek (scipy)
+3. Persistência de cenários
+4. Plano de Safra (consolidação + divisores)
+5. Exportações PDF e Excel
+6. Modelo IAPWS-IF97
+7. Substituição de variáveis
+
+---
+
+## ✅ Aprovação para /create-tasks
+
+Confirme com "Aprovado" ou "Proceed" para iniciar o planejamento de tarefas.

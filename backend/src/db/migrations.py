@@ -5,13 +5,13 @@ from typing import Set
 from sqlmodel import Session, select, SQLModel
 from sqlalchemy import text, inspect
 
-from database import (
+from src.db.database import (
     engine, ScenarioStatus, VariableType, VariableStatus, ResultStatus,
     Scenario, Variable, Sector, Equation, Dependency, Result, HarvestPlanSetting, parse_year,
     Stage, ControlPoint, HarvestPlanOrderedItem
 )
 
-from migrations_legacy import migrate_legacy_data, heal_missing_control_points
+from legacy.migrations_legacy import migrate_legacy_data, heal_missing_control_points
 
 def migrate_database_schema(session: Session):
     SQLModel.metadata.create_all(session.bind)

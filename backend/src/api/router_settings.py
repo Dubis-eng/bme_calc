@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from pydantic import BaseModel
-from database import get_session, HarvestYear, HarvestMonth, Scenario
-from schemas import (
+from src.db.database import get_session, HarvestYear, HarvestMonth, Scenario
+from src.schemas.schemas import (
     HarvestYearRead, HarvestYearCreate, HarvestMonthRead, HarvestMonthUpdate,
     HarvestPlanSettingUpdate
 )
-import services
+from src.services import services
 
 router = APIRouter(prefix="/api", tags=["settings"])
 
@@ -116,7 +116,7 @@ def reorder_months_endpoint(req: MonthReorderRequest, db=Depends(get_session)):
                     new_start_month = db_month.name
         
         if new_start_month:
-            from services_harvest_plan import get_harvest_plan_settings
+            from src.services.services_harvest_plan import get_harvest_plan_settings
             setting = get_harvest_plan_settings(db)
             setting.start_month = new_start_month
             db.add(setting)

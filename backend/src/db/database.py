@@ -179,7 +179,7 @@ class HarvestPlanOrderedItem(SQLModel, table=True):
 # ── DATABASE CREATION & SESSION ────────────────────────────────────────────
 
 def create_db_and_tables():
-    from migrations import migrate_legacy_data, migrate_database_schema
+    from src.db.migrations import migrate_legacy_data, migrate_database_schema
     # Detect if we need migration first
     with Session(engine) as session:
         migrate_legacy_data(session)

@@ -1,16 +1,16 @@
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
-from database import (
+from src.db.database import (
     Variable, Equation, Dependency, Scenario, HarvestPlanSetting,
     ScenarioStatus, VariableType, ResultStatus, VariableStatus, HarvestPlanOrderedItem
 )
-import engine
-from services_harvest_plan_calc import calculate_harvest_plan_consolidation
+from src.core import engine
+from src.services.services_harvest_plan_calc import calculate_harvest_plan_consolidation
 
 ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
 def get_ordered_months(start_month: str, db: Session) -> List[str]:
-    from database import HarvestMonth
+    from src.db.database import HarvestMonth
     stmt = select(HarvestMonth).where(HarvestMonth.enabled == True).order_by(HarvestMonth.order_index.asc())
     db_months = db.exec(stmt).all()
     enabled_names = [m.name for m in db_months]
@@ -22,7 +22,7 @@ def get_ordered_months(start_month: str, db: Session) -> List[str]:
     return enabled_names[idx:] + enabled_names[:idx]
 
 def get_harvest_years(db: Session) -> List[int]:
-    from database import HarvestYear
+    from src.db.database import HarvestYear
     stmt = select(HarvestYear.id).where(HarvestYear.active == True)
     years = db.exec(stmt).all()
     return sorted(list(set(years)), reverse=True)
@@ -44,7 +44,7 @@ def update_harvest_plan_settings(start_month: str, db: Session) -> HarvestPlanSe
         
         idx = ALL_MONTHS.index(start_month)
         ordered_names = ALL_MONTHS[idx:] + ALL_MONTHS[:idx]
-        from database import HarvestMonth
+        from src.db.database import HarvestMonth
         db_months = db.exec(select(HarvestMonth)).all()
         for m in db_months:
             if m.name in ordered_names:
@@ -121,7 +121,7 @@ def update_variables_harvest_config(configs: List[Dict[str, Any]], db: Session):
     db.commit()
 
 def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any]:
-    from database import HarvestPlanSelection, Scenario, ScenarioStatus
+    from src.db.database import HarvestPlanSelection, Scenario, ScenarioStatus
     
     selections = db.exec(select(HarvestPlanSelection).where(HarvestPlanSelection.year_harvest == year_harvest)).all()
     selections_list = []
@@ -153,7 +153,7 @@ def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any
     }
 
 def update_harvest_plan_selection(year_harvest: int, month: str, scenario_id: Optional[Any], exclude: bool, db: Session):
-    from database import HarvestPlanSelection
+    from src.db.database import HarvestPlanSelection
     import uuid
     
     sc_id = uuid.UUID(str(scenario_id)) if scenario_id else None

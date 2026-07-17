@@ -1,7 +1,7 @@
 from typing import List
 from sqlmodel import select, Session
-from database import Sector, Variable
-from schemas import SectorCreate, SectorUpdate
+from src.db.database import Sector, Variable
+from src.schemas.schemas import SectorCreate, SectorUpdate
 
 def list_sectors(db: Session) -> List[Sector]:
     return db.exec(select(Sector).order_by(Sector.ordem)).all()

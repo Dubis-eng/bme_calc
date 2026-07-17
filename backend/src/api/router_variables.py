@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from database import get_session
-import services
-from schemas import (
+from src.db.database import get_session
+from src.services import services
+from src.schemas.schemas import (
     VariableCreate, VariableUpdate, VariableDetail,
     SubstitutionPreviewRequest, SubstitutionPreviewResponse,
     SubstitutionConfirmRequest, SubstitutionConfirmResponse

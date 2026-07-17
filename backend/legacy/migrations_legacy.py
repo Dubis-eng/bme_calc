@@ -3,7 +3,7 @@ import re
 from sqlmodel import Session, select, SQLModel
 from sqlalchemy import text, inspect
 
-from database import (
+from src.db.database import (
     Scenario, Variable, Sector, Equation, Dependency, Result, parse_year,
     VariableType, VariableStatus, ResultStatus, Stage, ControlPoint
 )

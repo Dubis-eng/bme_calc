@@ -1,6 +1,6 @@
 import scipy.optimize as opt
 from typing import List, Dict, Any
-import engine
+from src.core import engine
 
 def run_goal_seek(
     variables: List[Dict[str, Any]],

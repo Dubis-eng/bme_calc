@@ -1,12 +1,12 @@
 import datetime
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
-from database import (
+from src.db.database import (
     Variable, Equation, Dependency, Sector,
     VariableType, VariableStatus, HarvestPlanOrderedItem
 )
-from services_variables import _update_variable_equation
-import engine
+from src.services.services_variables import _update_variable_equation
+from src.core import engine
 
 def get_substitution_preview(target_var_id: str, recursive: bool, db: Session, replacement_expr: Optional[str] = None):
     import networkx as nx

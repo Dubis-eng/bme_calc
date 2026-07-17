@@ -9,9 +9,9 @@ if os.name == 'posix':
 else:
     os.environ["DATABASE_URL"] = "sqlite:///./test.db"
 
-import main
-from database import create_db_and_tables, engine, get_session, Variable, Stage, ControlPoint, Sector
-from services_reorder import reorder_stages, reorder_control_points, reorder_variables
+from src import main
+from src.db.database import create_db_and_tables, engine, get_session, Variable, Stage, ControlPoint, Sector
+from src.services.services_reorder import reorder_stages, reorder_control_points, reorder_variables
 
 client = TestClient(main.app)
 
@@ -164,8 +164,8 @@ def test_ensure_variable_resolves_cp_and_stage():
     # the Stage and ControlPoint entities are correctly created and linked to the Variable.
     # Also verify that a database with unlinked variables is healed correctly on migrate_database_schema.
     from sqlmodel import Session
-    from services_scenarios import create_new_scenario
-    from database import get_session
+    from src.services.services_scenarios import create_new_scenario
+    from src.db.database import get_session
     
     session = next(get_session())
     
@@ -188,7 +188,7 @@ def test_ensure_variable_resolves_cp_and_stage():
         ]
     }
     
-    from schemas import ScenarioCreate
+    from src.schemas.schemas import ScenarioCreate
     req_obj = ScenarioCreate(**scenario_payload)
     sc = create_new_scenario(req_obj, session)
     
@@ -207,7 +207,7 @@ def test_ensure_variable_resolves_cp_and_stage():
     session.add(v)
     session.commit()
     
-    from migrations_legacy import heal_missing_control_points
+    from legacy.migrations_legacy import heal_missing_control_points
     heal_missing_control_points(session)
     
     session.refresh(v)

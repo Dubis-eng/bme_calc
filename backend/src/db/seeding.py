@@ -3,12 +3,12 @@ import json
 import uuid
 import datetime
 from sqlmodel import Session, select
-from database import (
+from src.db.database import (
     engine, Scenario, Variable, Equation, Dependency, Result, Sector,
     ScenarioStatus, VariableType, VariableStatus, ResultStatus
 )
 from sqlalchemy import text
-import engine as calc_engine
+from src.core import engine as calc_engine
 
 def get_or_create_sector(session: Session, sector_name: str, seeded_sectors: list) -> str:
     sector_str = sector_name.strip().upper() or "OUTROS"
@@ -180,7 +180,7 @@ def seed_initial_data():
             create_equation_and_dependencies(session, v["ID - REF"], eq_val, sector_str)
             create_result(session, v["ID - REF"], scenario_id, eq_val, results_map)
 
-        from migrations_legacy import heal_missing_control_points
+        from legacy.migrations_legacy import heal_missing_control_points
         heal_missing_control_points(session)
         session.commit()
     print("Database seeding completed successfully.")

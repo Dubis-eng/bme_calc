@@ -6,11 +6,11 @@ else:
 
 import pytest
 from fastapi.testclient import TestClient
-import main
-from database import create_db_and_tables, engine, Variable, Equation
+from src import main
+from src.db.database import create_db_and_tables, engine, Variable, Equation
 from sqlmodel import SQLModel, Session, select
-from exports import generate_scenario_pdf, generate_scenario_xlsx
-from schemas import ScenarioExportWrapper
+from src.services.exports import generate_scenario_pdf, generate_scenario_xlsx
+from src.schemas.schemas import ScenarioExportWrapper
 
 client = TestClient(main.app)
 

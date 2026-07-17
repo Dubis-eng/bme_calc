@@ -43,7 +43,7 @@ class FormulaEvaluator:
                     return ok_res(Decimal(var_val.replace(',', '.')))
                 except Exception:
                     return ok_res(var_val)
-            from engine import parse_number
+            from src.core.engine import parse_number
             return ok_res(parse_number(var_val))
                 
         if isinstance(node, ast.UnaryOp):

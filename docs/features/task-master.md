@@ -372,3 +372,171 @@ graph TD
 * [x] **Tarefa 21.6** *(Reordenação Drag-and-Drop / Acessível)* — Desenvolver reordenação por drag-and-drop e botões Sobe/Desce em `HarvestPlanTable.tsx` e salvar alterações ao fechar o cadeado.
 * [x] **Tarefa 21.7** *(Exportações)* — Atualizar relatórios PDF e planilhas Excel em `exports_harvest_plan.py` para renderizar os divisores.
 * [x] **Tarefa 21.8** *(Testes e Homologação)* — Criar testes unitários em `test_harvest_plan_structure.py` e validar conformidade com linter e limites de 300 linhas de código.
+
+---
+
+### Épico 22: Modernização Arquitetural, Reestruturação e Design System (EM ANDAMENTO)
+
+> **Branch:** `feature/architecture-improvements` | **Spec:** [feat-022](feat-022-architecture-modernization.md)
+> **Regra de ouro:** Cada domínio tem seus próprios testes antes de avançar. Nenhuma funcionalidade existente pode ser quebrada.
+
+---
+
+#### Domínio 0 — Reestruturação de Diretórios (Pré-requisito de todos os outros domínios)
+
+* [x] **Tarefa 22.0.1** *(Backend: Criar estrutura de pastas `src/`)* — Criar subpastas `src/api/`, `src/core/`, `src/db/`, `src/services/`, `src/schemas/` dentro de `backend/`. Mover cada arquivo para sua pasta de destino conforme mapa de movimentação. **Arquivos afetados:** todos os `*.py` de `backend/`. **Critério:** `python -m pytest backend/tests/` passa sem erros após movimentação.
+  - Dependências: —
+  - Prioridade: 🔴 Alta | Complexidade: 6
+
+* [ ] **Tarefa 22.0.2** *(Backend: Isolar testes em `backend/tests/`)* — Mover os 7 arquivos `test_*.py` para `backend/tests/`. Criar `backend/tests/conftest.py` com fixtures compartilhadas (cliente HTTP de teste, banco SQLite in-memory). Atualizar imports relativos. **Critério:** `pytest backend/tests/` verde.
+  - Dependências: 22.0.1
+  - Prioridade: 🔴 Alta | Complexidade: 4
+
+* [ ] **Tarefa 22.0.3** *(Backend: Isolar scripts utilitários em `backend/scripts/`)* — Mover `convert_xlsx_to_json.py`, `export_database_to_json.py`, `scan_excel_groups.py`, `scan_excel_turbinas.py` para `backend/scripts/`. Criar `backend/scripts/README.md` documentando cada script. **Critério:** scripts executam com `python backend/scripts/<nome>.py`.
+  - Dependências: 22.0.1
+  - Prioridade: 🟡 Média | Complexidade: 2
+
+* [ ] **Tarefa 22.0.4** *(Backend: Isolar dados de referência em `backend/data/`)* — Mover `memorial_de_calculo_balanco.json` para `backend/data/`. Mover `MEMORIAL CALCULO.xlsx` para `backend/data/reference/`. Mover `migrations_legacy.py` para `backend/legacy/`. Atualizar todos os caminhos hardcoded que referenciam esses arquivos. **Critério:** motor de cálculo carrega memorial sem erro no startup.
+  - Dependências: 22.0.1
+  - Prioridade: 🔴 Alta | Complexidade: 3
+
+* [ ] **Tarefa 22.0.5** *(Frontend: Criar subpastas de componentes por domínio)* — Criar subpastas `components/ui/`, `components/layout/`, `components/calculator/`, `components/scenario/`, `components/harvest-plan/`, `components/variables/`, `components/settings/`, `components/sectors/`, `components/search/`, `components/goalseek/`. Mover cada componente para seu domínio conforme mapa. **Critério:** `npm run build` sem erros de importação.
+  - Dependências: —
+  - Prioridade: 🔴 Alta | Complexidade: 7
+
+* [ ] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
+  - Dependências: 22.0.5
+  - Prioridade: 🔴 Alta | Complexidade: 5
+
+* [ ] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
+  - Dependências: 22.0.1, 22.0.4
+  - Prioridade: 🔴 Alta | Complexidade: 3
+
+* [ ] **Tarefa 22.0.8** *(Atualizar README.md e docs/ARCHITECTURE.md)* — Reescrever seção "Mapa de Diretórios" do `docs/ARCHITECTURE.md` com a nova estrutura. Atualizar `README.md` do projeto com novos caminhos de execução e setup. **Critério:** Estrutura documentada reflete o sistema de arquivos real.
+  - Dependências: 22.0.7
+  - Prioridade: 🟡 Média | Complexidade: 2
+
+---
+
+#### Domínio A — Design System Studio Dark
+
+* [ ] **Tarefa 22.A.1** *(Criar `docs/DESIGN.md` com tokens do sistema)* — Documentar paleta de cores (HSL tokens), tipografia (Inter Variable + JetBrains Mono), elevações, estados de campo (INPUT/OUTPUT/CONSTANT) e utilitários CSS. Este documento é a fonte de verdade do design. **Critério:** Documento criado e referenciado no README.
+  - Dependências: 22.0.6
+  - Prioridade: 🟡 Média | Complexidade: 2
+
+* [ ] **Tarefa 22.A.2** *(Atualizar `styles/index.css` com paleta Studio Dark)* — Implementar variáveis CSS HSL: `--background`, `--primary` (esmeralda), `--accent` (âmbar inputs), `--card`, gradientes radiais de spotlight, sistema de elevação em 3 camadas. Adicionar `font-feature-settings: "tnum" 1` global. Criar classes `.studio-surface`, `.glow-primary`, `.label-eyebrow`. **Critério:** Visual do app com dark mode premium; tabular numbers ativos em tabelas.
+  - Dependências: 22.A.1, 22.0.6
+  - Prioridade: 🔴 Alta | Complexidade: 5
+
+* [ ] **Tarefa 22.A.3** *(Atualizar `tailwind.config.js` com tokens HSL)* — Mapear todas as variáveis CSS `--bme-*` para classes Tailwind customizadas. Garantir que componentes existentes não quebrem com os novos tokens. **Critério:** `npm run build` sem warnings de classes não-reconhecidas.
+  - Dependências: 22.A.2
+  - Prioridade: 🟡 Média | Complexidade: 3
+
+* [ ] **Tarefa 22.A.4** *(Diferenciar visualmente INPUT / OUTPUT / CONSTANT)* — Aplicar âmbar (`--accent`) em campos INPUT editáveis. Aplicar branco neutro em OUTPUT (read-only). Aplicar cinza muted em CONSTANT. Garantir que todos os campos OUTPUT e CONSTANT têm `readOnly` programático no HTML. Atualizar `SectorVariableRow.tsx` e componentes de tabela. **Critério:** Usuário distingue visualmente o que pode editar sem tooltip.
+  - Dependências: 22.A.2, 22.0.5
+  - Prioridade: 🔴 Alta | Complexidade: 4
+
+* [ ] **Tarefa 22.A.5** *(Implementar row highlight e glow CTA Calcular)* — Adicionar `selectedFieldId` ao state global. Aplicar `box-shadow: inset 3px 0 0 hsl(--ring)` na linha selecionada. Adicionar classe `.glow-primary` ao botão Calcular com animação hover. **Critério:** Clicar em qualquer linha destaca a linha com barra lateral teal; botão Calcular tem glow esmeralda.
+  - Dependências: 22.A.2
+  - Prioridade: 🟡 Média | Complexidade: 3
+
+---
+
+#### Domínio B — Segurança CORS
+
+* [ ] **Tarefa 22.B.1** *(Substituir `allow_origins=["*"]` por env var)* — Em `src/main.py`, ler `ALLOWED_ORIGINS` do ambiente (parser de string separada por vírgula). Fallback para `["http://localhost:3000"]` em modo dev. Atualizar `backend/.env.sample` e `docker-compose.yml` com a nova variável. **Critério:** App funciona normalmente; requisição de origem não listada recebe 403.
+  - Dependências: 22.0.1
+  - Prioridade: 🔴 Alta | Complexidade: 2
+
+---
+
+#### Domínio C — Engine Decimal (Requer gate de paridade antes de migrar)
+
+* [ ] **Tarefa 22.C.1** *(Criar `tests/test_engine_decimal_parity.py`)* — Implementar testes que executam o mesmo conjunto de inputs com `float` (engine atual) e com `Decimal` (engine candidato). Comparar resultados — devem ser iguais até `1e-4` (tolerância de convergência). Se divergência > `1e-4`, teste falha e bloqueia a tarefa 22.C.2. **Critério:** Suíte de paridade passa com ≥ 20 cenários de teste representativos.
+  - Dependências: 22.0.2
+  - Prioridade: 🔴 Alta | Complexidade: 6
+
+* [ ] **Tarefa 22.C.2** *(Migrar `src/core/engine.py` de `float` para `Decimal`)* — Substituir todas as operações `float` por `Decimal`. Definir `getcontext().prec = 28`. Adaptar interface com `iapws` e `scipy` usando `Decimal(str(float_value))` para casting seguro. Manter a lógica de convergência e degradação graceful intacta. **Critério:** Testes de paridade (22.C.1) passam; suíte completa de backend passa.
+  - Dependências: 22.C.1 (GATE: paridade aprovada)
+  - Prioridade: 🔴 Alta | Complexidade: 7
+
+* [ ] **Tarefa 22.C.3** *(Adaptar `src/core/goalseek.py` para interface Decimal)* — Adaptar a fronteira entre `Decimal` (engine) e `float` (scipy). Input/output do goalseek converte `Decimal → float` antes de scipy e `float → Decimal` na resposta. **Critério:** Goal Seek funcional com resultados equivalentes ao antes da migração.
+  - Dependências: 22.C.2
+  - Prioridade: 🔴 Alta | Complexidade: 4
+
+* [ ] **Tarefa 22.C.4** *(Executar suíte completa de testes backend)* — Re-executar `pytest backend/tests/` completo após migração Decimal. Todos os 7+ arquivos de teste devem passar. Registrar métricas: tempo de convergência com Decimal vs float. **Critério:** 100% dos testes passando; tempo de convergência ≤ 2× o tempo anterior.
+  - Dependências: 22.C.3
+  - Prioridade: 🔴 Alta | Complexidade: 2
+
+---
+
+#### Domínio D — Frontend Stack (Migração Gradual CRA → Vite + Jotai + TanStack)
+
+* [ ] **Tarefa 22.D.1** *(Instalar Vite e criar `vite.config.ts`)* — Instalar `vite`, `@vitejs/plugin-react`, `@types/node`. Criar `frontend/vite.config.ts` com proxy para backend. Criar `frontend/src/main.tsx` como novo entry point. Manter `react-scripts` ativo. **Critério:** `vite dev` inicia e renderiza o App sem erros.
+  - Dependências: 22.0.6
+  - Prioridade: 🟡 Média | Complexidade: 4
+
+* [ ] **Tarefa 22.D.2** *(Validar e migrar build completo para Vite)* — Corrigir incompatibilidades (variáveis `process.env` → `import.meta.env`, imports `~` etc.). Garantir que todos os 29 componentes renderizam. Executar `vite build` sem erros. **Critério:** Build de produção com Vite funciona; app idêntico ao anterior.
+  - Dependências: 22.D.1
+  - Prioridade: 🟡 Média | Complexidade: 5
+
+* [ ] **Tarefa 22.D.3** *(Remover `react-scripts` e CRA)* — Remover `react-scripts` do `package.json`. Remover `react-app-env.d.ts` e `reportWebVitals.ts` legados. Atualizar scripts npm: `dev`, `build`, `preview`. **Critério:** `npm run dev` e `npm run build` funcionam exclusivamente via Vite.
+  - Dependências: 22.D.2
+  - Prioridade: 🟡 Média | Complexidade: 2
+
+* [ ] **Tarefa 22.D.4** *(Instalar Jotai e criar `state/atoms.ts`)* — Instalar `jotai` + `jotai/utils`. Criar `src/state/atoms.ts` com `inputAtomFamily`, `outputAtomFamily`, `calculationStatusAtom`. Criar `src/state/uiAtoms.ts` com `selectedFieldIdAtom`. Criar `src/state/scenarioAtoms.ts`. **Critério:** Atoms criados e testáveis com Vitest.
+  - Dependências: 22.D.3, 22.F.1
+  - Prioridade: 🟡 Média | Complexidade: 4
+
+* [ ] **Tarefa 22.D.5** *(Migrar state global de `App.tsx` para atoms Jotai)* — Mover os states de cenário ativo, status de cálculo, filtros ativos para atoms. Refatorar `App.tsx` para ser apenas orquestrador de rotas. **Critério:** `App.tsx` abaixo de 200 linhas; sem prop-drilling de estado de cálculo.
+  - Dependências: 22.D.4
+  - Prioridade: 🟡 Média | Complexidade: 6
+
+* [ ] **Tarefa 22.D.6** *(Migrar `SectorModules.tsx` para consumir atoms Jotai)* — Substituir props de estado por `useAtomValue` / `useSetAtom`. Envolver `SectorVariableRow` em `memo()`. Garantir que atualizar um campo não re-renderiza os outros. **Critério:** React DevTools Profiler mostra re-renders apenas no campo editado.
+  - Dependências: 22.D.5
+  - Prioridade: 🟡 Média | Complexidade: 5
+
+* [ ] **Tarefa 22.D.7** *(Instalar e integrar `@tanstack/react-table`)* — Instalar `@tanstack/react-table`. Migrar as tabelas de variáveis do `SectorModules.tsx` para `useReactTable`. Criar `ValueCell` memoizado (input/output/constant). **Critério:** Tabelas renderizam corretamente; edição de inputs funcional.
+  - Dependências: 22.D.6
+  - Prioridade: 🟢 Baixa | Complexidade: 5
+
+---
+
+#### Domínio E — Backend Tooling
+
+* [ ] **Tarefa 22.E.1** *(Criar `backend/pyproject.toml` com todas as dependências)* — Mapear `requirements.txt` atual para `pyproject.toml` com `[project.dependencies]`. Declarar `requires-python = ">=3.10"`. Adicionar `[tool.ruff]` e `[tool.mypy]`. Manter `requirements.txt` para compatibilidade Docker. **Critério:** `uv sync` instala todas as dependências corretamente.
+  - Dependências: 22.0.1
+  - Prioridade: 🟡 Média | Complexidade: 3
+
+* [ ] **Tarefa 22.E.2** *(Inicializar Alembic e criar migration inicial)* — Executar `alembic init backend/src/db/migrations`. Configurar `env.py` para conectar ao banco via `DATABASE_URL`. Criar migration `001_initial_schema.py` a partir do schema atual (`database.py`). Documentar fluxo de criação de novas migrations em `docs/ARCHITECTURE.md`. **Critério:** `alembic upgrade head` cria o schema completo em banco limpo.
+  - Dependências: 22.E.1, 22.0.1
+  - Prioridade: 🟡 Média | Complexidade: 6
+
+* [ ] **Tarefa 22.E.3** *(Gerar `uv.lock` e validar reproducibilidade)* — Executar `uv lock`. Commitar `uv.lock`. Testar em ambiente limpo (sem `.venv`) que `uv sync` restaura o ambiente idêntico. **Critério:** `uv sync && pytest backend/tests/` verde em ambiente limpo.
+  - Dependências: 22.E.1
+  - Prioridade: 🟡 Média | Complexidade: 2
+
+---
+
+#### Domínio F — Testes Frontend
+
+* [ ] **Tarefa 22.F.1** *(Instalar Vitest e criar `vitest.config.ts`)* — Instalar `vitest`, `@vitest/ui`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`. Criar `frontend/vitest.config.ts`. Criar teste smoke do App (renderiza sem crash). **Critério:** `npm run test:unit` passa com pelo menos 1 teste.
+  - Dependências: 22.D.1
+  - Prioridade: 🟡 Média | Complexidade: 3
+
+* [ ] **Tarefa 22.F.2** *(Criar testes smoke para componentes críticos)* — Testes de renderização sem crash para: `ScenarioManager`, `SectorModules`, `HarvestPlan`, `GoalSeekModal`. **Critério:** `npm run test:unit` com 4+ testes passando.
+  - Dependências: 22.F.1, 22.D.4
+  - Prioridade: 🟡 Média | Complexidade: 4
+
+* [ ] **Tarefa 22.F.3** *(Instalar Playwright e criar `playwright.config.ts`)* — Instalar `@playwright/test`. Criar `frontend/playwright.config.ts` apontando para `http://localhost:5173`. Criar `frontend/e2e/calculator.spec.ts` com fluxo: carrega app → seleciona cenário → edita input → clica Calcular → valida output. **Critério:** `npm run test:e2e` com teste E2E passando contra servidor Vite em execução.
+  - Dependências: 22.F.1, 22.D.3
+  - Prioridade: 🟢 Baixa | Complexidade: 5
+
+---
+
+#### Verificação Final (Definition of Done — Épico 22)
+
+* [ ] **Tarefa 22.Z.1** *(Checklist completo de verificação)* — Executar `python .agent/scripts/checklist.py .`. Validar manualmente todas as 7 funcionalidades protegidas. Verificar que `pytest backend/tests/` passa 100%. Verificar que `npm run test:unit` e `npm run test:e2e` passam. **Critério:** Checklist verde; PR criado para `main` com aprovação manual.
+  - Dependências: todas as tarefas 22.x
+  - Prioridade: 🔴 Alta | Complexidade: 3
+

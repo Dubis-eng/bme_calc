@@ -21,6 +21,10 @@ export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
   const [localValue, setLocalValue] = useState(() => getInputValue(variable));
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const equationsAndValues = variable['EQUAÇÕES E VALORES'];
+  const displayType = variable.tipo_exibicao;
+  const percentBase = variable.percent_base;
+
   // Keep local value in sync with external updates (e.g., calculations or loading scenarios)
   useEffect(() => {
     // Only overwrite localValue if this input is not currently focused,
@@ -28,7 +32,7 @@ export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
     if (document.activeElement !== inputRef.current) {
       setLocalValue(getInputValue(variable));
     }
-  }, [variable['EQUAÇÕES E VALORES'], variable.tipo_exibicao, variable.percent_base]);
+  }, [variable, equationsAndValues, displayType, percentBase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;

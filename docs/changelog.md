@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.2] - 2026-07-16
+
+### Fixed
+- **Correção de Warnings de Hooks React e Dependências ESLint**:
+  - Resolução de advertências `react-hooks/exhaustive-deps` em `FormattedVariableInput.tsx` extraindo propriedades complexas de variáveis e incluindo a variável como dependência do useEffect.
+  - Resolução de advertências de dependências de hooks em `useHarvestPlanState.ts` e `useScenario.ts` utilizando `useCallback` para estabilizar referências de funções locais.
+  - Correção de erro de compilação TypeScript (`TS2448: Block-scoped variable 'onLoadScenario' used before its declaration`) em `useScenario.ts` reordenando a declaração das funções locais `triggerCalculate` e `onLoadScenario` para ficarem antes do hook `useEffect` que as consome.
+  - Remoção do import não utilizado `formatHarvestYear` de `useScenario.ts` resolvendo o warning `@typescript-eslint/no-unused-vars`.
+
 ## [2.16.1] - 2026-07-07
 
 ### Fixed

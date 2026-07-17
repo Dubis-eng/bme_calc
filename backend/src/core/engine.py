@@ -3,7 +3,7 @@ import ast
 import networkx as nx
 from decimal import Decimal, getcontext
 from iapws import IAPWS97
-from evaluator import FormulaEvaluator, ok_res, err_res, to_decimal
+from src.core.evaluator import FormulaEvaluator, ok_res, err_res, to_decimal
 
 # Set precision to 28 digits (default)
 getcontext().prec = 28

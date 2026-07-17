@@ -2,7 +2,7 @@ import uuid
 import datetime
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
-from database import ScenarioStatus
+from src.db.database import ScenarioStatus
 
 class CalculateRequest(BaseModel):
     variables: List[Dict[str, Any]]

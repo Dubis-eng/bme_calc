@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Any
 from sqlmodel import select, Session
-from database import Stage, ControlPoint, Variable
+from src.db.database import Stage, ControlPoint, Variable
 
 def reorder_stages(sector_id: str, stage_ids: List[Any], db: Session) -> bool:
     stages = db.exec(select(Stage).where(Stage.sector_id == sector_id)).all()

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ConsolidatedItem } from '../components/HarvestPlanTable';
 import { VariableConfig } from '../components/HarvestPlanConfigTable';
@@ -25,7 +25,7 @@ export function useHarvestPlanState() {
   const [newDividerLabel, setNewDividerLabel] = useState('');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
-  const fetchSelections = () => {
+  const fetchSelections = useCallback(() => {
     if (!selectedYear) return;
     const yearNum = parseInt(selectedYear.split('/')[0], 10);
     axios.get(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`)
@@ -33,7 +33,7 @@ export function useHarvestPlanState() {
         setSelections(res.data.selections || []);
         setAvailableScenarios(res.data.available_scenarios || {});
       }).catch(err => console.error('Erro ao carregar seleções de cenários:', err));
-  };
+  }, [selectedYear]);
 
   const handleSelectScenario = (month: string, scenarioId: string | null, exclude: boolean) => {
     if (!selectedYear) return;
@@ -49,7 +49,7 @@ export function useHarvestPlanState() {
       }).finally(() => setLoading(false));
   };
 
-  const fetchSettingsAndYears = () => {
+  const fetchSettingsAndYears = useCallback(() => {
     setLoading(true);
     axios.get('http://localhost:8000/api/settings/cycle')
       .then(settingsRes => {
@@ -61,15 +61,15 @@ export function useHarvestPlanState() {
         setYears(yearStrings);
         if (yearStrings.length > 0) setSelectedYear(yearStrings[0]);
       }).catch(err => console.error('Erro ao carregar anos/configurações:', err)).finally(() => setLoading(false));
-  };
+  }, []);
 
-  const fetchConfigs = () => {
+  const fetchConfigs = useCallback(() => {
     axios.get('http://localhost:8000/api/harvest-plan/config')
       .then(res => setVariablesConfig(res.data))
       .catch(err => console.error('Erro ao carregar configurações de variáveis:', err));
-  };
+  }, []);
 
-  const fetchConsolidation = async () => {
+  const fetchConsolidation = useCallback(async () => {
     if (!selectedYear) return;
     try {
       setLoading(true);
@@ -81,19 +81,19 @@ export function useHarvestPlanState() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedYear]);
 
   useEffect(() => {
     fetchSettingsAndYears();
     fetchConfigs();
-  }, []);
+  }, [fetchSettingsAndYears, fetchConfigs]);
 
   useEffect(() => {
     if (selectedYear) {
       fetchConsolidation();
       fetchSelections();
     }
-  }, [selectedYear]);
+  }, [selectedYear, fetchConsolidation, fetchSelections]);
 
   const handleStartMonthChange = (val: string) => {
     setLoading(true);

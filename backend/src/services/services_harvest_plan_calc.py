@@ -1,14 +1,14 @@
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
-from database import (
+from src.db.database import (
     Variable, Equation, Dependency, Scenario, Result, HarvestPlanSetting,
     ScenarioStatus, VariableType, ResultStatus, VariableStatus
 )
-import engine
+from src.core import engine
 
 def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict[str, Any]:
-    from database import parse_year, HarvestPlanSelection
-    from services_harvest_plan import get_harvest_plan_settings, get_ordered_months, get_harvest_plan_structure
+    from src.db.database import parse_year, HarvestPlanSelection
+    from src.services.services_harvest_plan import get_harvest_plan_settings, get_ordered_months, get_harvest_plan_structure
     
     year_harvest_int = parse_year(year_harvest) if isinstance(year_harvest, str) else int(year_harvest)
         

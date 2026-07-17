@@ -5,12 +5,12 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-import engine
-import goalseek
-import exports
-from database import create_db_and_tables, get_session, Scenario, ScenarioStatus, HarvestYear, HarvestMonth, parse_year
-import services
-from schemas import (
+from src.core import engine
+from src.core import goalseek
+from src.services import exports
+from src.db.database import create_db_and_tables, get_session, Scenario, ScenarioStatus, HarvestYear, HarvestMonth, parse_year
+from src.services import services
+from src.schemas.schemas import (
     CalculateRequest,
     CalculateResponse,
     ScenarioCreate,
@@ -50,19 +50,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from router_variables import router as variables_router
+from src.api.router_variables import router as variables_router
 app.include_router(variables_router)
 
-from router_settings import router as settings_router
+from src.api.router_settings import router as settings_router
 app.include_router(settings_router)
 
-from router_harvest_plan import router as harvest_plan_router
+from src.api.router_harvest_plan import router as harvest_plan_router
 app.include_router(harvest_plan_router)
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
-    import seeding
+    from src.db import seeding
     seeding.seed_initial_data()
 
 # Calculation Endpoint

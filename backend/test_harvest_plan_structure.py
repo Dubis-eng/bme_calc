@@ -6,8 +6,8 @@ else:
 
 import pytest
 from fastapi.testclient import TestClient
-import main
-from database import create_db_and_tables, engine, Variable, VariableStatus
+from src import main
+from src.db.database import create_db_and_tables, engine, Variable, VariableStatus
 from sqlmodel import SQLModel, select
 
 client = TestClient(main.app)

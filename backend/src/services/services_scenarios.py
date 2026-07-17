@@ -2,12 +2,12 @@ import uuid
 import datetime
 from typing import List, Dict, Any
 from sqlmodel import select, Session
-from database import (
+from src.db.database import (
     Scenario, Variable, Equation, Dependency, Result, Sector, Stage, ControlPoint,
     ScenarioStatus, VariableType, VariableStatus, ResultStatus
 )
-from schemas import ScenarioDetail
-import engine
+from src.schemas.schemas import ScenarioDetail
+from src.core import engine
 
 def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str, Any]]:
     results = db.exec(select(Result).where(Result.scenario_id == scenario_id)).all()
@@ -202,8 +202,8 @@ def _upsert_result(var_id: str, scenario_id: uuid.UUID, eq_val: Any, var_calc: D
     db.add(db_res)
 
 def create_new_scenario(req, db: Session) -> ScenarioDetail:
-    from database import parse_year
-    from services_harvest_plan import get_harvest_plan_settings
+    from src.db.database import parse_year
+    from src.services.services_harvest_plan import get_harvest_plan_settings
     year_harvest_int = parse_year(req.year_harvest)
     stmt = select(Scenario.version).where(
         Scenario.year_harvest == year_harvest_int,
@@ -254,7 +254,7 @@ def update_existing_scenario(scenario_id: uuid.UUID, req, db: Session) -> Scenar
         raise ValueError("Cenário bloqueado para edições")
     db_scenario.updated_at = datetime.datetime.utcnow()
     
-    from services_harvest_plan import get_harvest_plan_settings
+    from src.services.services_harvest_plan import get_harvest_plan_settings
     setting = get_harvest_plan_settings(db)
     db_scenario.cycle_start_month = setting.start_month
     
