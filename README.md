@@ -30,7 +30,7 @@ Navegue para a pasta `backend`, ative o ambiente virtual e instale as dependênc
 cd backend
 .venv\Scripts\activate
 pip install -r requirements.txt
-python -m uvicorn main:app --reload --port 8000
+python -m uvicorn src.main:app --reload --port 8000
 ```
 
 #### 2. Frontend
@@ -48,7 +48,7 @@ npm start
 ### Executar Testes Unitários e de Integração
 Navegue para a pasta `backend` com o ambiente virtual ativo e execute:
 ```bash
-python -m pytest test_engine.py test_scenarios.py -v
+python -m pytest -v
 ```
 
 ### Executar Verificação e Auditoria de Qualidade

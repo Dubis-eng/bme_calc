@@ -4,7 +4,7 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.0.8 — Atualizar README.md e docs/ARCHITECTURE.md
+current_task: 22.A.1 — Criar docs/DESIGN.md com tokens do sistema
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
@@ -12,11 +12,11 @@ current_task: 22.0.8 — Atualizar README.md e docs/ARCHITECTURE.md
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
 - **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2207 (Atualizar README.md e docs/ARCHITECTURE.md)
+- **Próxima tarefa:** TASK-2212 (Criar docs/DESIGN.md com sistema de design documentado)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.7 (Atualizar Docker e CI para nova estrutura)
-- Branch: `task/22.0.7-docker-config-update`
+- Épico 22 — Tarefa 22.0.8 (Atualizar README.md e docs/ARCHITECTURE.md)
+- Branch: `task/22.0.8-docs-update`
 
 ## 📋 Progresso do Épico 22
 
@@ -27,12 +27,12 @@ current_task: 22.0.8 — Atualizar README.md e docs/ARCHITECTURE.md
 - [x] TASK-2204 Frontend: criar pastas `state/`, `api/`, `hooks/`, `styles/`
 - [x] TASK-2205 Atualizar todos os imports após movimentação
 - [x] TASK-2206 Atualizar docker-compose.yml e Dockerfile para nova estrutura
-- [/] TASK-2207 Atualizar README.md e docs/ARCHITECTURE.md
+- [x] TASK-2207 Atualizar README.md e docs/ARCHITECTURE.md
 
 ### Domínio A — Design System
 - [ ] TASK-2210 Atualizar `index.css` com paleta Studio Dark + tabular numbers
 - [ ] TASK-2211 Atualizar `tailwind.config.js` com tokens HSL
-- [ ] TASK-2212 Criar `docs/DESIGN.md` com sistema de design documentado
+- [/] TASK-2212 Criar `docs/DESIGN.md` com sistema de design documentado
 - [ ] TASK-2213 Aplicar `studio-surface`, `glow-primary`, row highlight nos componentes
 - [ ] TASK-2214 Diferenciar visualmente INPUT/OUTPUT/CONSTANT
 

@@ -412,7 +412,7 @@ graph TD
   - Dependências: 22.0.1, 22.0.4
   - Prioridade: 🔴 Alta | Complexidade: 3
 
-* [/] **Tarefa 22.0.8** *(Atualizar README.md e docs/ARCHITECTURE.md)* — Reescrever seção "Mapa de Diretórios" do `docs/ARCHITECTURE.md` com a nova estrutura. Atualizar `README.md` do projeto com novos caminhos de execução e setup. **Critério:** Estrutura documentada reflete o sistema de arquivos real.
+* [x] **Tarefa 22.0.8** *(Atualizar README.md e docs/ARCHITECTURE.md)* — Reescrever seção "Mapa de Diretórios" do `docs/ARCHITECTURE.md` com a nova estrutura. Atualizar `README.md` do projeto com novos caminhos de execução e setup. **Critério:** Estrutura documentada reflete o sistema de arquivos real.
   - Dependências: 22.0.7
   - Prioridade: 🟡 Média | Complexidade: 2
 
@@ -420,7 +420,7 @@ graph TD
 
 #### Domínio A — Design System Studio Dark
 
-* [ ] **Tarefa 22.A.1** *(Criar `docs/DESIGN.md` com tokens do sistema)* — Documentar paleta de cores (HSL tokens), tipografia (Inter Variable + JetBrains Mono), elevações, estados de campo (INPUT/OUTPUT/CONSTANT) e utilitários CSS. Este documento é a fonte de verdade do design. **Critério:** Documento criado e referenciado no README.
+* [/] **Tarefa 22.A.1** *(Criar `docs/DESIGN.md` com tokens do sistema)* — Documentar paleta de cores (HSL tokens), tipografia (Inter Variable + JetBrains Mono), elevações, estados de campo (INPUT/OUTPUT/CONSTANT) e utilitários CSS. Este documento é a fonte de verdade do design. **Critério:** Documento criado e referenciado no README.
   - Dependências: 22.0.6
   - Prioridade: 🟡 Média | Complexidade: 2
 
