@@ -7,7 +7,7 @@
         "DESCRIÇÃO": "Fibra - Agrícola",
         "TIPO": "INPUT",
         "UNIDADE DE MEDIDA": "%",
-        "EQUAÇÕES E VALORES": "0.1302",
+        "EQUAÇÕES E VALORES": "0.132",
         "STATUS": "ativa",
         "IN_HARVEST_PLAN": false,
         "HARVEST_PLAN_OP": null,
@@ -395,7 +395,7 @@
         "ID - REF": "J1026",
         "SETOR": "DESTILAÇÃO",
         "ETAPA": "APARELHO ANIDRO",
-        "PONTO DE CONTROLE": "",
+        "PONTO DE CONTROLE": "GERAL",
         "DESCRIÇÃO": "RESULTADOS",
         "TIPO": "INPUT",
         "UNIDADE DE MEDIDA": "0",
@@ -2998,7 +2998,7 @@
     {
         "ID - REF": "J159",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Dias do período",
         "TIPO": "OUTPUT",
@@ -3026,7 +3026,7 @@
     {
         "ID - REF": "J160",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Dias efetivos",
         "TIPO": "OUTPUT",
@@ -3040,7 +3040,7 @@
     {
         "ID - REF": "J161",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Tempo de Aproveitamento",
         "TIPO": "OUTPUT",
@@ -3054,7 +3054,7 @@
     {
         "ID - REF": "J162",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Aproveitamento Op. Industrial",
         "TIPO": "OUTPUT",
@@ -3068,7 +3068,7 @@
     {
         "ID - REF": "J163",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Aproveitamento Op. Agrícola",
         "TIPO": "OUTPUT",
@@ -3082,7 +3082,7 @@
     {
         "ID - REF": "J164",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Aproveitamento Climático",
         "TIPO": "OUTPUT",
@@ -3096,7 +3096,7 @@
     {
         "ID - REF": "J165",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "TAG",
         "TIPO": "OUTPUT",
@@ -3110,7 +3110,7 @@
     {
         "ID - REF": "J166",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Cana Própria",
         "TIPO": "OUTPUT",
@@ -3124,7 +3124,7 @@
     {
         "ID - REF": "J167",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Cana Fornecedor",
         "TIPO": "OUTPUT",
@@ -3138,7 +3138,7 @@
     {
         "ID - REF": "J168",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Moagem mensal",
         "TIPO": "OUTPUT",
@@ -3152,7 +3152,7 @@
     {
         "ID - REF": "J169",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Moagem horaria - Efetiva",
         "TIPO": "OUTPUT",
@@ -3180,7 +3180,7 @@
     {
         "ID - REF": "J170",
         "SETOR": "PLANEJAMENTO",
-        "ETAPA": "PLANO SAFRA",
+        "ETAPA": "AGRÍCOLA",
         "PONTO DE CONTROLE": "EXECUÇÃO",
         "DESCRIÇÃO": "Moagem diária",
         "TIPO": "OUTPUT",
@@ -3741,7 +3741,7 @@
         "ID - REF": "J210",
         "SETOR": "INFO GERAIS",
         "ETAPA": "PLANO SAFRA",
-        "PONTO DE CONTROLE": "",
+        "PONTO DE CONTROLE": "GERAL",
         "DESCRIÇÃO": "Açúcar 100%",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "sc/mês",
@@ -3755,7 +3755,7 @@
         "ID - REF": "J211",
         "SETOR": "INFO GERAIS",
         "ETAPA": "PLANO SAFRA",
-        "PONTO DE CONTROLE": "",
+        "PONTO DE CONTROLE": "GERAL",
         "DESCRIÇÃO": "Etanol 100%",
         "TIPO": "OUTPUT",
         "UNIDADE DE MEDIDA": "m3/mês",

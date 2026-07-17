@@ -9,22 +9,40 @@ Este documento detalha o blueprint de arquitetura técnica, fluxo de dados e dec
 bme_calc/
 ├── .agent/               # Toolkit de automação do Antigravity Kit
 ├── backend/              # Aplicação de API Backend (FastAPI + Python)
-│   ├── database.py       # Conexão SQLModel e esquema da tabela scenarios
-│   ├── engine.py         # Interpretador de fórmulas AST e solucionador de ciclos
-│   ├── goalseek.py       # Solver scipy.optimize.root_scalar para busca de metas
-│   ├── router_settings.py # Rotas de configurações unificadas sob /api/settings
-│   ├── services_*.py     # Serviços de negócios (cenários, safra, reordenação)
-│   ├── main.py           # Endpoints principais da API FastAPI
-│   └── test_*.py         # Testes de integração e motores matemáticos
+│   ├── data/             # Sementes e planilhas de referência (.json, .xlsx)
+│   ├── legacy/           # Códigos legados e migrações obsoletas
+│   ├── src/              # Código fonte principal do Backend
+│   │   ├── api/          # Rotas e controladores da API FastAPI
+│   │   ├── core/         # Motores matemáticos, solvers AST e Goals Seek
+│   │   ├── db/           # Conexão de banco, modelos e seeding
+│   │   ├── schemas/      # Modelos de validação Pydantic
+│   │   ├── services/     # Regras de negócios (safra, pdf, reordenação)
+│   │   └── main.py       # Ponto de entrada FastAPI
+│   ├── scripts/          # Utilitários de linha de comando e conversores
+│   ├── tests/            # Suíte de testes automatizados pytest
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── docs/                 # Documentação técnica e governança do projeto
-│   ├── features/         # Histórico de entregas (task-master.md)
+│   ├── features/         # Especificações de entregas (task-master.md)
 │   └── ARCHITECTURE.md   # Este arquivo
 ├── frontend/             # Aplicação Frontend (React + TypeScript)
-│   ├── public/           # Memorial de cálculo inicial (.json) e estáticos
 │   └── src/
-│       ├── components/   # Componentes modulares (ScenarioManager, GoalSeekModal)
-│       ├── utils/        # Helpers e conversores utilitários
-│       └── App.tsx       # Componente principal e controle de estado reativo
+│       ├── components/   # Componentes modulares organizados por subpastas de domínio
+│       │   ├── calculator/ # Visualizações da calculadora principal
+│       │   ├── goalseek/   # Modal de busca de metas
+│       │   ├── harvest-plan/ # Tabelas do plano de safra
+│       │   ├── layout/     # Estrutura base da página (Header, Sidebar, RightPanel)
+│       │   ├── scenario/   # Gerenciamento de cenários
+│       │   ├── search/     # Painel de pesquisa de variáveis
+│       │   ├── sectors/    # Exibição e ordenação de setores
+│       │   ├── settings/   # Configurações do sistema
+│       │   ├── ui/         # Componentes reutilizáveis básicos (Input)
+│       │   └── variables/  # Modal de edição de variáveis e fórmulas
+│       ├── hooks/        # Custom hooks de estado e busca de dados
+│       ├── pages/        # Telas/páginas principais do app
+│       ├── state/        # Gerenciamento de estado global (Jotai/Atoms)
+│       ├── styles/       # Temas e arquivos CSS
+│       └── utils/        # Conversores e helpers genéricos
 └── docker-compose.yml    # Orquestração local (Postgres, Backend, Frontend)
 ```
 

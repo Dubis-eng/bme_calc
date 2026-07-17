@@ -27,7 +27,9 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Épico 18: Ordenação em Cascata de Variáveis** — Ordenação em três níveis com drag-and-drop e botões (WCAG).
 * **[DONE] Épico 19: Unificação de Configurações e Sincronização de Ciclo** — Unificação de endpoints de configurações no backend, transação/idempotência de reordenamento de meses, e aviso visual com botão de recálculo manual para cenários com ciclo desatualizado.
 * **[DONE] Épico 20: Correção de Digitação de Percentuais e Decimais** — Componente `FormattedVariableInput` para digitação fluida de decimais (ponto/vírgula) e normalização entre frontend e backend para todas as variáveis percentuais e numéricas.
-* **[TODO] [feat-021-harvest-plan-sorting.md](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/features/feat-021-harvest-plan-sorting.md)** — Ordenação Personalizada e Divisores no Plano de Safra.
+* **[DONE] [feat-021-harvest-plan-sorting.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-021-harvest-plan-sorting.md)** — Ordenação Personalizada e Divisores no Plano de Safra.
+* **[ONGOING] [feat-022-architecture-modernization.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-022-architecture-modernization.md)** — Modernização Arquitetural, Reestruturação de Diretórios e Design System Studio Dark. Branch: `feature/architecture-improvements`.
+
 
 
 ---
