@@ -496,7 +496,7 @@ graph TD
   - Dependências: 22.D.5
   - Prioridade: 🟡 Média | Complexidade: 5
 
-* [ ] **Tarefa 22.D.7** *(Instalar e integrar `@tanstack/react-table`)* — Instalar `@tanstack/react-table`. Migrar as tabelas de variáveis do `SectorModules.tsx` para `useReactTable`. Criar `ValueCell` memoizado (input/output/constant). **Critério:** Tabelas renderizam corretamente; edição de inputs funcional.
+* [x] **Tarefa 22.D.7** *(Instalar e integrar `@tanstack/react-table`)* — Instalar `@tanstack/react-table`. Migrar as tabelas de variáveis do `SectorModules.tsx` para `useReactTable`. Criar `ValueCell` memoizado (input/output/constant). **Critério:** Tabelas renderizam corretamente; edição de inputs funcional.
   - Dependências: 22.D.6
   - Prioridade: 🟢 Baixa | Complexidade: 5
 

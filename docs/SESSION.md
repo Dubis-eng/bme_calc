@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.D.7 — Instalar e integrar @tanstack/react-table
+current_task: 22.E.1 — Criar backend/pyproject.toml com todas as dependências
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Jotai State Migration Concluída → Executando TanStack Table
-- **Próxima tarefa:** TASK-2260 (Instalar @tanstack/react-table)
+- **Fase:** Domínio D (Frontend Stack) Concluído → Executando Domínio E (Backend Tooling)
+- **Próxima tarefa:** TASK-2270 (Criar pyproject.toml + migrar dependências de requirements.txt)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio D (Jotai State Migration)
-- Branch: `task/22.D.5-migrate-app-atoms`
+- Épico 22 — Domínio D (TanStack Table Integration)
+- Branch: `task/22.D.7-tanstack-table`
 
 ## 📋 Progresso do Épico 22
 
@@ -53,8 +53,8 @@ current_task: 22.D.7 — Instalar e integrar @tanstack/react-table
 - [x] TASK-2250 Instalar Jotai, criar `state/atoms.ts` com `atomFamily`
 - [x] TASK-2251 Migrar state global do App.tsx para atoms
 - [x] TASK-2252 Migrar SectorModules para consumir atoms
-- [ ] TASK-2260 Instalar `@tanstack/react-table`
-- [ ] TASK-2261 Migrar tabelas de variáveis para TanStack Table com memo()
+- [x] TASK-2260 Instalar `@tanstack/react-table`
+- [x] TASK-2261 Migrar tabelas de variáveis para TanStack Table com memo()
 
 ### Domínio E — Backend Tooling
 - [ ] TASK-2270 Criar `pyproject.toml` + migrar dependências de `requirements.txt`
