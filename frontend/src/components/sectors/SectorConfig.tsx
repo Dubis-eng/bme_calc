@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Sector } from '../../types';
-import { BmeIcon } from '../../theme/design-system';
+import { BmeIcon } from '../../styles/design-system';
 
 interface SectorConfigProps {
   sectors: Sector[];

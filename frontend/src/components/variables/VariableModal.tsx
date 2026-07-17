@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Variable } from '../../types';
-import { useEquationAutocomplete } from '../../utils/useEquationAutocomplete';
+import { useEquationAutocomplete } from '../../hooks/useEquationAutocomplete';
 import { EquationDropdown } from './EquationDropdown';
 import { FormulaEditor } from './FormulaEditor';
 import { SubstitutionModal } from './SubstitutionModal';

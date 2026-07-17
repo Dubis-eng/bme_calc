@@ -3,7 +3,7 @@ import { Variable } from '../../types';
 
 interface DropdownProps {
   isOpen: boolean;
-  results: import('../../utils/useEquationAutocomplete').AutocompleteResult[];
+  results: import('../../hooks/useEquationAutocomplete').AutocompleteResult[];
   selectedIndex: number;
   token: string;
   onSelect: (variable: Variable) => void;

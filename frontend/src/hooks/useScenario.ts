@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Variable, Sector, BackendVariable } from '../types';
 import { ScenarioMetadata } from '../components/scenario/ScenarioManager';
-import { parseHarvestYear, mapBackendVariableToFrontend } from './helpers';
+import { parseHarvestYear, mapBackendVariableToFrontend } from '../utils/helpers';
 
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [variables, setVariables] = useState<Variable[]>([]);

@@ -404,11 +404,11 @@ graph TD
   - Dependências: —
   - Prioridade: 🔴 Alta | Complexidade: 7
 
-* [/] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
+* [x] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
   - Dependências: 22.0.5
   - Prioridade: 🔴 Alta | Complexidade: 5
 
-* [ ] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
+* [/] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
   - Dependências: 22.0.1, 22.0.4
   - Prioridade: 🔴 Alta | Complexidade: 3
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Variable } from '../../types';
-import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../theme/design-system';
+import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../styles/design-system';
 import { formatVariableValue } from '../../utils/helpers';
 import { FormattedVariableInput } from '../ui/Input';
 

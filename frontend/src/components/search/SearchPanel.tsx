@@ -1,6 +1,6 @@
 import React from 'react';
-import { SearchResult, SearchMatch } from '../../utils/useVariableSearch';
-import { BmeIcon } from '../../theme/design-system';
+import { SearchResult, SearchMatch } from '../../hooks/useVariableSearch';
+import { BmeIcon } from '../../styles/design-system';
 
 interface SearchPanelProps {
   isOpen: boolean;

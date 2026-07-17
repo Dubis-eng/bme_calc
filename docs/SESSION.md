@@ -4,7 +4,7 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.0.6 — Frontend: criar pastas state/, api/, hooks/, styles/
+current_task: 22.0.7 — Atualizar Docker e CI para nova estrutura
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
@@ -12,11 +12,11 @@ current_task: 22.0.6 — Frontend: criar pastas state/, api/, hooks/, styles/
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
 - **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2204 (Frontend: criar pastas state/, api/, hooks/, styles/)
+- **Próxima tarefa:** TASK-2206 (Atualizar docker-compose.yml e Dockerfile para nova estrutura)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.5 (Frontend: criar subpastas de componentes por domínio)
-- Branch: `task/22.0.5-frontend-components-restructuring`
+- Épico 22 — Tarefa 22.0.6 (Frontend: criar pastas state/, api/, hooks/, styles/, pages/)
+- Branch: `task/22.0.6-frontend-folders-creation`
 
 ## 📋 Progresso do Épico 22
 
@@ -24,9 +24,9 @@ current_task: 22.0.6 — Frontend: criar pastas state/, api/, hooks/, styles/
 - [x] TASK-2201 Backend: criar estrutura `src/`, mover arquivos por categoria
 - [x] TASK-2202 Backend: mover testes para `tests/`, scripts para `scripts/`, dados para `data/`
 - [x] TASK-2203 Frontend: criar subpastas de componentes por domínio
-- [/] TASK-2204 Frontend: criar pastas `state/`, `api/`, `hooks/`, `styles/`
-- [ ] TASK-2205 Atualizar todos os imports após movimentação
-- [ ] TASK-2206 Atualizar docker-compose.yml e Dockerfile para nova estrutura
+- [x] TASK-2204 Frontend: criar pastas `state/`, `api/`, `hooks/`, `styles/`
+- [x] TASK-2205 Atualizar todos os imports após movimentação
+- [/] TASK-2206 Atualizar docker-compose.yml e Dockerfile para nova estrutura
 
 ### Domínio A — Design System
 - [ ] TASK-2210 Atualizar `index.css` com paleta Studio Dark + tabular numbers

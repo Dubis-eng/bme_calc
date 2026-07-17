@@ -1,6 +1,6 @@
 import React from 'react';
 import { Variable } from '../../types';
-import { BmeIcon } from '../../theme/design-system';
+import { BmeIcon } from '../../styles/design-system';
 
 interface SectorAuditCardProps {
   auditVarId: string | null;

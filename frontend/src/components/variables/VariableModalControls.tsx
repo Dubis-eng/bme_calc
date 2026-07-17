@@ -1,5 +1,5 @@
 import React from 'react';
-import { BmeIcon } from '../../theme/design-system';
+import { BmeIcon } from '../../styles/design-system';
 
 interface VariableModalHeaderProps {
   isEdit: boolean;

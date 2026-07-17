@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Variable, FilterStatus } from '../../types';
-import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../theme/design-system';
+import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../styles/design-system';
 import { SectorFilterBar } from './SectorFilterBar';
 import { SectorFormulaPopover } from './SectorFormulaPopover';
 import { SectorAuditCard } from './SectorAuditCard';

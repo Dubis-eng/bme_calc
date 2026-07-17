@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { formatHarvestYear } from '../../utils/helpers';
-import { BmeIcon } from '../../theme/design-system';
+import { BmeIcon } from '../../styles/design-system';
 
 interface SystemSettingsModalProps {
   isOpen: boolean;

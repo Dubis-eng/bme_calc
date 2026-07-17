@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sector } from '../../types';
-import { BmeIcon } from '../../theme/design-system';
+import { BmeIcon } from '../../styles/design-system';
 import { HarvestPlanTable } from './HarvestPlanTable';
 import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
 import { useHarvestPlanState } from '../../hooks/useHarvestPlanState';

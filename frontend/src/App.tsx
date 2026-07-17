@@ -12,9 +12,9 @@ import { HarvestPlan } from './components/harvest-plan/HarvestPlan';
 import { SystemSettingsModal } from './components/settings/SystemSettingsModal';
 import { StatusDashboard } from './components/calculator/StatusDashboard';
 import { FlowchartPlaceholder } from './components/calculator/FlowchartPlaceholder';
-import { useVariableSearch } from './utils/useVariableSearch';
-import { useSearch } from './utils/useSearch';
-import { useScenario } from './utils/useScenario';
+import { useVariableSearch } from './hooks/useVariableSearch';
+import { useSearch } from './hooks/useSearch';
+import { useScenario } from './hooks/useScenario';
 import { getFriendlySectorName } from './utils/helpers';
 
 type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';

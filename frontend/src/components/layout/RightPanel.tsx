@@ -3,7 +3,7 @@ import { Variable, Sector } from '../../types';
 import { ScenarioManager, ScenarioMetadata } from '../scenario/ScenarioManager';
 import { ScenarioPremises } from '../scenario/ScenarioPremises';
 import { SectorConfig } from '../sectors/SectorConfig';
-import { SCENARIO_STATUS_BADGE } from '../../theme/design-system';
+import { SCENARIO_STATUS_BADGE } from '../../styles/design-system';
 
 
 interface RightPanelProps {
