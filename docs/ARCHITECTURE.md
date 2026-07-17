@@ -79,3 +79,15 @@ Persiste os dados de maneira estruturada e relacional através do PostgreSQL nor
 * **Ordenação de Meses Dinâmica**: Reordena a exibição e os cálculos de forma lógica e sequencial a partir do mês de início do ciclo configurado na tabela `harvest_plan_settings`.
 * **Estrutura Ordenada e Divisores**: Suporte a ordenação arbitrária por drag-and-drop e a inserção de divisores de agrupamento. A estrutura e ordem de exibição são persistidas na tabela `harvest_plan_ordered_items`.
 * **Exportação de Relatórios**: Geração de PDFs estruturados em formato paisagem (ReportLab) e planilhas Excel (OpenPyXL) que replicam fielmente a ordenação e os divisores destacados.
+
+### 6. Sistema de Migrações de Banco de Dados (Alembic)
+As migrações do banco de dados são gerenciadas através do Alembic:
+* **Configuração Dinâmica**: A conexão é injetada em tempo de execução a partir de `DATABASE_URL` em `backend/src/db/database.py`, permitindo usar o mesmo arquivo de configuração localmente (PostgreSQL ou SQLite) e no Docker.
+* **Autogeração de Migrações**: Para criar uma nova migração a partir das alterações nos modelos do SQLModel em `database.py`, execute:
+  ```bash
+  uv run alembic revision --autogenerate -m "Descrição da mudança"
+  ```
+* **Aplicação de Migrações**: Para atualizar o banco de dados para a última versão:
+  ```bash
+  uv run alembic upgrade head
+  ```

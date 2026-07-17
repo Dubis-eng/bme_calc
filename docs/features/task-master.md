@@ -504,15 +504,15 @@ graph TD
 
 #### Domínio E — Backend Tooling
 
-* [ ] **Tarefa 22.E.1** *(Criar `backend/pyproject.toml` com todas as dependências)* — Mapear `requirements.txt` atual para `pyproject.toml` com `[project.dependencies]`. Declarar `requires-python = ">=3.10"`. Adicionar `[tool.ruff]` e `[tool.mypy]`. Manter `requirements.txt` para compatibilidade Docker. **Critério:** `uv sync` instala todas as dependências corretamente.
+* [x] **Tarefa 22.E.1** *(Criar `backend/pyproject.toml` com todas as dependências)* — Mapear `requirements.txt` atual para `pyproject.toml` com `[project.dependencies]`. Declarar `requires-python = ">=3.10"`. Adicionar `[tool.ruff]` e `[tool.mypy]`. Manter `requirements.txt` para compatibilidade Docker. **Critério:** `uv sync` instala todas as dependências corretamente.
   - Dependências: 22.0.1
   - Prioridade: 🟡 Média | Complexidade: 3
 
-* [ ] **Tarefa 22.E.2** *(Inicializar Alembic e criar migration inicial)* — Executar `alembic init backend/src/db/migrations`. Configurar `env.py` para conectar ao banco via `DATABASE_URL`. Criar migration `001_initial_schema.py` a partir do schema atual (`database.py`). Documentar fluxo de criação de novas migrations em `docs/ARCHITECTURE.md`. **Critério:** `alembic upgrade head` cria o schema completo em banco limpo.
+* [x] **Tarefa 22.E.2** *(Inicializar Alembic e criar migration inicial)* — Executar `alembic init backend/src/db/migrations`. Configurar `env.py` para conectar ao banco via `DATABASE_URL`. Criar migration `001_initial_schema.py` a partir do schema atual (`database.py`). Documentar fluxo de criação de novas migrations em `docs/ARCHITECTURE.md`. **Critério:** `alembic upgrade head` cria o schema completo em banco limpo.
   - Dependências: 22.E.1, 22.0.1
   - Prioridade: 🟡 Média | Complexidade: 6
 
-* [ ] **Tarefa 22.E.3** *(Gerar `uv.lock` e validar reproducibilidade)* — Executar `uv lock`. Commitar `uv.lock`. Testar em ambiente limpo (sem `.venv`) que `uv sync` restaura o ambiente idêntico. **Critério:** `uv sync && pytest backend/tests/` verde em ambiente limpo.
+* [x] **Tarefa 22.E.3** *(Gerar `uv.lock` e validar reproducibilidade)* — Executar `uv lock`. Commitar `uv.lock`. Testar em ambiente limpo (sem `.venv`) que `uv sync` restaura o ambiente idêntico. **Critério:** `uv sync && pytest backend/tests/` verde em ambiente limpo.
   - Dependências: 22.E.1
   - Prioridade: 🟡 Média | Complexidade: 2
 

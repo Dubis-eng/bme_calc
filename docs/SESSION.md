@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.E.1 — Criar backend/pyproject.toml com todas as dependências
+current_task: 22.F.1 — Instalar Vitest + @testing-library/react, criar vitest.config.ts
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Domínio D (Frontend Stack) Concluído → Executando Domínio E (Backend Tooling)
-- **Próxima tarefa:** TASK-2270 (Criar pyproject.toml + migrar dependências de requirements.txt)
+- **Fase:** Domínio E (Backend Tooling) Concluído → Executando Domínio F (Testes Frontend)
+- **Próxima tarefa:** TASK-2280 (Instalar Vitest + @testing-library/react, criar vitest.config.ts)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio D (TanStack Table Integration)
-- Branch: `task/22.D.7-tanstack-table`
+- Épico 22 — Domínio E (Backend Tooling)
+- Branch: `task/22.E.1-backend-tooling`
 
 ## 📋 Progresso do Épico 22
 
@@ -57,9 +57,9 @@ current_task: 22.E.1 — Criar backend/pyproject.toml com todas as dependências
 - [x] TASK-2261 Migrar tabelas de variáveis para TanStack Table com memo()
 
 ### Domínio E — Backend Tooling
-- [ ] TASK-2270 Criar `pyproject.toml` + migrar dependências de `requirements.txt`
-- [ ] TASK-2271 Inicializar Alembic, criar migration inicial do schema
-- [ ] TASK-2272 Gerar `uv.lock`
+- [x] TASK-2270 Criar `pyproject.toml` + migrar dependências de `requirements.txt`
+- [x] TASK-2271 Inicializar Alembic, criar migration inicial do schema
+- [x] TASK-2272 Gerar `uv.lock`
 
 ### Domínio F — Testes Frontend
 - [ ] TASK-2280 Instalar Vitest + `@testing-library/react`, criar `vitest.config.ts`
