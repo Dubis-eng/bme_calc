@@ -488,11 +488,11 @@ graph TD
   - Dependências: 22.D.3, 22.F.1
   - Prioridade: 🟡 Média | Complexidade: 4
 
-* [ ] **Tarefa 22.D.5** *(Migrar state global de `App.tsx` para atoms Jotai)* — Mover os states de cenário ativo, status de cálculo, filtros ativos para atoms. Refatorar `App.tsx` para ser apenas orquestrador de rotas. **Critério:** `App.tsx` abaixo de 200 linhas; sem prop-drilling de estado de cálculo.
+* [x] **Tarefa 22.D.5** *(Migrar state global de `App.tsx` para atoms Jotai)* — Mover os states de cenário ativo, status de cálculo, filtros ativos para atoms. Refatorar `App.tsx` para ser apenas orquestrador de rotas. **Critério:** `App.tsx` abaixo de 200 linhas; sem prop-drilling de estado de cálculo.
   - Dependências: 22.D.4
   - Prioridade: 🟡 Média | Complexidade: 6
 
-* [ ] **Tarefa 22.D.6** *(Migrar `SectorModules.tsx` para consumir atoms Jotai)* — Substituir props de estado por `useAtomValue` / `useSetAtom`. Envolver `SectorVariableRow` em `memo()`. Garantir que atualizar um campo não re-renderiza os outros. **Critério:** React DevTools Profiler mostra re-renders apenas no campo editado.
+* [x] **Tarefa 22.D.6** *(Migrar `SectorModules.tsx` para consumir atoms Jotai)* — Substituir props de estado por `useAtomValue` / `useSetAtom`. Envolver `SectorVariableRow` em `memo()`. Garantir que atualizar um campo não re-renderiza os outros. **Critério:** React DevTools Profiler mostra re-renders apenas no campo editado.
   - Dependências: 22.D.5
   - Prioridade: 🟡 Média | Complexidade: 5
 

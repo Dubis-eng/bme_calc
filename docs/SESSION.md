@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.D.5 — Migrar state global de App.tsx para atoms Jotai
+current_task: 22.D.7 — Instalar e integrar @tanstack/react-table
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Jotai Inicializado → Migrando State Global de App.tsx
-- **Próxima tarefa:** TASK-2251 (Migrar state global do App.tsx para atoms)
+- **Fase:** Jotai State Migration Concluída → Executando TanStack Table
+- **Próxima tarefa:** TASK-2260 (Instalar @tanstack/react-table)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio D (Instalar Jotai e Criar atoms.ts)
-- Branch: `task/22.D.4-jotai-state`
+- Épico 22 — Domínio D (Jotai State Migration)
+- Branch: `task/22.D.5-migrate-app-atoms`
 
 ## 📋 Progresso do Épico 22
 
@@ -51,8 +51,8 @@ current_task: 22.D.5 — Migrar state global de App.tsx para atoms Jotai
 - [x] TASK-2241 Validar build Vite com todos os componentes existentes
 - [x] TASK-2242 Remover CRA (`react-scripts`) após validação
 - [x] TASK-2250 Instalar Jotai, criar `state/atoms.ts` com `atomFamily`
-- [ ] TASK-2251 Migrar state global do App.tsx para atoms
-- [ ] TASK-2252 Migrar SectorModules para consumir atoms
+- [x] TASK-2251 Migrar state global do App.tsx para atoms
+- [x] TASK-2252 Migrar SectorModules para consumir atoms
 - [ ] TASK-2260 Instalar `@tanstack/react-table`
 - [ ] TASK-2261 Migrar tabelas de variáveis para TanStack Table com memo()
 

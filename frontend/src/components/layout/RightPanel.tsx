@@ -22,7 +22,6 @@ interface RightPanelProps {
     hasUnsavedChanges: boolean;
     scenarioVars: Variable[];
     isLocked: boolean;
-    onVariableChange: (id: string, val: string) => void;
     onGoalSeekOpen: () => void;
     sectors: Sector[];
     onRefreshSectors: () => void;
@@ -53,7 +52,6 @@ export const RightPanel: React.FC<RightPanelProps> = ({
     hasUnsavedChanges,
     scenarioVars,
     isLocked,
-    onVariableChange,
     onGoalSeekOpen,
     sectors,
     onRefreshSectors,
@@ -119,7 +117,6 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                         <ScenarioPremises
                             scenarioVars={scenarioVars}
                             isLocked={isLocked}
-                            onVariableChange={onVariableChange}
                         />
                         <button
                             id="btn-goal-seek"

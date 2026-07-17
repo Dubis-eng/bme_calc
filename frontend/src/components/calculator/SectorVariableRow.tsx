@@ -1,21 +1,19 @@
-import React from 'react';
+import React, { memo } from 'react';
+import { useAtom } from 'jotai';
 import { Variable } from '../../types';
 import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../styles/design-system';
 import { formatVariableValue } from '../../utils/helpers';
 import { FormattedVariableInput } from '../ui/Input';
-
+import { selectedFieldIdAtom } from '../../state/atoms';
 
 interface SectorVariableRowProps {
   variable: Variable;
   results: Record<string, any>;
   isLocked: boolean;
-  highlightedVarId: string | null;
-  onSelectVariable?: (id: string | null) => void;
   auditVarId: string | null;
   setAuditVarId: React.Dispatch<React.SetStateAction<string | null>>;
   internalAuditDeps: string[];
   onEditVariable: (variable: Variable) => void;
-  onVariableChange: (id: string, value: string) => void;
   setActiveFormulaPopover: (popover: { varId: string; formula: string } | null) => void;
   handleDragStart: (e: React.DragEvent, type: 'stage' | 'cp' | 'var', id: string) => void;
   handleDragOver: (e: React.DragEvent) => void;
@@ -23,11 +21,12 @@ interface SectorVariableRowProps {
   handleMove: (type: 'stage' | 'cp' | 'var', id: string, direction: 'up' | 'down') => void;
 }
 
-export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
-  variable, results, isLocked, highlightedVarId, onSelectVariable, auditVarId, setAuditVarId,
-  internalAuditDeps, onEditVariable, onVariableChange, setActiveFormulaPopover,
+export const SectorVariableRow = memo<SectorVariableRowProps>(({
+  variable, results, isLocked, auditVarId, setAuditVarId,
+  internalAuditDeps, onEditVariable, setActiveFormulaPopover,
   handleDragStart, handleDragOver, handleDrop, handleMove
 }) => {
+  const [highlightedVarId, setSelectedFieldId] = useAtom(selectedFieldIdAtom);
   const v = variable;
   const id = v['ID - REF'];
   const res = results[id];
@@ -66,7 +65,7 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
       onDragStart={(e) => handleDragStart(e, 'var', id)}
       onDragOver={handleDragOver}
       onDrop={(e) => handleDrop(e, 'var', id)}
-      onClick={() => onSelectVariable?.(id)}
+      onClick={() => setSelectedFieldId(id)}
     >
       <td className="bme-table-cell text-center select-none w-10">
         <div className="flex items-center justify-center gap-1">
@@ -105,7 +104,6 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
               id={`input-val-${id}`}
               variable={v}
               isLocked={isLocked}
-              onVariableChange={onVariableChange}
               className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md border text-right focus:outline-none transition-all duration-150 disabled:opacity-50 ${fieldClass}`}
             />
             {v.tipo_exibicao === 'PERCENTAGE' && (
@@ -140,4 +138,5 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
       </td>
     </tr>
   );
-};
+});
+

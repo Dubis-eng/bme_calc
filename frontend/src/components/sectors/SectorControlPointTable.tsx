@@ -6,13 +6,10 @@ interface SectorControlPointTableProps {
   cp: { cpName: string; cpId: string; variables: Variable[] };
   results: Record<string, any>;
   isLocked: boolean;
-  highlightedVarId: string | null;
-  onSelectVariable?: (id: string | null) => void;
   auditVarId: string | null;
   setAuditVarId: React.Dispatch<React.SetStateAction<string | null>>;
   internalAuditDeps: string[];
   onEditVariable: (variable: Variable) => void;
-  onVariableChange: (id: string, value: string) => void;
   setActiveFormulaPopover: (popover: { varId: string; formula: string } | null) => void;
   handleDragStart: (e: React.DragEvent, type: 'stage' | 'cp' | 'var', id: string) => void;
   handleDragOver: (e: React.DragEvent) => void;
@@ -21,8 +18,8 @@ interface SectorControlPointTableProps {
 }
 
 export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = ({
-  cp, results, isLocked, highlightedVarId, onSelectVariable, auditVarId, setAuditVarId,
-  internalAuditDeps, onEditVariable, onVariableChange, setActiveFormulaPopover,
+  cp, results, isLocked, auditVarId, setAuditVarId,
+  internalAuditDeps, onEditVariable, setActiveFormulaPopover,
   handleDragStart, handleDragOver, handleDrop, handleMove
 }) => {
   return (
@@ -65,13 +62,10 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
                 variable={v}
                 results={results}
                 isLocked={isLocked}
-                highlightedVarId={highlightedVarId}
-                onSelectVariable={onSelectVariable}
                 auditVarId={auditVarId}
                 setAuditVarId={setAuditVarId}
                 internalAuditDeps={internalAuditDeps}
                 onEditVariable={onEditVariable}
-                onVariableChange={onVariableChange}
                 setActiveFormulaPopover={setActiveFormulaPopover}
                 handleDragStart={handleDragStart}
                 handleDragOver={handleDragOver}

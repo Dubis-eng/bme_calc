@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useAtom } from 'jotai';
 import { Variable } from '../../types';
-import { getInputValue, cleanInputValue } from '../../utils/helpers';
+import { getInputValue } from '../../utils/helpers';
+import { variableValueAtomFamily, hasUnsavedChangesAtom } from '../../state/atoms';
 
 interface FormattedVariableInputProps {
   variable: Variable;
   isLocked: boolean;
-  onVariableChange: (id: string, value: string) => void;
+  onVariableChange?: (id: string, value: string) => void;
   className?: string;
   id?: string;
 }
@@ -13,12 +15,12 @@ interface FormattedVariableInputProps {
 export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
   variable,
   isLocked,
-  onVariableChange,
   className = '',
   id
 }) => {
   const varId = variable['ID - REF'];
-  const [localValue, setLocalValue] = useState(() => getInputValue(variable));
+  const [localValue, setLocalValue] = useAtom(variableValueAtomFamily(varId));
+  const [, setHasUnsavedChanges] = useAtom(hasUnsavedChangesAtom);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const equationsAndValues = variable['EQUAÇÕES E VALORES'];
@@ -32,15 +34,16 @@ export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
     if (document.activeElement !== inputRef.current) {
       setLocalValue(getInputValue(variable));
     }
-  }, [variable, equationsAndValues, displayType, percentBase]);
+  }, [variable, equationsAndValues, displayType, percentBase, setLocalValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setLocalValue(val);
-    onVariableChange(varId, cleanInputValue(val, variable));
+    setHasUnsavedChanges(true);
   };
 
   const handleBlur = () => {
+    // Clean and format value on blur
     setLocalValue(getInputValue(variable));
   };
 

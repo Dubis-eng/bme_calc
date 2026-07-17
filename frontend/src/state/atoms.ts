@@ -16,6 +16,17 @@ export const convergenceErrorAtom = atom<boolean>(false);
 export const iterationsAtom = atom<number>(1);
 export const residualAtom = atom<number>(0);
 export const isOfflineAtom = atom<boolean>(false);
+export const savingAtom = atom<boolean>(false);
+export const savingActiveAtom = atom<boolean>(false);
+
+const baseToleranceAtom = atom<number>(parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5'));
+export const toleranceAtom = atom(
+  (get) => get(baseToleranceAtom),
+  (get, set, newVal: number) => {
+    set(baseToleranceAtom, newVal);
+    localStorage.setItem('bme_calc_tolerance', String(newVal));
+  }
+);
 
 // Local input values atom family to avoid global re-renders on every keystroke
 export const variableValueAtomFamily = atomFamily((id: string) => atom(''));

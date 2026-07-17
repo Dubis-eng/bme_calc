@@ -1,28 +1,54 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useAtom, useAtomValue } from 'jotai';
 import { Variable, Sector, BackendVariable } from '../types';
 import { ScenarioMetadata } from '../components/scenario/ScenarioManager';
 import { parseHarvestYear, mapBackendVariableToFrontend } from '../utils/helpers';
+import {
+  variablesAtom,
+  resultsAtom,
+  loadingAtom,
+  calculatingAtom,
+  convergenceErrorAtom,
+  iterationsAtom,
+  activeSectorAtom,
+  currentScenarioAtom,
+  savingAtom,
+  savingActiveAtom,
+  anoSafraAtom,
+  mesReferenciaAtom,
+  hasUnsavedChangesAtom,
+  isOfflineAtom,
+  residualAtom,
+  setVariablesWithValuesAtom,
+  getMergedVariablesAtom,
+  toleranceAtom,
+  updateVariableValueAtom
+} from '../state/atoms';
 
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
-  const [variables, setVariables] = useState<Variable[]>([]);
-  const [results, setResults] = useState<Record<string, unknown>>({});
-  const [loading, setLoading] = useState(true);
-  const [calculating, setCalculating] = useState(false);
-  const [convergenceError, setConvergenceError] = useState(false);
-  const [iterations, setIterations] = useState(1);
-  const [activeSector, setActiveSector] = useState<string>('');
-  const [currentScenario, setCurrentScenario] = useState<ScenarioMetadata | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [anoSafra, setAnoSafra] = useState<number>(2026);
-  const [mesReferencia, setMesReferencia] = useState('Abril');
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [savingActive, setSavingActive] = useState(false);
+  const [variables, setVariables] = useAtom(variablesAtom);
+  const [, setVariablesWithValues] = useAtom(setVariablesWithValuesAtom);
+  const mergedVariables = useAtomValue(getMergedVariablesAtom);
+  const [, updateVariableValue] = useAtom(updateVariableValueAtom);
+  
+  const [results, setResults] = useAtom(resultsAtom);
+  const [loading, setLoading] = useAtom(loadingAtom);
+  const [calculating, setCalculating] = useAtom(calculatingAtom);
+  const [convergenceError, setConvergenceError] = useAtom(convergenceErrorAtom);
+  const [iterations, setIterations] = useAtom(iterationsAtom);
+  const [activeSector, setActiveSector] = useAtom(activeSectorAtom);
+  const [currentScenario, setCurrentScenario] = useAtom(currentScenarioAtom);
+  const [saving, setSaving] = useAtom(savingAtom);
+  const [anoSafra, setAnoSafra] = useAtom(anoSafraAtom);
+  const [mesReferencia, setMesReferencia] = useAtom(mesReferenciaAtom);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useAtom(hasUnsavedChangesAtom);
+  const [savingActive, setSavingActive] = useAtom(savingActiveAtom);
+  const [isOffline, setIsOffline] = useAtom(isOfflineAtom);
+  const [residual, setResidual] = useAtom(residualAtom);
   const [years, setYears] = useState<{ id: number; active: boolean }[]>([]);
   const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
-  const [isOffline, setIsOffline] = useState(false);
-  const [residual, setResidual] = useState<number>(0);
-  const [tolerance, setTolerance] = useState<number>(() => parseFloat(localStorage.getItem('bme_calc_tolerance') || '1e-5'));
+  const [tolerance, setTolerance] = useAtom(toleranceAtom);
 
   const checkConnection = useCallback(async () => {
     try {
@@ -46,7 +72,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     fetch('/memorial_de_calculo_balanco.json')
       .then(res => res.json())
       .then(data => {
-        setVariables(data);
+        setVariablesWithValues(data);
         if (data.length > 0) setActiveSector(data[0].SETOR);
       })
       .finally(() => setLoading(false));
@@ -86,7 +112,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   }, [isOffline, tolerance, handleApiError]);
 
   const onLoadScenario = useCallback((loadedVars: Variable[], meta: ScenarioMetadata) => {
-    setVariables(loadedVars); setCurrentScenario(meta);
+    setVariablesWithValues(loadedVars); setCurrentScenario(meta);
     const parsedYear = typeof meta.year_harvest === 'string' ? parseHarvestYear(meta.year_harvest) : meta.year_harvest;
     setAnoSafra(parsedYear); setMesReferencia(meta.reference_month); setHasUnsavedChanges(false);
     if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
@@ -131,24 +157,22 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   const handleChange = (id: string, value: string) => {
     if (isLocked || isOffline) return;
-    setVariables(prev => prev.map(v => v["ID - REF"] === id ? { ...v, "EQUAÇÕES E VALORES": value } : v));
-    setHasUnsavedChanges(true);
+    updateVariableValue({ id, value });
   };
 
   const updateTolerance = (val: number) => {
     setTolerance(val);
-    localStorage.setItem('bme_calc_tolerance', String(val));
-    triggerCalculate(variables, val);
+    triggerCalculate(mergedVariables, val);
   };
 
-  const handleCalculate = () => triggerCalculate(variables);
+  const handleCalculate = () => triggerCalculate(mergedVariables);
 
   const handleSaveNew = async () => {
     if (isOffline) return;
     setSaving(true);
     try {
       const res = await axios.post('http://localhost:8000/api/scenarios', {
-        year_harvest: anoSafra, reference_month: mesReferencia, variables, status: 'Em Edição'
+        year_harvest: anoSafra, reference_month: mesReferencia, variables: mergedVariables, status: 'Em Edição'
       });
       setCurrentScenario({
         id: res.data.id, year_harvest: res.data.year_harvest, reference_month: res.data.reference_month,
@@ -170,7 +194,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     setSavingActive(true);
     try {
       const res = await axios.put(`http://localhost:8000/api/scenarios/${currentScenario.id}`, {
-        year_harvest: anoSafra, reference_month: mesReferencia, variables, status: currentScenario.status
+        year_harvest: anoSafra, reference_month: mesReferencia, variables: mergedVariables, status: currentScenario.status
       });
       setHasUnsavedChanges(false);
       if (res.data) {
@@ -194,7 +218,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   };
 
   const onApplyOptimalValue = (inputId: string, val: number, newRes: Record<string, number>) => {
-    setVariables(prev => prev.map(v => v["ID - REF"] === inputId ? { ...v, "EQUAÇÕES E VALORES": val } : v));
+    setVariablesWithValues(variables.map(v => v["ID - REF"] === inputId ? { ...v, "EQUAÇÕES E VALORES": val } : v));
     setResults(newRes);
     setHasUnsavedChanges(true);
   };
@@ -238,7 +262,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       }
       
       const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
-      setVariables(updated);
+      setVariablesWithValues(updated);
       triggerCalculate(updated);
     } catch (err) {
       const error = err as { response?: { data?: { detail?: string } }; message?: string };
@@ -272,7 +296,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       try {
         const res = await axios.get('http://localhost:8000/api/variables');
         const mapped: Variable[] = res.data.map((v: BackendVariable) => mapBackendVariableToFrontend(v));
-        setVariables(mapped);
+        setVariablesWithValues(mapped);
         triggerCalculate(mapped);
       } catch (err) { console.error(err); handleApiError(err); }
     }

@@ -5,13 +5,11 @@ import { FormattedVariableInput } from '../ui/Input';
 interface ScenarioPremisesProps {
   scenarioVars: Variable[];
   isLocked: boolean;
-  onVariableChange: (id: string, value: string) => void;
 }
 
 export function ScenarioPremises({
   scenarioVars,
-  isLocked,
-  onVariableChange
+  isLocked
 }: ScenarioPremisesProps) {
   if (scenarioVars.length === 0) return null;
 
@@ -36,7 +34,6 @@ export function ScenarioPremises({
                   id={`input-val-${id}`}
                   variable={v}
                   isLocked={isLocked}
-                  onVariableChange={onVariableChange}
                   className="input-field px-2.5 py-1.5 text-xs font-mono font-semibold w-full
                     disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800"
                 />

@@ -15,11 +15,8 @@ interface SectorModulesProps {
   variables: Variable[];
   results: Record<string, any>;
   isLocked: boolean;
-  highlightedVarId: string | null;
-  onSelectVariable?: (id: string | null) => void;
   onEditVariable: (variable: Variable) => void;
   onAddVariable: (sector: string, definition: string) => void;
-  onVariableChange: (id: string, value: string) => void;
   onNavigateToVariable?: (id: string) => void;
   activeStatusFilter: FilterStatus;
   setActiveStatusFilter: (filter: FilterStatus) => void;
@@ -27,9 +24,8 @@ interface SectorModulesProps {
 }
 
 export const SectorModules: React.FC<SectorModulesProps> = ({
-  activeSector, variables, results, isLocked, highlightedVarId,
-  onSelectVariable,
-  onEditVariable, onAddVariable, onVariableChange, onNavigateToVariable,
+  activeSector, variables, results, isLocked,
+  onEditVariable, onAddVariable, onNavigateToVariable,
   activeStatusFilter, setActiveStatusFilter, onReorderSuccess
 }) => {
   const [activeTypeFilter, setActiveTypeFilter] = useState<'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA'>('ALL');
@@ -253,13 +249,10 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                       cp={cp}
                       results={results}
                       isLocked={isLocked}
-                      highlightedVarId={highlightedVarId}
-                      onSelectVariable={onSelectVariable}
                       auditVarId={auditVarId}
                       setAuditVarId={setAuditVarId}
                       internalAuditDeps={internalAuditDeps}
                       onEditVariable={onEditVariable}
-                      onVariableChange={onVariableChange}
                       setActiveFormulaPopover={setActiveFormulaPopover}
                       handleDragStart={handleDragStart}
                       handleDragOver={handleDragOver}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAtom } from 'jotai';
 import axios from 'axios';
 import { Variable, Sector, FilterStatus } from './types';
 import { GoalSeekModal } from './components/goalseek/GoalSeekModal';
@@ -16,6 +17,7 @@ import { useVariableSearch } from './hooks/useVariableSearch';
 import { useSearch } from './hooks/useSearch';
 import { useScenario } from './hooks/useScenario';
 import { getFriendlySectorName } from './utils/helpers';
+import { selectedFieldIdAtom } from './state/atoms';
 
 type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';
 
@@ -32,7 +34,7 @@ function App() {
   const [showDashboard, setShowDashboard] = useState(true);
   const [activeStatusFilter, setActiveStatusFilter] = useState<FilterStatus>('all');
 
-  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+  const [selectedFieldId, setSelectedFieldId] = useAtom(selectedFieldIdAtom);
 
   const fetchSectors = () => {
     axios.get('http://localhost:8000/api/sectors')
@@ -202,7 +204,7 @@ function App() {
                         onClick={async () => {
                           handleCalculate();
                           const currentCycleMonth = months.find(m => m.order_index === 0)?.name || 'Abril';
-                          setCurrentScenario(prev => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
+                          setCurrentScenario((prev: any) => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
                           setHasUnsavedChanges(true);
                         }}
                         className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold transition-all uppercase tracking-wider whitespace-nowrap"
@@ -239,11 +241,8 @@ function App() {
                     variables={variables}
                     results={results}
                     isLocked={isLocked || isOffline}
-                    highlightedVarId={selectedFieldId || search.highlightedVarId}
-                    onSelectVariable={setSelectedFieldId}
                     onEditVariable={handleEditVariable}
                     onAddVariable={handleAddVariable}
-                    onVariableChange={handleChange}
                     onNavigateToVariable={onScrollTo}
                     activeStatusFilter={activeStatusFilter}
                     setActiveStatusFilter={setActiveStatusFilter}
@@ -258,7 +257,7 @@ function App() {
             variables={variables}
             onLoadScenario={onLoadScenario}
             currentScenario={currentScenario}
-            onStatusChange={newStatus => setCurrentScenario(prev => prev ? { ...prev, status: newStatus } : null)}
+            onStatusChange={newStatus => setCurrentScenario((prev: any) => prev ? { ...prev, status: newStatus } : null)}
             anoSafra={anoSafra}
             setAnoSafra={setAnoSafra}
             mesReferencia={mesReferencia}
@@ -270,7 +269,6 @@ function App() {
             hasUnsavedChanges={hasUnsavedChanges}
             scenarioVars={scenarioVars}
             isLocked={isLocked || isOffline}
-            onVariableChange={handleChange}
             onGoalSeekOpen={() => setIsGoalSeekOpen(true)}
             sectors={sectors}
             onRefreshSectors={fetchSectors}
