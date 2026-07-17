@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] - 2026-07-17
+
+### Added
+- **Modernização do Frontend & Build System (Épico 22)**:
+  - Migração completa do sistema de build de Create React App (`react-scripts`) para **Vite**, reduzindo tempos de compilação e eliminando dependências obsoletas.
+  - Implementação de Gerenciamento de Estado Atômico com **Jotai**, utilizando `atomFamily` para isolar estados de digitação de variáveis individuais e eliminar re-renderizações desnecessárias.
+  - Refatoração e integração de `@tanstack/react-table` (TanStack Table v8) em `SectorControlPointTable.tsx` para exibição e estruturação otimizada de variáveis.
+  - Criação do componente isolado e memoizado `ValueCell.tsx` para gerenciar inputs de dados e resultados de fórmulas sem prop-drilling.
+  - Configuração do módulo ES nativo no frontend adicionando `"type": "module"` ao `package.json` e adaptando configurações de PostCSS e Tailwind CSS para `.cjs`.
+- **Backend Tooling & Migrações de Banco**:
+  - Criação do arquivo de empacotamento `pyproject.toml` contendo metadados do projeto, regras de Ruff/Mypy e dependências declaradas.
+  - Geração automatizada e fixação de dependências reproduzíveis usando arquivo de lock `uv.lock`.
+  - Inicialização do **Alembic** e geração da primeira migração de banco de dados (`3bef9a6d8dca_initial_schema.py`) sincronizada com o banco PostgreSQL ativo em Docker.
+- **Suíte de Testes Automatizados**:
+  - Configuração do test runner **Vitest** no frontend com ambiente `jsdom` e mock de requisições de rede.
+  - Criação de testes unitários smoke de montagem para componentes críticos: `App`, `ScenarioManager`, `SectorModules`, `HarvestPlan` e `GoalSeekModal`.
+  - Configuração da suíte de testes E2E com **Playwright** e criação de especificação `calculator.spec.ts` validando o fluxo completo de interação e cálculo.
+
 ## [2.16.2] - 2026-07-16
 
 ### Fixed
