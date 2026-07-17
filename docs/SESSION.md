@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.C.1 — Criar tests/test_engine_decimal_parity.py
+current_task: 22.D.1 — Instalar Vite, criar vite.config.ts e main.tsx
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Domínio B Concluído → Executando Domínio C (Engine Decimal Parity)
-- **Próxima tarefa:** TASK-2230 (Criar test_engine_decimal_parity.py)
+- **Fase:** Domínio C Concluído → Executando Domínio D (Frontend Stack)
+- **Próxima tarefa:** TASK-2240 (Instalar Vite, criar vite.config.ts e main.tsx)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio B (Segurança CORS)
-- Branch: `task/22.B.1-cors-security`
+- Épico 22 — Domínio C (Engine Decimal)
+- Branch: `task/22.C.1-engine-decimal-parity`
 
 ## 📋 Progresso do Épico 22
 
@@ -41,10 +41,10 @@ current_task: 22.C.1 — Criar tests/test_engine_decimal_parity.py
 - [x] TASK-2221 Atualizar `.env.sample`, `docker-compose.yml` e docs
 
 ### Domínio C — Engine Decimal
-- [ ] TASK-2230 Criar `test_engine_decimal_parity.py` (testes de paridade float vs Decimal)
-- [ ] TASK-2231 Migrar `engine.py` para `Decimal` (pós-paridade aprovada)
-- [ ] TASK-2232 Adaptar `goalseek.py` (interface float↔Decimal)
-- [ ] TASK-2233 Re-executar todos os testes de backend
+- [x] TASK-2230 Criar `test_engine_decimal_parity.py` (testes de paridade float vs Decimal)
+- [x] TASK-2231 Migrar `engine.py` para `Decimal` (pós-paridade aprovada)
+- [x] TASK-2232 Adaptar `goalseek.py` (interface float↔Decimal)
+- [x] TASK-2233 Re-executar todos os testes de backend
 
 ### Domínio D — Frontend Stack
 - [ ] TASK-2240 Instalar Vite, criar `vite.config.ts` e `main.tsx`

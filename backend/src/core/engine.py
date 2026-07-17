@@ -136,6 +136,9 @@ def calculate_state(variables_list, tolerance=0.0001):
     max_delta = Decimal('0')
     
     if has_cycle:
+        for ref in formulas:
+            state[ref] = ok_res(Decimal('0'))
+            
         for i in range(100):
             iterations = i + 1
             old_state = state.copy()

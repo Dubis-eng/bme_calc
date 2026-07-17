@@ -452,19 +452,19 @@ graph TD
 
 #### Domínio C — Engine Decimal (Requer gate de paridade antes de migrar)
 
-* [ ] **Tarefa 22.C.1** *(Criar `tests/test_engine_decimal_parity.py`)* — Implementar testes que executam o mesmo conjunto de inputs com `float` (engine atual) e com `Decimal` (engine candidato). Comparar resultados — devem ser iguais até `1e-4` (tolerância de convergência). Se divergência > `1e-4`, teste falha e bloqueia a tarefa 22.C.2. **Critério:** Suíte de paridade passa com ≥ 20 cenários de teste representativos.
+* [x] **Tarefa 22.C.1** *(Criar `tests/test_engine_decimal_parity.py`)* — Implementar testes que executam o mesmo conjunto de inputs com `float` (engine atual) e com `Decimal` (engine candidato). Comparar resultados — devem ser iguais até `1e-4` (tolerância de convergência). Se divergência > `1e-4`, teste falha e bloqueia a tarefa 22.C.2. **Critério:** Suíte de paridade passa com ≥ 20 cenários de teste representativos.
   - Dependências: 22.0.2
   - Prioridade: 🔴 Alta | Complexidade: 6
 
-* [ ] **Tarefa 22.C.2** *(Migrar `src/core/engine.py` de `float` para `Decimal`)* — Substituir todas as operações `float` por `Decimal`. Definir `getcontext().prec = 28`. Adaptar interface com `iapws` e `scipy` usando `Decimal(str(float_value))` para casting seguro. Manter a lógica de convergência e degradação graceful intacta. **Critério:** Testes de paridade (22.C.1) passam; suíte completa de backend passa.
+* [x] **Tarefa 22.C.2** *(Migrar `src/core/engine.py` de `float` para `Decimal`)* — Substituir todas as operações `float` por `Decimal`. Definir `getcontext().prec = 28`. Adaptar interface com `iapws` e `scipy` usando `Decimal(str(float_value))` para casting seguro. Manter a lógica de convergência e degradação graceful intacta. **Critério:** Testes de paridade (22.C.1) passam; suíte completa de backend passa.
   - Dependências: 22.C.1 (GATE: paridade aprovada)
   - Prioridade: 🔴 Alta | Complexidade: 7
 
-* [ ] **Tarefa 22.C.3** *(Adaptar `src/core/goalseek.py` para interface Decimal)* — Adaptar a fronteira entre `Decimal` (engine) e `float` (scipy). Input/output do goalseek converte `Decimal → float` antes de scipy e `float → Decimal` na resposta. **Critério:** Goal Seek funcional com resultados equivalentes ao antes da migração.
+* [x] **Tarefa 22.C.3** *(Adaptar `src/core/goalseek.py` para interface Decimal)* — Adaptar a fronteira entre `Decimal` (engine) e `float` (scipy). Input/output do goalseek converte `Decimal → float` antes de scipy e `float → Decimal` na resposta. **Critério:** Goal Seek funcional com resultados equivalentes ao antes da migração.
   - Dependências: 22.C.2
   - Prioridade: 🔴 Alta | Complexidade: 4
 
-* [ ] **Tarefa 22.C.4** *(Executar suíte completa de testes backend)* — Re-executar `pytest backend/tests/` completo após migração Decimal. Todos os 7+ arquivos de teste devem passar. Registrar métricas: tempo de convergência com Decimal vs float. **Critério:** 100% dos testes passando; tempo de convergência ≤ 2× o tempo anterior.
+* [x] **Tarefa 22.C.4** *(Executar suíte completa de testes backend)* — Re-executar `pytest backend/tests/` completo após migração Decimal. Todos os 7+ arquivos de teste devem passar. Registrar métricas: tempo de convergência com Decimal vs float. **Critério:** 100% dos testes passando; tempo de convergência ≤ 2× o tempo anterior.
   - Dependências: 22.C.3
   - Prioridade: 🔴 Alta | Complexidade: 2
 
