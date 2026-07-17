@@ -392,11 +392,11 @@ graph TD
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 4
 
-* [ ] **Tarefa 22.0.3** *(Backend: Isolar scripts utilitários em `backend/scripts/`)* — Mover `convert_xlsx_to_json.py`, `export_database_to_json.py`, `scan_excel_groups.py`, `scan_excel_turbinas.py` para `backend/scripts/`. Criar `backend/scripts/README.md` documentando cada script. **Critério:** scripts executam com `python backend/scripts/<nome>.py`.
+* [x] **Tarefa 22.0.3** *(Backend: Isolar scripts utilitários em `backend/scripts/`)* — Mover `convert_xlsx_to_json.py`, `export_database_to_json.py`, `scan_excel_groups.py`, `scan_excel_turbinas.py` para `backend/scripts/`. Criar `backend/scripts/README.md` documentando cada script. **Critério:** scripts executam com `python backend/scripts/<nome>.py`.
   - Dependências: 22.0.1
   - Prioridade: 🟡 Média | Complexidade: 2
 
-* [ ] **Tarefa 22.0.4** *(Backend: Isolar dados de referência em `backend/data/`)* — Mover `memorial_de_calculo_balanco.json` para `backend/data/`. Mover `MEMORIAL CALCULO.xlsx` para `backend/data/reference/`. Mover `migrations_legacy.py` para `backend/legacy/`. Atualizar todos os caminhos hardcoded que referenciam esses arquivos. **Critério:** motor de cálculo carrega memorial sem erro no startup.
+* [/] **Tarefa 22.0.4** *(Backend: Isolar dados de referência em `backend/data/`)* — Mover `memorial_de_calculo_balanco.json` para `backend/data/`. Mover `MEMORIAL CALCULO.xlsx` para `backend/data/reference/`. Mover `migrations_legacy.py` para `backend/legacy/`. Atualizar todos os caminhos hardcoded que referenciam esses arquivos. **Critério:** motor de cálculo carrega memorial sem erro no startup.
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 3
 

@@ -4,7 +4,7 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.0.3 — Isolar scripts em backend/scripts/
+current_task: 22.0.4 — Isolar dados de referência em backend/data/
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
@@ -12,11 +12,11 @@ current_task: 22.0.3 — Isolar scripts em backend/scripts/
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
 - **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2203 (Mover scripts para scripts/)
+- **Próxima tarefa:** TASK-2204 (Mover dados para data/)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.2 (Isolar testes em backend/tests/)
-- Branch: `task/22.0.2-backend-tests-isolation`
+- Épico 22 — Tarefa 22.0.3 (Isolar scripts utilitários em backend/scripts/)
+- Branch: `task/22.0.3-backend-scripts-isolation`
 
 ## 📋 Progresso do Épico 22
 

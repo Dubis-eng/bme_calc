@@ -1,9 +1,14 @@
 import os
+import sys
 import json
 import uuid
 from typing import List, Dict, Any, Optional
 from sqlmodel import Session, select
-from database import engine, Scenario, Variable, Equation, Result
+
+# Adjust path to find src packages
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.db.database import engine, Scenario, Variable, Equation, Result
 
 def get_target_scenario(session: Session) -> Optional[Scenario]:
     # Tenta obter o cenário base de seeding
@@ -54,11 +59,12 @@ def map_variable_to_dict(var: Variable, eq_map: Dict[str, str], res_map: Dict[st
     }
 
 def save_json_to_targets(json_data: list):
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(scripts_dir))
     targets = [
-        os.path.join(base_dir, "memorial_de_calculo_balanco.json"),
-        os.path.abspath(os.path.join(base_dir, "../docs/memorial_de_calculo_balanco.json")),
-        os.path.abspath(os.path.join(base_dir, "../frontend/public/memorial_de_calculo_balanco.json"))
+        os.path.join(project_root, "backend", "memorial_de_calculo_balanco.json"),
+        os.path.join(project_root, "docs", "memorial_de_calculo_balanco.json"),
+        os.path.join(project_root, "frontend", "public", "memorial_de_calculo_balanco.json")
     ]
     
     for target in targets:
