@@ -1,20 +1,20 @@
 // aria-label: placeholder to satisfy UX audit regex false positive on SectorAuditCard
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Variable, FilterStatus } from '../types';
-import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
+import { Variable, FilterStatus } from '../../types';
+import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../theme/design-system';
 import { SectorFilterBar } from './SectorFilterBar';
 import { SectorFormulaPopover } from './SectorFormulaPopover';
 import { SectorAuditCard } from './SectorAuditCard';
-import { groupAndSortVariables } from '../utils/sorting';
+import { groupAndSortVariables } from '../../utils/sorting';
 import { SectorVariableRow } from './SectorVariableRow';
-import { SectorControlPointTable } from './SectorControlPointTable';
+import { SectorControlPointTable } from '../sectors/SectorControlPointTable';
 import {
   formatVariableValue,
   getInputValue,
   cleanInputValue,
   getDependencies
-} from '../utils/helpers';
+} from '../../utils/helpers';
 
 interface SectorModulesProps {
   activeSector: string;

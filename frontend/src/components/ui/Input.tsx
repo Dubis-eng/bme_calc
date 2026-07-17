@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Variable } from '../types';
-import { getInputValue, cleanInputValue } from '../utils/helpers';
+import { Variable } from '../../types';
+import { getInputValue, cleanInputValue } from '../../utils/helpers';
 
 interface FormattedVariableInputProps {
   variable: Variable;

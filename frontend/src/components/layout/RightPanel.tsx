@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Variable, Sector } from '../types';
-import { ScenarioManager, ScenarioMetadata } from './ScenarioManager';
-import { ScenarioPremises } from './ScenarioPremises';
-import { SectorConfig } from './SectorConfig';
-import { SCENARIO_STATUS_BADGE } from '../theme/design-system';
+import { Variable, Sector } from '../../types';
+import { ScenarioManager, ScenarioMetadata } from '../scenario/ScenarioManager';
+import { ScenarioPremises } from '../scenario/ScenarioPremises';
+import { SectorConfig } from '../sectors/SectorConfig';
+import { SCENARIO_STATUS_BADGE } from '../../theme/design-system';
 
 
 interface RightPanelProps {

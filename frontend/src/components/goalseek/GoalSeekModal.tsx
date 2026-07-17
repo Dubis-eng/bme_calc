@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Variable } from '../types';
-import { BmeIcon } from '../theme/design-system';
+import { Variable } from '../../types';
+import { BmeIcon } from '../../theme/design-system';
 
 interface GoalSeekModalProps {
     isOpen: boolean;

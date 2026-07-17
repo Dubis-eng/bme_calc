@@ -1,9 +1,9 @@
 import React from 'react';
-import { Sector } from '../types';
-import { BmeIcon } from '../theme/design-system';
+import { Sector } from '../../types';
+import { BmeIcon } from '../../theme/design-system';
 import { HarvestPlanTable } from './HarvestPlanTable';
 import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
-import { useHarvestPlanState } from '../hooks/useHarvestPlanState';
+import { useHarvestPlanState } from '../../hooks/useHarvestPlanState';
 
 interface HarvestPlanProps { sectors: Sector[]; }
 const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];

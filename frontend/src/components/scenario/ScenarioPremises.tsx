@@ -1,6 +1,6 @@
 import React from 'react';
-import { Variable } from '../types';
-import { FormattedVariableInput } from './FormattedVariableInput';
+import { Variable } from '../../types';
+import { FormattedVariableInput } from '../ui/Input';
 
 interface ScenarioPremisesProps {
   scenarioVars: Variable[];

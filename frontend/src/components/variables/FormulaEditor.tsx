@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Variable } from '../types';
+import { Variable } from '../../types';
 
 interface FormulaEditorProps {
   value: string;

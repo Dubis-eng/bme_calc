@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Variable, Sector, FilterStatus } from '../types';
-import { getFriendlySectorName } from '../utils/helpers';
+import { Variable, Sector, FilterStatus } from '../../types';
+import { getFriendlySectorName } from '../../utils/helpers';
 
 interface StatusDashboardProps {
   sectors: Sector[];

@@ -400,11 +400,11 @@ graph TD
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 3
 
-* [/] **Tarefa 22.0.5** *(Frontend: Criar subpastas de componentes por domínio)* — Criar subpastas `components/ui/`, `components/layout/`, `components/calculator/`, `components/scenario/`, `components/harvest-plan/`, `components/variables/`, `components/settings/`, `components/sectors/`, `components/search/`, `components/goalseek/`. Mover cada componente para seu domínio conforme mapa. **Critério:** `npm run build` sem erros de importação.
+* [x] **Tarefa 22.0.5** *(Frontend: Criar subpastas de componentes por domínio)* — Criar subpastas `components/ui/`, `components/layout/`, `components/calculator/`, `components/scenario/`, `components/harvest-plan/`, `components/variables/`, `components/settings/`, `components/sectors/`, `components/search/`, `components/goalseek/`. Mover cada componente para seu domínio conforme mapa. **Critério:** `npm run build` sem erros de importação.
   - Dependências: —
   - Prioridade: 🔴 Alta | Complexidade: 7
 
-* [ ] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
+* [/] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
   - Dependências: 22.0.5
   - Prioridade: 🔴 Alta | Complexidade: 5
 

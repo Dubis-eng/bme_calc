@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Variable, Sector } from '../types';
-import { getFriendlySectorName } from '../utils/helpers';
-import { BmeIcon } from '../theme/design-system';
+import { Variable, Sector } from '../../types';
+import { getFriendlySectorName } from '../../utils/helpers';
+import { BmeIcon } from '../../theme/design-system';
 
 interface SidebarProps {
   isSidebarExpanded: boolean;

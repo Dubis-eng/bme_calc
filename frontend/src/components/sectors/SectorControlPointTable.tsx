@@ -1,6 +1,6 @@
 import React from 'react';
-import { Variable } from '../types';
-import { SectorVariableRow } from './SectorVariableRow';
+import { Variable } from '../../types';
+import { SectorVariableRow } from '../calculator/SectorVariableRow';
 
 interface SectorControlPointTableProps {
   cp: { cpName: string; cpId: string; variables: Variable[] };

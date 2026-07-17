@@ -1,8 +1,8 @@
 import React from 'react';
-import { Variable } from '../types';
-import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../theme/design-system';
-import { formatVariableValue } from '../utils/helpers';
-import { FormattedVariableInput } from './FormattedVariableInput';
+import { Variable } from '../../types';
+import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../theme/design-system';
+import { formatVariableValue } from '../../utils/helpers';
+import { FormattedVariableInput } from '../ui/Input';
 
 
 interface SectorVariableRowProps {

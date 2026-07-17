@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterStatus } from '../types';
+import { FilterStatus } from '../../types';
 
 interface SectorFilterBarProps {
   activeTypeFilter: 'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA';

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ConsolidatedItem } from '../components/HarvestPlanTable';
-import { VariableConfig } from '../components/HarvestPlanConfigTable';
+import { ConsolidatedItem } from '../components/harvest-plan/HarvestPlanTable';
+import { VariableConfig } from '../components/harvest-plan/HarvestPlanConfigTable';
 
 export function useHarvestPlanState() {
   const [activeSubTab, setActiveSubTab] = useState<'visualizacao' | 'configuracao'>('visualizacao');

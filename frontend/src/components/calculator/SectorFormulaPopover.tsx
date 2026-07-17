@@ -1,5 +1,5 @@
 import React from 'react';
-import { BmeIcon } from '../theme/design-system';
+import { BmeIcon } from '../../theme/design-system';
 
 interface SectorFormulaPopoverProps {
   activeFormulaPopover: { varId: string; formula: string } | null;
