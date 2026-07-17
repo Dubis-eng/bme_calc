@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.A.1 — Criar docs/DESIGN.md com tokens do sistema
+current_task: 22.B.1 — Substituir allow_origins=["*"] por env var
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Planejamento concluído → Execução iniciando em 22.0.x
-- **Próxima tarefa:** TASK-2212 (Criar docs/DESIGN.md com sistema de design documentado)
+- **Fase:** Domínio A Concluído → Executando Domínio B (CORS Security)
+- **Próxima tarefa:** TASK-2220 (Substituir allow_origins=["*"] por env var ALLOWED_ORIGINS)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Tarefa 22.0.8 (Atualizar README.md e docs/ARCHITECTURE.md)
-- Branch: `task/22.0.8-docs-update`
+- Épico 22 — Domínio A (Design System Studio Dark)
+- Branch: `task/22.A.2-studio-dark-css`
 
 ## 📋 Progresso do Épico 22
 
@@ -30,11 +30,11 @@ current_task: 22.A.1 — Criar docs/DESIGN.md com tokens do sistema
 - [x] TASK-2207 Atualizar README.md e docs/ARCHITECTURE.md
 
 ### Domínio A — Design System
-- [ ] TASK-2210 Atualizar `index.css` com paleta Studio Dark + tabular numbers
-- [ ] TASK-2211 Atualizar `tailwind.config.js` com tokens HSL
-- [/] TASK-2212 Criar `docs/DESIGN.md` com sistema de design documentado
-- [ ] TASK-2213 Aplicar `studio-surface`, `glow-primary`, row highlight nos componentes
-- [ ] TASK-2214 Diferenciar visualmente INPUT/OUTPUT/CONSTANT
+- [x] TASK-2210 Atualizar `index.css` com paleta Studio Dark + tabular numbers
+- [x] TASK-2211 Atualizar `tailwind.config.js` com tokens HSL
+- [x] TASK-2212 Criar `docs/DESIGN.md` com sistema de design documentado
+- [x] TASK-2213 Aplicar `studio-surface`, `glow-primary`, row highlight nos componentes
+- [x] TASK-2214 Diferenciar visualmente INPUT/OUTPUT/CONSTANT
 
 ### Domínio B — Segurança CORS
 - [ ] TASK-2220 Substituir `allow_origins=["*"]` por env var `ALLOWED_ORIGINS`

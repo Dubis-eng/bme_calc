@@ -32,6 +32,8 @@ function App() {
   const [showDashboard, setShowDashboard] = useState(true);
   const [activeStatusFilter, setActiveStatusFilter] = useState<FilterStatus>('all');
 
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+
   const fetchSectors = () => {
     axios.get('http://localhost:8000/api/sectors')
       .then(res => setSectors(res.data))
@@ -237,7 +239,8 @@ function App() {
                     variables={variables}
                     results={results}
                     isLocked={isLocked || isOffline}
-                    highlightedVarId={search.highlightedVarId}
+                    highlightedVarId={selectedFieldId || search.highlightedVarId}
+                    onSelectVariable={setSelectedFieldId}
                     onEditVariable={handleEditVariable}
                     onAddVariable={handleAddVariable}
                     onVariableChange={handleChange}

@@ -10,6 +10,7 @@ interface SectorVariableRowProps {
   results: Record<string, any>;
   isLocked: boolean;
   highlightedVarId: string | null;
+  onSelectVariable?: (id: string | null) => void;
   auditVarId: string | null;
   setAuditVarId: React.Dispatch<React.SetStateAction<string | null>>;
   internalAuditDeps: string[];
@@ -23,7 +24,7 @@ interface SectorVariableRowProps {
 }
 
 export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
-  variable, results, isLocked, highlightedVarId, auditVarId, setAuditVarId,
+  variable, results, isLocked, highlightedVarId, onSelectVariable, auditVarId, setAuditVarId,
   internalAuditDeps, onEditVariable, onVariableChange, setActiveFormulaPopover,
   handleDragStart, handleDragOver, handleDrop, handleMove
 }) => {
@@ -31,10 +32,31 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
   const id = v['ID - REF'];
   const res = results[id];
   const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
+  const isConstant = (v.TIPO as string) === 'CONSTANT';
   const isHighlight = highlightedVarId === id;
   const isAuditedOrigin = auditVarId === id;
   const isAuditedDep = auditVarId !== null && internalAuditDeps.includes(id);
   const isInactive = v.STATUS === 'inativa';
+
+  const fieldClass = isInput
+    ? 'field-input'
+    : isConstant
+    ? 'field-constant'
+    : 'field-output';
+
+  const getReadOnlyValue = () => {
+    if (res !== undefined && res.status === 'OK' && res.value !== null) {
+      return formatVariableValue(res.value, v);
+    }
+    if (isConstant) {
+      const num = Number(String(v['EQUAÇÕES E VALORES']).replace(',', '.'));
+      if (!isNaN(num)) {
+        return formatVariableValue(num, v);
+      }
+      return String(v['EQUAÇÕES E VALORES']);
+    }
+    return '—';
+  };
 
   return (
     <tr
@@ -44,6 +66,7 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
       onDragStart={(e) => handleDragStart(e, 'var', id)}
       onDragOver={handleDragOver}
       onDrop={(e) => handleDrop(e, 'var', id)}
+      onClick={() => onSelectVariable?.(id)}
     >
       <td className="bme-table-cell text-center select-none w-10">
         <div className="flex items-center justify-center gap-1">
@@ -83,20 +106,32 @@ export const SectorVariableRow: React.FC<SectorVariableRowProps> = ({
               variable={v}
               isLocked={isLocked}
               onVariableChange={onVariableChange}
-              className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md bg-slate-800 border border-slate-700/60 text-slate-200 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-teal-500/60 focus:border-teal-500/50 disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800`}
+              className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md border text-right focus:outline-none transition-all duration-150 disabled:opacity-50 ${fieldClass}`}
             />
             {v.tipo_exibicao === 'PERCENTAGE' && (
               <span className="text-[10px] font-bold text-slate-500 w-4 shrink-0 select-none text-left">%</span>
             )}
           </div>
         ) : (
-          res !== undefined ? (
-            res.status === 'OK' && res.value !== null ? (
-              <span className="text-slate-200 tabular-nums">{formatVariableValue(res.value, v)}</span>
-            ) : (
+          res !== undefined && res.status !== 'OK' ? (
+            <div className="flex justify-end items-center">
               <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[res.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`} title={res.error_message || res.status}>⚠ {res.status}</span>
-            )
-          ) : <span className="text-slate-700">—</span>
+            </div>
+          ) : (
+            <div className="flex justify-end items-center gap-1.5">
+              <label htmlFor={`input-val-${id}`} className="sr-only">Valor para {id}</label>
+              <input
+                id={`input-val-${id}`}
+                type="text"
+                readOnly
+                value={getReadOnlyValue()}
+                className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md border text-right focus:outline-none transition-all duration-150 ${fieldClass}`}
+              />
+              {v.tipo_exibicao === 'PERCENTAGE' && (
+                <span className="text-[10px] font-bold text-slate-500 w-4 shrink-0 select-none text-left">%</span>
+              )}
+            </div>
+          )
         )}
       </td>
 

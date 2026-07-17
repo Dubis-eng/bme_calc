@@ -7,6 +7,7 @@ interface SectorControlPointTableProps {
   results: Record<string, any>;
   isLocked: boolean;
   highlightedVarId: string | null;
+  onSelectVariable?: (id: string | null) => void;
   auditVarId: string | null;
   setAuditVarId: React.Dispatch<React.SetStateAction<string | null>>;
   internalAuditDeps: string[];
@@ -20,7 +21,7 @@ interface SectorControlPointTableProps {
 }
 
 export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = ({
-  cp, results, isLocked, highlightedVarId, auditVarId, setAuditVarId,
+  cp, results, isLocked, highlightedVarId, onSelectVariable, auditVarId, setAuditVarId,
   internalAuditDeps, onEditVariable, onVariableChange, setActiveFormulaPopover,
   handleDragStart, handleDragOver, handleDrop, handleMove
 }) => {
@@ -65,6 +66,7 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
                 results={results}
                 isLocked={isLocked}
                 highlightedVarId={highlightedVarId}
+                onSelectVariable={onSelectVariable}
                 auditVarId={auditVarId}
                 setAuditVarId={setAuditVarId}
                 internalAuditDeps={internalAuditDeps}

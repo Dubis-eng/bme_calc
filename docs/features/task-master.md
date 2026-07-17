@@ -405,7 +405,7 @@ graph TD
   - Prioridade: 🔴 Alta | Complexidade: 7
 
 * [x] **Tarefa 22.0.6** *(Frontend: Criar pastas `state/`, `api/`, `hooks/`, `styles/`, `pages/`)* — Criar estrutura de pastas. Mover `utils/useScenario.ts`, `utils/useEquationAutocomplete.ts`, `utils/useSearch.ts`, `utils/useVariableSearch.ts` → `hooks/`. Mover `index.css` e `theme/design-system.tsx` → `styles/`. Criar esqueletos de `state/atoms.ts`, `api/client.ts` e `pages/CalculatorPage.tsx`. **Critério:** App compila e renderiza corretamente.
-  - Dependências: 22.0.5
+  - Dependências: —
   - Prioridade: 🔴 Alta | Complexidade: 5
 
 * [x] **Tarefa 22.0.7** *(Atualizar Docker e CI para nova estrutura)* — Atualizar `backend/Dockerfile` para novo entry point `src/main.py`. Atualizar `docker-compose.yml` com novos volumes e caminhos. Verificar que `docker-compose up` inicia todos os serviços sem erro. **Critério:** `docker-compose up --build` verde.
@@ -424,19 +424,19 @@ graph TD
   - Dependências: 22.0.6
   - Prioridade: 🟡 Média | Complexidade: 2
 
-* [ ] **Tarefa 22.A.2** *(Atualizar `styles/index.css` com paleta Studio Dark)* — Implementar variáveis CSS HSL: `--background`, `--primary` (esmeralda), `--accent` (âmbar inputs), `--card`, gradientes radiais de spotlight, sistema de elevação em 3 camadas. Adicionar `font-feature-settings: "tnum" 1` global. Criar classes `.studio-surface`, `.glow-primary`, `.label-eyebrow`. **Critério:** Visual do app com dark mode premium; tabular numbers ativos em tabelas.
+* [x] **Tarefa 22.A.2** *(Atualizar `styles/index.css` com paleta Studio Dark)* — Implementar variáveis CSS HSL: `--background`, `--primary` (esmeralda), `--accent` (âmbar inputs), `--card`, gradientes radiais de spotlight, sistema de elevação em 3 camadas. Adicionar `font-feature-settings: "tnum" 1` global. Criar classes `.studio-surface`, `.glow-primary`, `.label-eyebrow`. **Critério:** Visual do app com dark mode premium; tabular numbers ativos em tabelas.
   - Dependências: 22.A.1, 22.0.6
   - Prioridade: 🔴 Alta | Complexidade: 5
 
-* [ ] **Tarefa 22.A.3** *(Atualizar `tailwind.config.js` com tokens HSL)* — Mapear todas as variáveis CSS `--bme-*` para classes Tailwind customizadas. Garantir que componentes existentes não quebrem com os novos tokens. **Critério:** `npm run build` sem warnings de classes não-reconhecidas.
+* [x] **Tarefa 22.A.3** *(Atualizar `tailwind.config.js` com tokens HSL)* — Mapear todas as variáveis CSS `--bme-*` para classes Tailwind customizadas. Garantir que componentes existentes não quebrem com os novos tokens. **Critério:** `npm run build` sem warnings de classes não-reconhecidas.
   - Dependências: 22.A.2
   - Prioridade: 🟡 Média | Complexidade: 3
 
-* [ ] **Tarefa 22.A.4** *(Diferenciar visualmente INPUT / OUTPUT / CONSTANT)* — Aplicar âmbar (`--accent`) em campos INPUT editáveis. Aplicar branco neutro em OUTPUT (read-only). Aplicar cinza muted em CONSTANT. Garantir que todos os campos OUTPUT e CONSTANT têm `readOnly` programático no HTML. Atualizar `SectorVariableRow.tsx` e componentes de tabela. **Critério:** Usuário distingue visualmente o que pode editar sem tooltip.
+* [x] **Tarefa 22.A.4** *(Diferenciar visualmente INPUT / OUTPUT / CONSTANT)* — Aplicar âmbar (`--accent`) em campos INPUT editáveis. Aplicar branco neutro em OUTPUT (read-only). Aplicar cinza muted em CONSTANT. Garantir que todos os campos OUTPUT e CONSTANT têm `readOnly` programático no HTML. Atualizar `SectorVariableRow.tsx` e componentes de tabela. **Critério:** Usuário distingue visualmente o que pode editar sem tooltip.
   - Dependências: 22.A.2, 22.0.5
   - Prioridade: 🔴 Alta | Complexidade: 4
 
-* [ ] **Tarefa 22.A.5** *(Implementar row highlight e glow CTA Calcular)* — Adicionar `selectedFieldId` ao state global. Aplicar `box-shadow: inset 3px 0 0 hsl(--ring)` na linha selecionada. Adicionar classe `.glow-primary` ao botão Calcular com animação hover. **Critério:** Clicar em qualquer linha destaca a linha com barra lateral teal; botão Calcular tem glow esmeralda.
+* [x] **Tarefa 22.A.5** *(Implementar row highlight e glow CTA Calcular)* — Adicionar `selectedFieldId` ao state global. Aplicar `box-shadow: inset 3px 0 0 hsl(--ring)` na linha selecionada. Adicionar classe `.glow-primary` ao botão Calcular com animação hover. **Critério:** Clicar em qualquer linha destaca a linha com barra lateral teal; botão Calcular tem glow esmeralda.
   - Dependências: 22.A.2
   - Prioridade: 🟡 Média | Complexidade: 3
 

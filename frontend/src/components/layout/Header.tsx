@@ -153,7 +153,7 @@ export function Header({
             id="btn-calculate"
             onClick={handleCalculate}
             disabled={calculating || isLocked}
-            className="btn-primary flex items-center gap-2 px-4 py-1.5 text-xs"
+            className="btn-primary flex items-center gap-2 px-4 py-1.5 text-xs glow-primary animate-glow-pulse"
           >
             {calculating && (
               <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

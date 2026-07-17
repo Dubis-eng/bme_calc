@@ -2,19 +2,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Variable, FilterStatus } from '../../types';
-import { BmeIcon, TYPE_BADGE, ERROR_BADGE } from '../../styles/design-system';
+import { BmeIcon } from '../../styles/design-system';
 import { SectorFilterBar } from './SectorFilterBar';
 import { SectorFormulaPopover } from './SectorFormulaPopover';
 import { SectorAuditCard } from './SectorAuditCard';
 import { groupAndSortVariables } from '../../utils/sorting';
-import { SectorVariableRow } from './SectorVariableRow';
 import { SectorControlPointTable } from '../sectors/SectorControlPointTable';
-import {
-  formatVariableValue,
-  getInputValue,
-  cleanInputValue,
-  getDependencies
-} from '../../utils/helpers';
+import { getDependencies } from '../../utils/helpers';
 
 interface SectorModulesProps {
   activeSector: string;
@@ -22,6 +16,7 @@ interface SectorModulesProps {
   results: Record<string, any>;
   isLocked: boolean;
   highlightedVarId: string | null;
+  onSelectVariable?: (id: string | null) => void;
   onEditVariable: (variable: Variable) => void;
   onAddVariable: (sector: string, definition: string) => void;
   onVariableChange: (id: string, value: string) => void;
@@ -33,6 +28,7 @@ interface SectorModulesProps {
 
 export const SectorModules: React.FC<SectorModulesProps> = ({
   activeSector, variables, results, isLocked, highlightedVarId,
+  onSelectVariable,
   onEditVariable, onAddVariable, onVariableChange, onNavigateToVariable,
   activeStatusFilter, setActiveStatusFilter, onReorderSuccess
 }) => {
@@ -41,7 +37,6 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   const [showInactive, setShowInactive] = useState(false);
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
   const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
-  const [draggedItem, setDraggedItem] = useState<{ type: 'stage' | 'cp' | 'var'; id: string } | null>(null);
 
   const matchesStatus = (v: Variable): boolean => {
     if (activeStatusFilter === 'all') return true;
@@ -66,7 +61,6 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
   const handleDragStart = (e: React.DragEvent, type: 'stage' | 'cp' | 'var', id: string) => {
     e.stopPropagation();
     e.dataTransfer.setData('text/plain', JSON.stringify({ type, id }));
-    setDraggedItem({ type, id });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -135,8 +129,6 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
       onReorderSuccess?.();
     } catch (err) {
       console.error(err);
-    } finally {
-      setDraggedItem(null);
     }
   };
 
@@ -262,6 +254,7 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
                       results={results}
                       isLocked={isLocked}
                       highlightedVarId={highlightedVarId}
+                      onSelectVariable={onSelectVariable}
                       auditVarId={auditVarId}
                       setAuditVarId={setAuditVarId}
                       internalAuditDeps={internalAuditDeps}
