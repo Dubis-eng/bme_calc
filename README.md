@@ -64,5 +64,6 @@ python .agent/scripts/verify_all.py . --url http://localhost:3000
 Toda a documentação técnica e de governança do projeto está centralizada no diretório [docs/](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/):
 * [docs/README.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/README.md): Mapa de Ingestão e Status de Funcionalidades.
 * [docs/ARCHITECTURE.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/ARCHITECTURE.md): Detalhamento da arquitetura de software e estrutura de diretórios.
+* [docs/DESIGN.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/DESIGN.md): **Sistema de Design Studio Dark** — tokens de cor HSL, tipografia, elevações e estados de campo.
 * [docs/AUDIT_RULES.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/AUDIT_RULES.md): Diretrizes de design system (Maestro UI), WCAG e comandos de validação.
 * [docs/changelog.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/changelog.md): Histórico de lançamentos e versões do sistema.

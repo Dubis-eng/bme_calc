@@ -420,7 +420,7 @@ graph TD
 
 #### Domínio A — Design System Studio Dark
 
-* [/] **Tarefa 22.A.1** *(Criar `docs/DESIGN.md` com tokens do sistema)* — Documentar paleta de cores (HSL tokens), tipografia (Inter Variable + JetBrains Mono), elevações, estados de campo (INPUT/OUTPUT/CONSTANT) e utilitários CSS. Este documento é a fonte de verdade do design. **Critério:** Documento criado e referenciado no README.
+* [x] **Tarefa 22.A.1** *(Criar `docs/DESIGN.md` com tokens do sistema)* — Documentar paleta de cores (HSL tokens), tipografia (Inter Variable + JetBrains Mono), elevações, estados de campo (INPUT/OUTPUT/CONSTANT) e utilitários CSS. Este documento é a fonte de verdade do design. **Critério:** Documento criado e referenciado no README.
   - Dependências: 22.0.6
   - Prioridade: 🟡 Média | Complexidade: 2
 
