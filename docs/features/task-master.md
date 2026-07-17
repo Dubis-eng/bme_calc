@@ -484,7 +484,7 @@ graph TD
   - Dependências: 22.D.2
   - Prioridade: 🟡 Média | Complexidade: 2
 
-* [ ] **Tarefa 22.D.4** *(Instalar Jotai e criar `state/atoms.ts`)* — Instalar `jotai` + `jotai/utils`. Criar `src/state/atoms.ts` com `inputAtomFamily`, `outputAtomFamily`, `calculationStatusAtom`. Criar `src/state/uiAtoms.ts` com `selectedFieldIdAtom`. Criar `src/state/scenarioAtoms.ts`. **Critério:** Atoms criados e testáveis com Vitest.
+* [x] **Tarefa 22.D.4** *(Instalar Jotai e criar `state/atoms.ts`)* — Instalar `jotai` + `jotai/utils`. Criar `src/state/atoms.ts` com `inputAtomFamily`, `outputAtomFamily`, `calculationStatusAtom`. Criar `src/state/uiAtoms.ts` com `selectedFieldIdAtom`. Criar `src/state/scenarioAtoms.ts`. **Critério:** Atoms criados e testáveis com Vitest.
   - Dependências: 22.D.3, 22.F.1
   - Prioridade: 🟡 Média | Complexidade: 4
 

@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.D.4 — Instalar Jotai, criar state/atoms.ts com atomFamily
+current_task: 22.D.5 — Migrar state global de App.tsx para atoms Jotai
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Migração Vite Concluída → Executando Jotai State Management
-- **Próxima tarefa:** TASK-2250 (Instalar Jotai, criar state/atoms.ts com atomFamily)
+- **Fase:** Jotai Inicializado → Migrando State Global de App.tsx
+- **Próxima tarefa:** TASK-2251 (Migrar state global do App.tsx para atoms)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio D (Migração Vite)
-- Branch: `task/22.D.1-migrate-vite`
+- Épico 22 — Domínio D (Instalar Jotai e Criar atoms.ts)
+- Branch: `task/22.D.4-jotai-state`
 
 ## 📋 Progresso do Épico 22
 
@@ -50,7 +50,7 @@ current_task: 22.D.4 — Instalar Jotai, criar state/atoms.ts com atomFamily
 - [x] TASK-2240 Instalar Vite, criar `vite.config.ts` e `main.tsx`
 - [x] TASK-2241 Validar build Vite com todos os componentes existentes
 - [x] TASK-2242 Remover CRA (`react-scripts`) após validação
-- [ ] TASK-2250 Instalar Jotai, criar `state/atoms.ts` com `atomFamily`
+- [x] TASK-2250 Instalar Jotai, criar `state/atoms.ts` com `atomFamily`
 - [ ] TASK-2251 Migrar state global do App.tsx para atoms
 - [ ] TASK-2252 Migrar SectorModules para consumir atoms
 - [ ] TASK-2260 Instalar `@tanstack/react-table`
