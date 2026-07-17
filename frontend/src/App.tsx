@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import axios from 'axios';
 import { Variable, Sector, FilterStatus } from './types';
+import { ScenarioMetadata } from './components/scenario/ScenarioManager';
 import { GoalSeekModal } from './components/goalseek/GoalSeekModal';
 import { SectorModules } from './components/calculator/SectorModules';
 import { VariableModal } from './components/variables/VariableModal';
@@ -204,7 +205,7 @@ function App() {
                         onClick={async () => {
                           handleCalculate();
                           const currentCycleMonth = months.find(m => m.order_index === 0)?.name || 'Abril';
-                          setCurrentScenario((prev: any) => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
+                          setCurrentScenario((prev: ScenarioMetadata | null) => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
                           setHasUnsavedChanges(true);
                         }}
                         className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold transition-all uppercase tracking-wider whitespace-nowrap"
@@ -257,7 +258,7 @@ function App() {
             variables={variables}
             onLoadScenario={onLoadScenario}
             currentScenario={currentScenario}
-            onStatusChange={newStatus => setCurrentScenario((prev: any) => prev ? { ...prev, status: newStatus } : null)}
+            onStatusChange={newStatus => setCurrentScenario((prev: ScenarioMetadata | null) => prev ? { ...prev, status: newStatus } : null)}
             anoSafra={anoSafra}
             setAnoSafra={setAnoSafra}
             mesReferencia={mesReferencia}

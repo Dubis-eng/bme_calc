@@ -536,7 +536,7 @@ graph TD
 
 #### Verificação Final (Definition of Done — Épico 22)
 
-* [ ] **Tarefa 22.Z.1** *(Checklist completo de verificação)* — Executar `python .agent/scripts/checklist.py .`. Validar manualmente todas as 7 funcionalidades protegidas. Verificar que `pytest backend/tests/` passa 100%. Verificar que `npm run test:unit` e `npm run test:e2e` passam. **Critério:** Checklist verde; PR criado para `main` com aprovação manual.
+* [x] **Tarefa 22.Z.1** *(Checklist completo de verificação)* — Executar `python .agent/scripts/checklist.py .`. Validar manualmente todas as 7 funcionalidades protegidas. Verificar que `pytest backend/tests/` passa 100%. Verificar que `npm run test:unit` e `npm run test:e2e` passam. **Critério:** Checklist verde; PR criado para `main` com aprovação manual.
   - Dependências: todas as tarefas 22.x
   - Prioridade: 🔴 Alta | Complexidade: 3
 

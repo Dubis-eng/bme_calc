@@ -1,12 +1,12 @@
 import React, { memo } from 'react';
-import { Variable } from '../../types';
+import { Variable, Result } from '../../types';
 import { FormattedVariableInput } from '../ui/Input';
 import { formatVariableValue } from '../../utils/helpers';
 import { ERROR_BADGE } from '../../styles/design-system';
 
 interface ValueCellProps {
   variable: Variable;
-  result: any;
+  result: Result | undefined;
   isLocked: boolean;
 }
 
