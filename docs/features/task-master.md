@@ -444,7 +444,7 @@ graph TD
 
 #### Domínio B — Segurança CORS
 
-* [ ] **Tarefa 22.B.1** *(Substituir `allow_origins=["*"]` por env var)* — Em `src/main.py`, ler `ALLOWED_ORIGINS` do ambiente (parser de string separada por vírgula). Fallback para `["http://localhost:3000"]` em modo dev. Atualizar `backend/.env.sample` e `docker-compose.yml` com a nova variável. **Critério:** App funciona normalmente; requisição de origem não listada recebe 403.
+* [x] **Tarefa 22.B.1** *(Substituir `allow_origins=["*"]` por env var)* — Em `src/main.py`, ler `ALLOWED_ORIGINS` do ambiente (parser de string separada por vírgula). Fallback para `["http://localhost:3000"]` em modo dev. Atualizar `backend/.env.sample` e `docker-compose.yml` com a nova variável. **Critério:** App funciona normalmente; requisição de origem não listada recebe 403.
   - Dependências: 22.0.1
   - Prioridade: 🔴 Alta | Complexidade: 2
 

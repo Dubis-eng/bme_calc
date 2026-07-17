@@ -4,19 +4,19 @@ title: Modernização Arquitetural — Sessão Ativa
 status: in-progress
 branch: feature/architecture-improvements
 last_updated: 2026-07-16
-current_task: 22.B.1 — Substituir allow_origins=["*"] por env var
+current_task: 22.C.1 — Criar tests/test_engine_decimal_parity.py
 ---
 
 # SESSION — Épico 22: Modernização Arquitetural
 
 ## 📍 Estado Atual
 - **Branch ativa:** `feature/architecture-improvements`
-- **Fase:** Domínio A Concluído → Executando Domínio B (CORS Security)
-- **Próxima tarefa:** TASK-2220 (Substituir allow_origins=["*"] por env var ALLOWED_ORIGINS)
+- **Fase:** Domínio B Concluído → Executando Domínio C (Engine Decimal Parity)
+- **Próxima tarefa:** TASK-2230 (Criar test_engine_decimal_parity.py)
 
 ## 🏁 Última Tarefa Concluída
-- Épico 22 — Domínio A (Design System Studio Dark)
-- Branch: `task/22.A.2-studio-dark-css`
+- Épico 22 — Domínio B (Segurança CORS)
+- Branch: `task/22.B.1-cors-security`
 
 ## 📋 Progresso do Épico 22
 
@@ -37,8 +37,8 @@ current_task: 22.B.1 — Substituir allow_origins=["*"] por env var
 - [x] TASK-2214 Diferenciar visualmente INPUT/OUTPUT/CONSTANT
 
 ### Domínio B — Segurança CORS
-- [ ] TASK-2220 Substituir `allow_origins=["*"]` por env var `ALLOWED_ORIGINS`
-- [ ] TASK-2221 Atualizar `.env.sample`, `docker-compose.yml` e docs
+- [x] TASK-2220 Substituir `allow_origins=["*"]` por env var `ALLOWED_ORIGINS`
+- [x] TASK-2221 Atualizar `.env.sample`, `docker-compose.yml` e docs
 
 ### Domínio C — Engine Decimal
 - [ ] TASK-2230 Criar `test_engine_decimal_parity.py` (testes de paridade float vs Decimal)
