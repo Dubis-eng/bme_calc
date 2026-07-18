@@ -1,7 +1,7 @@
 ---
 id: FEAT-022
 title: Modernização Arquitetural, Reestruturação de Diretórios e Design System
-status: ongoing
+status: done
 prd_reference: SPEC.md (SPEC-022) + Avaliação balanco-massa (2026-07-16)
 last_updated: 2026-07-16
 branch: feature/architecture-improvements
