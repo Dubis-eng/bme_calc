@@ -1,5 +1,5 @@
 // aria-label: placeholder to satisfy UX audit regex false positive on SectorAuditCard
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import axios from 'axios';
 import { Variable, FilterStatus } from '../../types';
 import { BmeIcon } from '../../styles/design-system';
@@ -45,14 +45,14 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
     return !st || st === 'PENDING';
   };
 
-  const sectorVariables = variables.filter(v => {
+  const sectorVariables = useMemo(() => variables.filter(v => {
     if (v.SETOR !== activeSector) return false;
     if (v.STATUS === 'inativa' && !showInactive) return false;
     if (activeTypeFilter !== 'ALL' && v.TIPO !== activeTypeFilter) return false;
     return matchesStatus(v);
-  });
+  }), [variables, activeSector, showInactive, activeTypeFilter, activeStatusFilter, results]);
 
-  const groupedStages = groupAndSortVariables(sectorVariables);
+  const groupedStages = useMemo(() => groupAndSortVariables(sectorVariables), [sectorVariables]);
 
   const handleDragStart = (e: React.DragEvent, type: 'stage' | 'cp' | 'var', id: string) => {
     e.stopPropagation();

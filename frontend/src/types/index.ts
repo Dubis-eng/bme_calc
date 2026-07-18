@@ -49,3 +49,12 @@ export interface BackendVariable {
   percent_base?: "DECIMAL" | "INTEGER";
 }
 
+export interface ScenarioMetadata {
+  id?: string;
+  year_harvest: number | string;
+  reference_month: string;
+  version?: number;
+  status?: string;
+  cycle_start_month?: string;
+}
+

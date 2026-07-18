@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAtom } from 'jotai';
 import {
   useReactTable,
@@ -26,6 +26,8 @@ interface SectorControlPointTableProps {
   handleMove: (type: 'stage' | 'cp' | 'var', id: string, direction: 'up' | 'down') => void;
 }
 
+const columnHelper = createColumnHelper<Variable>();
+
 export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = ({
   cp, results, isLocked, auditVarId, setAuditVarId,
   internalAuditDeps, onEditVariable, setActiveFormulaPopover,
@@ -33,9 +35,7 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
 }) => {
   const [highlightedVarId, setSelectedFieldId] = useAtom(selectedFieldIdAtom);
 
-  const columnHelper = createColumnHelper<Variable>();
-
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.display({
       id: 'drag',
       cell: (info) => {
@@ -120,12 +120,13 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
         );
       },
     }),
-  ];
+  ], [isLocked, auditVarId, results, setAuditVarId, setActiveFormulaPopover, handleMove, onEditVariable]);
 
   const table = useReactTable({
     data: cp.variables,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row['ID - REF'],
   });
 
   return (

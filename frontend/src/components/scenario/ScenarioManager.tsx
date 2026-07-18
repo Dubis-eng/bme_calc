@@ -191,7 +191,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                                         : 'bg-teal-600 hover:bg-teal-700'
                                 }`}
                             >
-                                {savingActive ? 'Salvando...' : hasUnsavedChanges ? '⚠️ Salvar Alterações' : 'Salvar Alterações'}
+                                {savingActive ? 'Salvando...' : hasUnsavedChanges ? '⚠️ Salvar Alterações Pendentes' : 'Sem Alterações Pendentes'}
                             </button>
                         </div>
                     )}

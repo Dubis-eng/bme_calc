@@ -1,12 +1,14 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import { Variable } from '../types';
+import { Variable, Result, ScenarioMetadata } from '../types';
+
+
 
 export const variablesAtom = atom<Variable[]>([]);
-export const resultsAtom = atom<Record<string, any>>({});
+export const resultsAtom = atom<Record<string, Result>>({});
 export const selectedFieldIdAtom = atom<string | null>(null);
 export const activeSectorAtom = atom<string>('');
-export const currentScenarioAtom = atom<any>(null);
+export const currentScenarioAtom = atom<ScenarioMetadata | null>(null);
 export const anoSafraAtom = atom<number>(2026);
 export const mesReferenciaAtom = atom<string>('Abril');
 export const hasUnsavedChangesAtom = atom<boolean>(false);
@@ -31,15 +33,16 @@ export const toleranceAtom = atom(
 // Local input values atom family to avoid global re-renders on every keystroke
 export const variableValueAtomFamily = atomFamily((id: string) => atom(''));
 
-// Write-only atom to initialize variables and populate the local value atom family
+// Write-only atom to initialize variables and populate the atom family with raw values.
+// The atom family stores raw decimal values — display formatting happens in FormattedVariableInput.
 export const setVariablesWithValuesAtom = atom(
   null,
   (get, set, newVars: Variable[]) => {
     set(variablesAtom, newVars);
     for (const v of newVars) {
       const id = v['ID - REF'];
-      const val = String(v['EQUAÇÕES E VALORES']);
-      set(variableValueAtomFamily(id), val);
+      const rawVal = String(v['EQUAÇÕES E VALORES'] ?? '');
+      set(variableValueAtomFamily(id), rawVal);
     }
   }
 );
@@ -53,15 +56,14 @@ export const updateVariableValueAtom = atom(
   }
 );
 
-// Read-only atom to retrieve variables merged with their latest local values from the atom family
+// Read-only atom to retrieve variables merged with their latest committed values.
+// The atom family stores clean (raw decimal) values, written only on input blur.
 export const getMergedVariablesAtom = atom((get) => {
   const vars = get(variablesAtom);
   return vars.map(v => {
     const id = v['ID - REF'];
-    const currentVal = get(variableValueAtomFamily(id));
-    return {
-      ...v,
-      'EQUAÇÕES E VALORES': currentVal
-    };
+    const committedVal = get(variableValueAtomFamily(id));
+    if (!committedVal && committedVal !== '0') return v;
+    return { ...v, 'EQUAÇÕES E VALORES': committedVal };
   });
 });

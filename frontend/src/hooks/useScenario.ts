@@ -26,7 +26,10 @@ import {
   updateVariableValueAtom
 } from '../state/atoms';
 
+import { useScenarioIO } from './useScenarioIO';
+
 export function useScenario(sectors: Sector[], fetchSectors: () => void) {
+  const { years, months, fetchYearsAndMonths, ensureSectorExists, createVariablePayload } = useScenarioIO();
   const [variables, setVariables] = useAtom(variablesAtom);
   const [, setVariablesWithValues] = useAtom(setVariablesWithValuesAtom);
   const mergedVariables = useAtomValue(getMergedVariablesAtom);
@@ -46,8 +49,6 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
   const [savingActive, setSavingActive] = useAtom(savingActiveAtom);
   const [isOffline, setIsOffline] = useAtom(isOfflineAtom);
   const [residual, setResidual] = useAtom(residualAtom);
-  const [years, setYears] = useState<{ id: number; active: boolean }[]>([]);
-  const [months, setMonths] = useState<{ id: number; name: string; order_index: number; enabled: boolean }[]>([]);
   const [tolerance, setTolerance] = useAtom(toleranceAtom);
 
   const checkConnection = useCallback(async () => {
@@ -77,17 +78,6 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  const fetchYearsAndMonths = useCallback(async () => {
-    try {
-      const yrRes = await axios.get('http://localhost:8000/api/settings/years');
-      setYears(yrRes.data);
-      const moRes = await axios.get('http://localhost:8000/api/settings/months');
-      setMonths(moRes.data);
-    } catch (err) {
-      handleApiError(err);
-    }
-  }, [handleApiError]);
 
   const triggerCalculate = useCallback(async (varsList: Variable[], tolVal?: number) => {
     if (isOffline) return;
@@ -225,34 +215,8 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   const handleSaveVariable = async (newVar: Variable, isEdit: boolean, origId?: string) => {
     if (isLocked) return;
-    const sectorId = newVar.SETOR.toUpperCase();
-    if (!sectors.some(s => s.id === sectorId)) {
-      try {
-        const maxO = sectors.reduce((m, s) => s.ordem > m ? s.ordem : m, 0);
-        await axios.post('http://localhost:8000/api/sectors', {
-          id: sectorId, nome: sectorId.charAt(0).toUpperCase() + sectorId.slice(1).toLowerCase(), descricao: 'Criado via variável', ordem: maxO > 0 ? maxO + 10 : 10
-        });
-        fetchSectors();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    const payload = {
-      id: newVar["ID - REF"],
-      nome: newVar["DESCRIÇÃO"] || newVar["ID - REF"],
-      descricao: newVar["DESCRIÇÃO"] || "",
-      setor_id: newVar["SETOR"],
-      tipo: newVar["TIPO"],
-      unidade: newVar["UNIDADE DE MEDIDA"] || "",
-      status: newVar["STATUS"] || "ativa",
-      etapa: newVar["ETAPA"] || "",
-      ponto_controle: newVar["PONTO DE CONTROLE"] || "",
-      equation_value: String(newVar["EQUAÇÕES E VALORES"] || ""),
-      casas_decimais: (newVar.casas_decimais === undefined || newVar.casas_decimais === null || (newVar.casas_decimais as unknown) === '') ? null : Number(newVar.casas_decimais),
-      tipo_exibicao: newVar.tipo_exibicao || "NUMBER",
-      percent_base: newVar.percent_base || "DECIMAL"
-    };
+    await ensureSectorExists(newVar.SETOR, sectors, fetchSectors);
+    const payload = createVariablePayload(newVar);
 
     try {
       if (isEdit && origId) {

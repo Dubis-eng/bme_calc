@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import { useAtom } from 'jotai';
+import React, { useState, useEffect, useRef } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Variable } from '../../types';
-import { getInputValue } from '../../utils/helpers';
-import { variableValueAtomFamily, hasUnsavedChangesAtom } from '../../state/atoms';
+import { getInputValue, cleanInputValue } from '../../utils/helpers';
+import { variableValueAtomFamily, updateVariableValueAtom } from '../../state/atoms';
 
 interface FormattedVariableInputProps {
   variable: Variable;
@@ -12,39 +12,57 @@ interface FormattedVariableInputProps {
   id?: string;
 }
 
-export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
+export const FormattedVariableInput = React.memo<FormattedVariableInputProps>(({
   variable,
   isLocked,
   className = '',
   id
 }) => {
   const varId = variable['ID - REF'];
-  const [localValue, setLocalValue] = useAtom(variableValueAtomFamily(varId));
-  const [, setHasUnsavedChanges] = useAtom(hasUnsavedChangesAtom);
+
+  // Local display state — typing only updates this; zero Jotai propagation during input.
+  const [localDisplayValue, setLocalDisplayValue] = useState(() => getInputValue(variable));
+
+  // Read-only subscription to the committed (clean) value stored in the atom family.
+  // This changes only after a blur or a calculation — never during typing.
+  const committedRawVal = useAtomValue(variableValueAtomFamily(varId));
+
+  // Write-only dispatcher — no re-render subscription on this component.
+  const updateGlobalValue = useSetAtom(updateVariableValueAtom);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const variableRef = useRef<Variable>(variable);
+  variableRef.current = variable;
 
-  const equationsAndValues = variable['EQUAÇÕES E VALORES'];
-  const displayType = variable.tipo_exibicao;
-  const percentBase = variable.percent_base;
+  // Track previous committed value to detect external changes (post-calculation or scenario load).
+  const prevCommittedRef = useRef<string>(committedRawVal);
 
-  // Keep local value in sync with external updates (e.g., calculations or loading scenarios)
   useEffect(() => {
-    // Only overwrite localValue if this input is not currently focused,
-    // avoiding issues with intermediate typing states.
+    if (prevCommittedRef.current === committedRawVal) return;
+    prevCommittedRef.current = committedRawVal;
+    // Only sync display if the user is not currently typing in this field.
     if (document.activeElement !== inputRef.current) {
-      setLocalValue(getInputValue(variable));
+      // Build a temp variable with the committed raw value to get the correct display.
+      const varForDisplay = { ...variableRef.current, 'EQUAÇÕES E VALORES': committedRawVal };
+      setLocalDisplayValue(getInputValue(varForDisplay));
     }
-  }, [variable, equationsAndValues, displayType, percentBase, setLocalValue]);
+  }, [committedRawVal]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setLocalValue(val);
-    setHasUnsavedChanges(true);
+    // Only local state changes — zero writes to Jotai, zero external re-renders.
+    setLocalDisplayValue(e.target.value);
   };
 
   const handleBlur = () => {
-    // Clean and format value on blur
-    setLocalValue(getInputValue(variable));
+    const currentVar = variableRef.current;
+    const cleaned = cleanInputValue(localDisplayValue, currentVar);
+    const updatedVar = { ...currentVar, 'EQUAÇÕES E VALORES': cleaned };
+    const formatted = getInputValue(updatedVar);
+    // Update display to formatted value.
+    setLocalDisplayValue(formatted);
+    // Write the clean raw value to the global atom — the ONLY write to Jotai.
+    updateGlobalValue({ id: varId, value: cleaned });
   };
 
   return (
@@ -54,11 +72,10 @@ export const FormattedVariableInput: React.FC<FormattedVariableInputProps> = ({
       type="text"
       aria-label={`Valor para ${varId}`}
       disabled={isLocked || variable.STATUS === 'inativa'}
-      value={localValue}
+      value={localDisplayValue}
       onChange={handleChange}
       onBlur={handleBlur}
       className={className}
     />
   );
-};
-
+});
