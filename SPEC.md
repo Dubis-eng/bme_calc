@@ -1,29 +1,43 @@
-# SPEC.md — Correção do Bug de Input na Tabela e Resolução de Débitos Técnicos
+# Specification Document — Épico 27: Refinamento Interativo de Fluxogramas por Setor
 
-## 1. Visão Geral
-Este documento especifica as modificações necessárias para solucionar o bug de entrada não responsiva no campo de formulário da tabela de variáveis (`<input id="input-val-J178">`) e sanar os débitos técnicos listados em `docs/BACKLOG.md` em conformidade com a Constituição `GEMINI.md`.
+## 1. Visão Geral e Objetivo
+Evolução do módulo de fluxogramas interativos do `bme_calc` para resolver problemas de persistência ao alternar abas, desvincular o seletor de cenários da página de variáveis para torná-lo um seletor dinâmico e independente na toolbar, implementar edição e renomeação completa de blocos via modal com filtros cascata (`Setor → Etapa/Processo → Ponto de Controle → Variável`), e suporte ao gerenciamento de setores no fluxo.
 
----
+## 2. Requisitos Funcionais
 
-## 2. Decisões Arquiteturais e de Design Resolvidas (/grill-me)
+### RF-01: Persistência Confiável do Layout Customizado
+- O layout salvo pelo usuário na tabela PostgreSQL `sector_flowcharts` é a fonte primária de verdade.
+- Trocar de aba de setor no aplicativo **NUNCA** pode resetar nem perder o posicionamento, conexões ou nomes de blocos salvos pelo usuário.
+- O botão "Resetar / Ver Padrão" permite alternar temporariamente para a topologia automática baseada no cadastro relacional, sem apagar o layout salvo até que um novo salvamento seja confirmado.
 
-### 2.1. Bug do Input Desresponsivo na Tabela (`SectorControlPointTable.tsx` & `useScenario.ts`)
-- **Problema:** A cada digitação no campo de input, a tabela recria seus elementos DOM (devido à re-instanciação não memoizada do TanStack Table) e perde o foco. Ao perder o foco, o `useEffect` de sincronização reverte o valor do campo para a prop estática `variable['EQUAÇÕES E VALORES']`.
-- **Solução:**
-  1. No hook `useScenario.ts`, exportar `variables: mergedVariables` (mesclado com `variableValueAtomFamily`) em vez de `variablesAtom` estático.
-  2. Em `SectorControlPointTable.tsx`, memoizar a definição de `columns` com `useMemo` para garantir a preservação da identidade dos nós DOM da tabela e manter o foco durante a digitação.
+### RF-02: Seletor Dinâmico e Independente de Cenários na Toolbar
+- Inclusão de dois dropdowns ativos na barra do fluxograma:
+  - **Dropdown de Ano Safra** (ex: 2025/2026, 2026/2027).
+  - **Dropdown de Cenário / Versão** (buscando dinamicamente via `GET /api/scenarios`).
+- Permite selecionar e projetar os valores calculados de qualquer cenário em tempo real (aprovado ou em edição) diretamente no canvas, de forma totalmente independente da tela de cadastro de variáveis.
 
-### 2.2. Modurarização e Limite de 300 Linhas (`GEMINI.md` P0)
-- **`useScenario.ts` (atualmente 315 linhas):** Extrair a lógica de I/O de cenários, anos e meses para um sub-hook `useScenarioIO.ts`.
-- **`test_engine_decimal_parity.py` (atualmente 454 linhas):** Extrair a classe auxiliar `FloatFormulaEvaluator` para `backend/tests/float_evaluator.py`.
+### RF-03: Modal de Edição Completa de Bloco (Duplo Clique)
+- Ao dar duplo clique em qualquer bloco (Processo ou E/S):
+  - **Campo para Renomear Bloco/Título**: Permite alterar livremente o nome exibido no cabeçalho do nó.
+  - **Filtro Cascata de Hierarquia**:
+    1. Dropdown para selecionar o **Setor**.
+    2. Dropdown para selecionar a **Etapa / Processo**.
+    3. Dropdown para selecionar o **Ponto de Controle**.
+  - **Campo de Busca Textual**: Filtragem rápida por código, ID ou descrição de variável.
+  - **Anexo / Desvinculação**: Checkbox para marcar quais variáveis pertencem àquele bloco.
 
-### 2.3. Eliminação de Tipos `any` e Validação de Auditoria
-- Substituir o uso residual de `any` em `atoms.ts` e componentes frontend por interfaces fortemente tipadas.
-- Executar os scripts de auditoria SEO e UX para limpar os alertas pendentes.
+### RF-04: Gerenciamento Dinâmico de Setores no Fluxograma
+- Na barra de abas de setores do fluxograma:
+  - Permite adicionar um novo setor customizado.
+  - Permite oculta/remover um setor do fluxo visual.
 
----
+### RF-05: Preservação do Motor de Cálculo e Zero Hardcode
+- Nenhuma regra de nome ou posicionamento é hardcoded.
+- O fluxograma permanece 100% como camada visual reativa, mantendo intacto o motor de cálculo AST e solvers.
 
-## 3. Plano de Verificação e Qualidade
-- **Checklist de Código Limpo:** Execução de `python .agent/scripts/checklist.py .`.
-- **Testes Backend:** `pytest backend/tests/`.
-- **Testes Frontend:** `npm run test` (Vitest).
+## 3. Requisitos Não-Funcionais e Restrições (GEMINI.md P0)
+- **Densidade:** Nenhum arquivo pode ultrapassar **300 linhas físicas**.
+- **Tipagem:** TypeScript estrito sem o uso de tipo `any`.
+- **Nesting:** Máximo de 3 níveis de aninhamento por função.
+- **Design System:** Cores baseadas em `teal`, `cyan` e `emerald` (tons de roxo/violeta banidos pelas regras Maestro UI).
+- **Validação:** Aprovação de 100% na suíte de testes (Pytest + Vitest) e Master Checklist (`python .agent/scripts/checklist.py .`).

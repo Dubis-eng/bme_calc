@@ -1,28 +1,27 @@
 ---
-id: EPIC-23
-title: Resolução de Bugs de Input na Tabela e Sanidade de Auditoria — Sessão Concluída
+id: EPIC-28
+title: Controle de Layout, Conexões e Exclusão Isolada de Setores Customizados — Épico Concluído
 status: ACCEPTED
 branch: main
-last_updated: 2026-07-18
-current_task: Nenhuma — Épico 23 Concluído com Sucesso (100% Master Checklist PASS)
+last_updated: 2026-07-19
+current_task: Nenhuma — Épico 28 Concluído com Sucesso (100% Master Checklist PASS)
 ---
 
-# SESSION — Épico 23: Resolução de Bug de Input e Débitos de Auditoria
+# SESSION — Épico 28: Controle de Layout, Conexões e Exclusão Isolada de Setores Customizados
 
 ## 📍 Estado Atual
 - **Branch ativa:** `main`
-- **Fase:** Épico 23 Totalmente Concluído e Auditado (7/7 Master Checklist PASS)
-- **Próxima tarefa:** Nenhuma (Tudo concluído e verificado)
+- **Fase:** Épico 28 Totalmente Concluído e Auditado (7/7 Master Checklist PASS, 7/7 Pytest PASS)
+- **Próxima tarefa:** Nenhuma (Todas as solicitações atendidas e homologadas pelo usuário)
 
-## 🏁 Última Tarefa Concluída
-- TASK-2305 — Execução e aprovação da suíte de testes (Pytest 31/31, Master Checklist 7/7)
-
-## 📋 Progresso do Épico 23
-- [x] TASK-2301 Fix bug de input na tabela (mergedVariables + memoização TanStack Table)
-- [x] TASK-2302 Modularização de `test_engine_decimal_parity.py` -> `float_evaluator.py` (< 300 linhas)
-- [x] TASK-2303 Modularização de `useScenario.ts` -> `useScenarioIO.ts` (< 300 linhas)
-- [x] TASK-2304 Eliminação de tipos `any` em `atoms.ts`, `App.tsx` e `ValueCell.tsx`
-- [x] TASK-2305 Execução e aprovação da suíte de testes e master checklist
+## 🏁 Últimas Entregas Concluídas
+- **TASK-2801**: Sincronização em tempo real de inputs com Jotai e botão `⚡ Calcular` na toolbar.
+- **TASK-2802**: Trava de edição de layout (`🔒 Layout Travado / 🔓 Edição Liberada`) e exclusão de arestas.
+- **TASK-2803**: Linhas de conexão limpas sem rótulos de texto e com setas direcionais (`MarkerType.ArrowClosed`).
+- **TASK-2804**: Isolamento de setores customizados do fluxograma sem poluir a Calculadora/Variáveis.
+- **TASK-2805**: Botão de exclusão definitiva (`🗑️ Excluir`) restrito a setores customizados (`isCustom: true`) limpando o banco PostgreSQL via `DELETE /api/flowcharts/{sector_id}`.
+- **TASK-2806**: Persistência imune à limpeza de cache através de carregamento nativo via `GET /api/flowcharts`.
+- **TASK-2807**: Suítes de testes (`test_flowcharts.py` Pytest 7/7 PASS) e Master Checklist (7/7 PASS).
 
 ## ⚠️ Blockers / Open Issues
 - Nenhum.

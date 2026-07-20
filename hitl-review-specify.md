@@ -1,44 +1,9 @@
-# 📋 HITL Review — /specify EPIC-022
+# Human-In-The-Loop Review — Épico 25: Fluxogramas Dinâmicos e Modeláveis por Setor
 
-> **Data:** 2026-07-16 | **Branch:** `feature/architecture-improvements`
-> **Status aguardado:** APROVADO / REJEITADO / AJUSTES
+## Status: APROVADO PARA CRIAÇÃO DE TAREFAS
 
----
-
-## Decisões Capturadas na Entrevista
-
-| # | Pergunta | Resposta |
-|---|---|---|
-| 1 | Domínios a incluir | Todos os 6 domínios (Design, CORS, Decimal, Vite+Jotai, uv+Alembic, Testes) |
-| 2 | Prioridade máxima | Tudo em conjunto — planejar o épico completo primeiro |
-| 3 | Estratégia de migração frontend | Gradual — manter CRA funcionando, migrar componente por componente |
-| 4 | Testes de paridade Decimal/float | Sim — cada tarefa com seus próprios testes antes de avançar |
-
----
-
-## Riscos Identificados
-
-| Risco | Probabilidade | Mitigação |
-|---|---|---|
-| Decimal quebra convergência do engine | Médio | Testes de paridade obrigatórios (TASK-A pré-requisito) |
-| Migração Vite quebra componentes existentes | Médio | Manter CRA paralelo até validação completa |
-| Jotai incompatível com GoalSeekModal ou HarvestPlan | Baixo | Migração gradual por componente |
-| Alembic conflita com migrations.py custom | Baixo | Manter migrations.py como fallback durante transição |
-
----
-
-## Funcionalidades Protegidas (Invioláveis)
-
-1. Motor de cálculo com convergência iterativa
-2. Goal Seek (scipy)
-3. Persistência de cenários
-4. Plano de Safra (consolidação + divisores)
-5. Exportações PDF e Excel
-6. Modelo IAPWS-IF97
-7. Substituição de variáveis
-
----
-
-## ✅ Aprovação para /create-tasks
-
-Confirme com "Aprovado" ou "Proceed" para iniciar o planejamento de tarefas.
+### Resumo das Decisões de Arquitetura:
+1. **Modelagem orientada aos 10 setores reais do BME Calc:** Eliminação total de topologias mock com variáveis genéricas. O fluxograma gera layouts nativos para os 10 setores reais do memorial de cálculo (1.063 variáveis).
+2. **Topologia Auto-Gerada + Editor Interativo:** Caso um setor não tenha layout salvo, a topologia é gerada dinamicamente agrupando por `Etapa → Ponto de Controle`. O usuário pode editar nós, conectar arestas, mover posições e adicionar/remover variáveis.
+3. **Persistência Backend (SQLModel + PostgreSQL):** Tabela `sector_flowcharts` criada no backend com rotas `GET / PUT / DELETE /api/flowcharts/{sector_id}`.
+4. **Respeito Estrito à Constituição (P0):** Limite de 300 linhas por arquivo, auditoria `checklist.py` 100% PASS e testes Pytest mantidos.

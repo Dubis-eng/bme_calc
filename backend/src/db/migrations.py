@@ -111,57 +111,23 @@ def migrate_database_schema(session: Session):
     # Ensure new columns exist on variables table
     if "variables" in tables:
         cols = [col["name"] for col in inspect(session.bind).get_columns("variables")]
-        if "in_harvest_plan" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN in_harvest_plan BOOLEAN DEFAULT FALSE"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating in_harvest_plan: {e}")
-        if "harvest_plan_op" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN harvest_plan_op VARCHAR DEFAULT NULL"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating harvest_plan_op: {e}")
-        if "harvest_plan_weight_var_id" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN harvest_plan_weight_var_id VARCHAR DEFAULT NULL"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating harvest_plan_weight_var_id: {e}")
-        if "casas_decimais" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN casas_decimais INTEGER DEFAULT NULL"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating casas_decimais: {e}")
-        if "tipo_exibicao" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN tipo_exibicao VARCHAR DEFAULT 'NUMBER'"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating tipo_exibicao: {e}")
-        if "percent_base" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN percent_base VARCHAR DEFAULT 'DECIMAL'"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating percent_base: {e}")
-        if "control_point_id" not in cols:
-            try:
-                if session.bind.dialect.name == "postgresql":
-                    session.execute(text("ALTER TABLE variables ADD COLUMN control_point_id UUID DEFAULT NULL"))
-                else:
-                    session.execute(text("ALTER TABLE variables ADD COLUMN control_point_id VARCHAR DEFAULT NULL"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating control_point_id: {e}")
-        if "ordem" not in cols:
-            try:
-                session.execute(text("ALTER TABLE variables ADD COLUMN ordem INTEGER DEFAULT 0"))
-                session.commit()
-            except Exception as e:
-                print(f"Error migrating Variable ordem: {e}")
+        add_cols = [
+            ("in_harvest_plan", "BOOLEAN DEFAULT FALSE"),
+            ("harvest_plan_op", "VARCHAR DEFAULT NULL"),
+            ("harvest_plan_weight_var_id", "VARCHAR DEFAULT NULL"),
+            ("casas_decimais", "INTEGER DEFAULT NULL"),
+            ("tipo_exibicao", "VARCHAR DEFAULT 'NUMBER'"),
+            ("percent_base", "VARCHAR DEFAULT 'DECIMAL'"),
+            ("control_point_id", "UUID DEFAULT NULL" if session.bind.dialect.name == "postgresql" else "VARCHAR DEFAULT NULL"),
+            ("ordem", "INTEGER DEFAULT 0"),
+        ]
+        for col_name, col_def in add_cols:
+            if col_name not in cols:
+                try:
+                    session.execute(text(f"ALTER TABLE variables ADD COLUMN {col_name} {col_def}"))
+                    session.commit()
+                except Exception:
+                    pass
 
     # Run data migration if control points/stages are empty
     if "stages" in tables and "control_points" in tables:
@@ -264,6 +230,29 @@ def migrate_database_schema(session: Session):
             session.commit()
         except Exception as e:
             print(f"Error updating variables status to INATIVA: {e}")
+
+    # Ensure sector_flowcharts columns exist
+    if "sector_flowcharts" in tables:
+        if session.bind.dialect.name == "postgresql":
+            try:
+                session.execute(text("ALTER TABLE sector_flowcharts DROP CONSTRAINT IF EXISTS sector_flowcharts_sector_id_fkey"))
+                session.commit()
+            except Exception as e:
+                print(f"Error dropping constraint in sector_flowcharts: {e}")
+        cols = [col["name"] for col in inspector.get_columns("sector_flowcharts")]
+        if "view_mode" not in cols:
+            try:
+                session.execute(text("ALTER TABLE sector_flowcharts ADD COLUMN view_mode VARCHAR DEFAULT 'full'"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating view_mode in sector_flowcharts: {e}")
+        if "summary_field_ids" not in cols:
+            try:
+                col_type = "JSON DEFAULT '[]'" if session.bind.dialect.name == "postgresql" else "TEXT DEFAULT '[]'"
+                session.execute(text(f"ALTER TABLE sector_flowcharts ADD COLUMN summary_field_ids {col_type}"))
+                session.commit()
+            except Exception as e:
+                print(f"Error migrating summary_field_ids in sector_flowcharts: {e}")
 
     # Seed harvest_plan_ordered_items if it exists and is empty
     tables_updated = inspect(session.bind).get_table_names()

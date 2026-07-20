@@ -29,6 +29,7 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Épico 20: Correção de Digitação de Percentuais e Decimais** — Componente `FormattedVariableInput` para digitação fluida de decimais (ponto/vírgula) e normalização entre frontend e backend para todas as variáveis percentuais e numéricas.
 * **[DONE] [feat-021-harvest-plan-sorting.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-021-harvest-plan-sorting.md)** — Ordenação Personalizada e Divisores no Plano de Safra.
 * **[DONE] [feat-022-architecture-modernization.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-022-architecture-modernization.md)** — Modernização Arquitetural, Reestruturação de Diretórios e Design System Studio Dark.
+* **[DONE] [architecture/README.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/architecture/README.md)** — Registro e catalogação das Decisões de Arquitetura (ADRs) usando o framework global.
 
 
 

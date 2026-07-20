@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Fluxo de Cálculo - BME Calc",
+    "subtitle": "Arquitetura e fluxo de dados do motor de cálculo de balanço de massa e energia",
+    "output": "calculation-flow.html"
+  },
+  "layout": {
+    "mode": "grid",
+    "cols": 5,
+    "origin": [40, 100],
+    "gapX": 50,
+    "gapY": 90,
+    "cellW": 140,
+    "cellH": 64
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "Usuário/Operador", "sublabel": "Navegador Web", "row": 0, "col": 0 },
+    { "id": "frontend", "type": "frontend", "label": "Frontend (React)", "sublabel": "State Management (Jotai)", "row": 0, "col": 1 },
+    { "id": "api", "type": "backend", "label": "FastAPI API", "sublabel": "src/api/routes", "row": 0, "col": 2 },
+    { "id": "db", "type": "database", "label": "Banco de Dados", "sublabel": "PostgreSQL / SQLModel", "row": 1, "col": 2 },
+    { "id": "engine", "type": "backend", "label": "Motor de Cálculo", "sublabel": "engine.py: calculate_state", "row": 0, "col": 3 },
+    { "id": "evaluator", "type": "backend", "label": "Avaliador AST", "sublabel": "evaluator.py: FormulaEvaluator", "row": 1, "col": 3 },
+    { "id": "topological", "type": "backend", "label": "Resolutor Grafo", "sublabel": "networkx.DiGraph (Loops)", "row": 0, "col": 4 },
+    { "id": "physical", "type": "security", "label": "Modelos Físicos", "sublabel": "IAPWS-IF97 & OIML Densidade", "row": 1, "col": 4 }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Frontend (Cliente)", "wraps": ["frontend"] },
+    { "kind": "region", "label": "Serviço Backend (Python)", "wraps": ["api", "engine", "evaluator", "topological", "physical"] }
+  ],
+  "connections": [
+    { "from": "users", "to": "frontend", "label": "Edita inputs / clica calcular", "variant": "emphasis", "labelDy": -24 },
+    { "from": "frontend", "to": "api", "label": "POST /calculate", "variant": "emphasis", "labelDy": -24 },
+    { "from": "api", "to": "db", "label": "Carrega/Grava cenários", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "from": "api", "to": "engine", "label": "Inicia resolução", "variant": "emphasis", "labelDy": -24 },
+    { "from": "engine", "to": "topological", "label": "Gera Grafo Dep.", "fromSide": "right", "toSide": "left", "labelDy": -24 },
+    { "from": "topological", "to": "engine", "label": "Ordem Topológica (e ciclos)", "fromSide": "bottom", "toSide": "right", "variant": "dashed", "labelDy": 39 },
+    { "from": "engine", "to": "evaluator", "label": "Avalia Fórmulas AST", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "from": "evaluator", "to": "physical", "label": "Calcula Vapor/Densidade", "fromSide": "right", "toSide": "left", "labelDy": -24 }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Fluxo Principal",
+      "items": [
+        "O usuário insere dados ou altera fórmulas na interface React.",
+        "O clique em calcular envia o payload de cenário para o FastAPI.",
+        "O Motor de Cálculo resolve as fórmulas em ordem de dependência."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Grafo e Ciclos",
+      "items": [
+        "NetworkX é usado para ordenar as dependências topologicamente.",
+        "Loops de dependência circulares são resolvidos por iteração numérica.",
+        "Convergência é alcançada quando o delta é inferior a 0.0001 (limite de 100 iterações)."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Física e Termodinâmica",
+      "items": [
+        "Avaliador AST interpreta fórmulas no estilo Excel de forma segura.",
+        "IAPWS-IF97 fornece propriedades físicas reais de água e vapor.",
+        "Polinômio OIML calcula a densidade de misturas hidroalcoólicas."
+      ]
+    }
+  ]
+}

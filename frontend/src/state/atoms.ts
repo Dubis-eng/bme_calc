@@ -52,6 +52,10 @@ export const updateVariableValueAtom = atom(
   null,
   (get, set, { id, value }: { id: string; value: string }) => {
     set(variableValueAtomFamily(id), value);
+    const vars = get(variablesAtom);
+    if (vars.some(v => v['ID - REF'] === id)) {
+      set(variablesAtom, vars.map(v => v['ID - REF'] === id ? { ...v, 'EQUAÇÕES E VALORES': value } : v));
+    }
     set(hasUnsavedChangesAtom, true);
   }
 );

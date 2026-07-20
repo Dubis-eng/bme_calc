@@ -12,6 +12,7 @@ Thumbs.db
 
 # Toolkit de Automação do Antigravity
 .agent/
+.agents/
 
 # Python - Compilação, Caches e Ambientes Virtuais
 __pycache__/

@@ -13,7 +13,8 @@ import { RightPanel } from './components/layout/RightPanel';
 import { HarvestPlan } from './components/harvest-plan/HarvestPlan';
 import { SystemSettingsModal } from './components/settings/SystemSettingsModal';
 import { StatusDashboard } from './components/calculator/StatusDashboard';
-import { FlowchartPlaceholder } from './components/calculator/FlowchartPlaceholder';
+import { ProcessFlowCanvas } from './components/calculator/ProcessFlowCanvas';
+import { ManageSectorsModal } from './components/calculator/ManageSectorsModal';
 import { useVariableSearch } from './hooks/useVariableSearch';
 import { useSearch } from './hooks/useSearch';
 import { useScenario } from './hooks/useScenario';
@@ -22,9 +23,23 @@ import { selectedFieldIdAtom } from './state/atoms';
 
 type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';
 
+const DEFAULT_FLOW_SECTORS = [
+  { id: 'EXTRAÇÃO', label: 'Extração / Moagem' },
+  { id: 'DESTILAÇÃO', label: 'Destilação' },
+  { id: 'AÇÚCAR', label: 'Fábrica de Açúcar' },
+  { id: 'FERMENTAÇÃO', label: 'Fermentação' },
+  { id: 'TRATAMENTO DO CALDO', label: 'Tratamento do Caldo' },
+  { id: 'UTILIDADES', label: 'Utilidades' },
+  { id: 'PLANEJAMENTO', label: 'Planejamento' },
+  { id: 'INFO GERAIS', label: 'Informações Gerais' },
+  { id: 'INFORMAÇÕES TURBINAS', label: 'Turbinas' },
+  { id: 'LEVEDURA', label: 'Levedura' },
+];
+
 function App() {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [activeTab, setActiveTab] = useState<ActiveTab>('calculator');
+  const [activeFlowSector, setActiveFlowSector] = useState<string>('EXTRAÇÃO');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isGoalSeekOpen, setIsGoalSeekOpen] = useState(false);
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
@@ -36,11 +51,55 @@ function App() {
   const [activeStatusFilter, setActiveStatusFilter] = useState<FilterStatus>('all');
 
   const [selectedFieldId, setSelectedFieldId] = useAtom(selectedFieldIdAtom);
+  const [customFlowSectors, setCustomFlowSectors] = useState<Array<{ id: string; label: string }>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('bme_custom_flow_sectors') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [hiddenFlowSectors, setHiddenFlowSectors] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('bme_hidden_flow_sectors') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [isManageSectorsOpen, setIsManageSectorsOpen] = useState(false);
+
+  const toggleHideSector = (sectorId: string) => {
+    setHiddenFlowSectors((prev) => {
+      const updated = prev.includes(sectorId) ? prev.filter((s) => s !== sectorId) : [...prev, sectorId];
+      localStorage.setItem('bme_hidden_flow_sectors', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleDeleteCustomFlowchartSector = async (sectorId: string) => {
+    if (!window.confirm(`Tem certeza que deseja excluir permanentemente o fluxograma '${sectorId}'?`)) return;
+    try { await axios.delete(`http://localhost:8000/api/flowcharts/${encodeURIComponent(sectorId)}`); } catch (err) { console.error(err); }
+    setCustomFlowSectors((prev) => { const updated = prev.filter((s) => s.id !== sectorId); localStorage.setItem('bme_custom_flow_sectors', JSON.stringify(updated)); return updated; });
+    setHiddenFlowSectors((prev) => { const updated = prev.filter((s) => s !== sectorId); localStorage.setItem('bme_hidden_flow_sectors', JSON.stringify(updated)); return updated; });
+    if (activeFlowSector === sectorId) { const remaining = visibleFlowSectors.filter((s) => s.id !== sectorId); if (remaining.length > 0) setActiveFlowSector(remaining[0].id); }
+  };
+
+  const officialFlowSectors = (sectors.length > 0 ? sectors.map(s => ({ id: s.id, label: s.nome || getFriendlySectorName(s.id) })) : DEFAULT_FLOW_SECTORS).map(s => ({ ...s, isCustom: false }));
+
+  const allFlowSectors = [
+    ...officialFlowSectors,
+    ...customFlowSectors.filter(c => !officialFlowSectors.some(o => o.id === c.id)).map(c => ({ ...c, isCustom: true }))
+  ];
+
+  const visibleFlowSectors = allFlowSectors.filter(s => !hiddenFlowSectors.includes(s.id));
 
   const fetchSectors = () => {
-    axios.get('http://localhost:8000/api/sectors')
-      .then(res => setSectors(res.data))
-      .catch(console.error);
+    axios.get('http://localhost:8000/api/sectors').then(res => setSectors(res.data)).catch(console.error);
+    axios.get('http://localhost:8000/api/flowcharts').then(res => {
+      if (Array.isArray(res.data)) {
+        const saved = res.data.map((fc: { sector_id: string }) => ({ id: fc.sector_id, label: fc.sector_id.replace(/_/g, ' ') }));
+        setCustomFlowSectors(prev => [...prev, ...saved.filter(s => !prev.some(c => c.id === s.id))]);
+      }
+    }).catch(() => {});
   };
 
   useEffect(() => { fetchSectors(); }, []);
@@ -79,11 +138,6 @@ function App() {
     setTimeout(() => document.querySelector(`[data-group-name="${subName}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   };
 
-  const handleSectorFromDashboard = (sectorId: string) => {
-    setActiveSector(sectorId);
-    setShowDashboard(false);
-  };
-
   const handleSectorNavClick = (sectorId: string) => {
     setActiveSector(sectorId);
     setShowDashboard(false);
@@ -110,12 +164,7 @@ function App() {
             <span className="font-bold">⚠️ Conexão Perdida:</span>
             <span>O servidor está offline. As alterações e os cálculos estão bloqueados para evitar perda de dados.</span>
           </div>
-          <button 
-            onClick={() => checkConnection()}
-            className="bg-white text-rose-700 hover:text-rose-900 font-bold px-4 py-1.5 rounded-lg shadow hover:bg-slate-100 transition-all text-xs active:scale-95"
-          >
-            Tentar Reconectar
-          </button>
+          <button onClick={() => checkConnection()} className="bg-white text-rose-700 hover:text-rose-900 font-bold px-4 py-1.5 rounded-lg shadow hover:bg-slate-100 transition-all text-xs active:scale-95">Tentar Reconectar</button>
         </div>
       )}
       <Header
@@ -126,61 +175,53 @@ function App() {
       />
 
       {activeTab === 'flowchart' && (
-        <div className="flex-1 relative overflow-hidden">
-          <FlowchartPlaceholder />
+        <div className="flex-1 flex flex-col overflow-hidden p-4 bg-slate-950/80">
+          <div className="flex items-center justify-between gap-2 mb-3 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80">
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
+              {visibleFlowSectors.map(tab => (
+                <button key={tab.id} onClick={() => setActiveFlowSector(tab.id)} className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${activeFlowSector === tab.id ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'}`}>
+                  {tab.label}
+                </button>
+              ))}
+              <button onClick={() => { const name = window.prompt('Digite o nome do novo Setor para o fluxograma:'); if (name?.trim()) { const newId = name.trim().toUpperCase().replace(/\s+/g, '_'); const newLabel = name.trim(); setCustomFlowSectors((prev) => { if (prev.some(p => p.id === newId)) return prev; const updated = [...prev, { id: newId, label: newLabel }]; localStorage.setItem('bme_custom_flow_sectors', JSON.stringify(updated)); return updated; }); setActiveFlowSector(newId); } }} className="px-2.5 py-1.5 rounded-md text-xs font-semibold text-teal-400 hover:bg-teal-950/60 border border-teal-800/50 transition-all whitespace-nowrap" title="Adicionar novo setor customizado ao fluxograma">
+                ➕ Novo Setor
+              </button>
+            </div>
+            <button onClick={() => setIsManageSectorsOpen(true)} className="px-2.5 py-1.5 rounded-md text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-slate-700 transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0" title="Gerenciar setores visíveis/ocultos no fluxograma">
+              <span>👁️‍🗨️</span> Gerenciar Setores
+              {hiddenFlowSectors.length > 0 && <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold border border-amber-500/40">{hiddenFlowSectors.length} ocultos</span>}
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 relative">
+            <ProcessFlowCanvas sector={activeFlowSector} onCalculate={handleCalculate} isCalculating={calculating} />
+          </div>
         </div>
       )}
 
       {activeTab === 'harvest_plan' && (
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 flex flex-col overflow-hidden p-6">
-            <HarvestPlan sectors={sectors} />
-          </main>
+          <main className="flex-1 flex flex-col overflow-hidden p-6"><HarvestPlan sectors={sectors} /></main>
         </div>
       )}
 
       {activeTab === 'calculator' && (
         <div className="flex flex-1 overflow-hidden">
-          <Sidebar
-            isSidebarExpanded={isSidebarExpanded}
-            setIsSidebarExpanded={setIsSidebarExpanded}
-            uniqueSectors={uniqueSectors}
-            activeSector={activeSector}
-            setActiveSector={handleSectorNavClick}
-            variables={variables}
-            sectors={sectors}
-            results={resultsMap}
-            onSubgroupClick={handleSubgroupClick}
-            onVariableClick={onScrollTo}
-            onSettingsClick={() => setIsSettingsOpen(true)}
-          />
-
+          <Sidebar isSidebarExpanded={isSidebarExpanded} setIsSidebarExpanded={setIsSidebarExpanded} uniqueSectors={uniqueSectors} activeSector={activeSector} setActiveSector={handleSectorNavClick} variables={variables} sectors={sectors} results={resultsMap} onSubgroupClick={handleSubgroupClick} onVariableClick={onScrollTo} onSettingsClick={() => setIsSettingsOpen(true)} />
           <main className="flex-1 flex flex-col overflow-hidden bg-slate-900/20">
             {showDashboard ? (
-              <StatusDashboard
-                sectors={sectors}
-                variables={variables}
-                results={resultsMap}
-                filter={activeStatusFilter}
-                setFilter={setActiveStatusFilter}
-                onSectorClick={handleSectorFromDashboard}
-              />
+              <StatusDashboard sectors={sectors} variables={variables} results={resultsMap} filter={activeStatusFilter} setFilter={setActiveStatusFilter} onSectorClick={handleSectorNavClick} />
             ) : (
               <div className="flex flex-col flex-1 overflow-hidden p-5">
-                {/* ── Breadcrumb ── */}
                 <div className="flex items-center gap-2 text-[11px] text-slate-600 mb-3">
-                  <button onClick={() => setShowDashboard(true)} className="hover:text-teal-400 transition-colors">
-                    Dashboard
-                  </button>
+                  <button onClick={() => setShowDashboard(true)} className="hover:text-teal-400 transition-colors">Dashboard</button>
                   <span>/</span>
                   <span className="text-slate-400 font-medium">{getFriendlySectorName(activeSector)}</span>
                 </div>
 
-                {/* ── Status banners ── */}
                 {(isLocked || isOffline) && (
                   <div className="mb-3 px-4 py-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg text-slate-400 text-xs font-semibold flex items-center gap-2">
                     <span>🔒</span>
-                    <span>{isOffline ? 'Modo Offline. Todas as alterações e recálculos estão suspensos.' : `Cenário Congelado (Status: ${currentScenario?.status}). Edições e recalculações bloqueadas.`}</span>
+                    <span>{isOffline ? 'Modo Offline. Alterações suspensas.' : `Cenário Congelado (Status: ${currentScenario?.status}). Edições bloqueadas.`}</span>
                   </div>
                 )}
                 {convergenceError && (
@@ -189,65 +230,33 @@ function App() {
                     <span>Resultado não convergiu. Limite de 100 ciclos atingido. Revise os dados de entrada.</span>
                   </div>
                 )}
-                {currentScenario && currentScenario.cycle_start_month && months.length > 0 &&
-                 currentScenario.cycle_start_month !== (months.find(m => m.order_index === 0)?.name || 'Abril') && (
+                {currentScenario && currentScenario.cycle_start_month && months.length > 0 && currentScenario.cycle_start_month !== (months.find(m => m.order_index === 0)?.name || 'Abril') && (
                   <div className="mb-3 px-4 py-2.5 bg-amber-950/40 border border-amber-800/40 rounded-lg text-amber-400 text-xs flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                       <span>⚠️</span>
-                      <span>
-                        Ciclo desatualizado: Este cenário foi calculado usando o ciclo comercial iniciado em{' '}
-                        <strong>{currentScenario.cycle_start_month}</strong>, mas o ciclo atual inicia em{' '}
-                        <strong>{months.find(m => m.order_index === 0)?.name || 'Abril'}</strong>.
-                      </span>
+                      <span>Ciclo desatualizado: Calculado em <strong>{currentScenario.cycle_start_month}</strong>, ciclo atual inicia em <strong>{months.find(m => m.order_index === 0)?.name || 'Abril'}</strong>.</span>
                     </div>
                     {!isLocked && !isOffline && (
-                      <button
-                        onClick={async () => {
-                          handleCalculate();
-                          const currentCycleMonth = months.find(m => m.order_index === 0)?.name || 'Abril';
-                          setCurrentScenario((prev: ScenarioMetadata | null) => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null);
-                          setHasUnsavedChanges(true);
-                        }}
-                        className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold transition-all uppercase tracking-wider whitespace-nowrap"
-                        aria-label="Recalcular cenário com o novo ciclo comercial"
-                      >
-                        Recalcular Cenário com o Novo Ciclo
-                      </button>
+                      <button onClick={async () => { handleCalculate(); const currentCycleMonth = months.find(m => m.order_index === 0)?.name || 'Abril'; setCurrentScenario((prev: ScenarioMetadata | null) => prev ? { ...prev, cycle_start_month: currentCycleMonth } : null); setHasUnsavedChanges(true); }} className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold transition-all uppercase tracking-wider whitespace-nowrap">Recalcular com Novo Ciclo</button>
                     )}
                   </div>
                 )}
 
-                {/* ── Sector header ── */}
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-base font-bold text-white">{getFriendlySectorName(activeSector)}</h2>
-                    <p className="text-xs text-slate-600 mt-0.5">
-                      {variables.filter(v => v.SETOR === activeSector).length} variáveis cadastradas
-                    </p>
+                    <p className="text-xs text-slate-600 mt-0.5">{variables.filter(v => v.SETOR === activeSector).length} variáveis cadastradas</p>
                   </div>
-                  <button
-                    id="btn-add-variable"
-                    onClick={() => handleAddVariable(activeSector, '')}
-                    disabled={isLocked || isOffline}
-                    className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs"
-                  >
-                    <span>+</span>
-                    <span>Cadastrar Variável</span>
+                  <button id="btn-add-variable" onClick={() => handleAddVariable(activeSector, '')} disabled={isLocked || isOffline} className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs">
+                    <span>+ Cadastrar Variável</span>
                   </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto min-h-0">
                   <SectorModules
-                    activeSector={activeSector}
-                    variables={variables}
-                    results={results}
-                    isLocked={isLocked || isOffline}
-                    onEditVariable={handleEditVariable}
-                    onAddVariable={handleAddVariable}
-                    onNavigateToVariable={onScrollTo}
-                    activeStatusFilter={activeStatusFilter}
-                    setActiveStatusFilter={setActiveStatusFilter}
-                    onReorderSuccess={reloadCurrentScenario}
+                    activeSector={activeSector} variables={variables} results={results} isLocked={isLocked || isOffline}
+                    onEditVariable={handleEditVariable} onAddVariable={handleAddVariable} onNavigateToVariable={onScrollTo}
+                    activeStatusFilter={activeStatusFilter} setActiveStatusFilter={setActiveStatusFilter} onReorderSuccess={reloadCurrentScenario}
                   />
                 </div>
               </div>
@@ -255,26 +264,12 @@ function App() {
           </main>
 
           <RightPanel
-            variables={variables}
-            onLoadScenario={onLoadScenario}
-            currentScenario={currentScenario}
+            variables={variables} onLoadScenario={onLoadScenario} currentScenario={currentScenario}
             onStatusChange={newStatus => setCurrentScenario((prev: ScenarioMetadata | null) => prev ? { ...prev, status: newStatus } : null)}
-            anoSafra={anoSafra}
-            setAnoSafra={setAnoSafra}
-            mesReferencia={mesReferencia}
-            setMesReferencia={setMesReferencia}
-            onSaveNew={handleSaveNew}
-            saving={saving}
-            onSaveActive={handleSaveActive}
-            savingActive={savingActive}
-            hasUnsavedChanges={hasUnsavedChanges}
-            scenarioVars={scenarioVars}
-            isLocked={isLocked || isOffline}
-            onGoalSeekOpen={() => setIsGoalSeekOpen(true)}
-            sectors={sectors}
-            onRefreshSectors={fetchSectors}
-            years={years}
-            months={months}
+            anoSafra={anoSafra} setAnoSafra={setAnoSafra} mesReferencia={mesReferencia} setMesReferencia={setMesReferencia}
+            onSaveNew={handleSaveNew} saving={saving} onSaveActive={handleSaveActive} savingActive={savingActive}
+            hasUnsavedChanges={hasUnsavedChanges} scenarioVars={scenarioVars} isLocked={isLocked || isOffline}
+            onGoalSeekOpen={() => setIsGoalSeekOpen(true)} sectors={sectors} onRefreshSectors={fetchSectors} years={years} months={months}
           />
         </div>
       )}
@@ -283,6 +278,16 @@ function App() {
       <VariableModal isOpen={isVariableModalOpen} onClose={() => setIsVariableModalOpen(false)} onSave={handleSaveVariableWrapped} variableToEdit={variableToEdit} variables={variables} prefilledSector={prefilledSector} prefilledEtapa={prefilledEtapa} onSubstitutionSuccess={reloadCurrentScenario} />
       <SearchPanel isOpen={search.isSearchPanelOpen} query={search.searchQuery} results={searchResults} onClose={search.closeSearchPanel} onScrollTo={onScrollTo} onEdit={onSearchEdit} />
       <SystemSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} years={years} months={months} fetchYearsAndMonths={fetchYearsAndMonths} tolerance={tolerance} onUpdateTolerance={updateTolerance} />
+
+      <ManageSectorsModal
+        isOpen={isManageSectorsOpen}
+        onClose={() => setIsManageSectorsOpen(false)}
+        allFlowSectors={allFlowSectors}
+        hiddenFlowSectors={hiddenFlowSectors}
+        onToggleHideSector={toggleHideSector}
+        onRestoreAll={() => { setHiddenFlowSectors([]); localStorage.removeItem('bme_hidden_flow_sectors'); }}
+        onDeleteSector={handleDeleteCustomFlowchartSector}
+      />
     </div>
   );
 }

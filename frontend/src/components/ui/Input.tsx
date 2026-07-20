@@ -20,12 +20,15 @@ export const FormattedVariableInput = React.memo<FormattedVariableInputProps>(({
 }) => {
   const varId = variable['ID - REF'];
 
-  // Local display state — typing only updates this; zero Jotai propagation during input.
-  const [localDisplayValue, setLocalDisplayValue] = useState(() => getInputValue(variable));
-
   // Read-only subscription to the committed (clean) value stored in the atom family.
   // This changes only after a blur or a calculation — never during typing.
   const committedRawVal = useAtomValue(variableValueAtomFamily(varId));
+
+  // Local display state — typing only updates this; zero Jotai propagation during input.
+  const [localDisplayValue, setLocalDisplayValue] = useState(() => {
+    const rawVal = committedRawVal !== '' ? committedRawVal : String(variable['EQUAÇÕES E VALORES'] ?? '');
+    return getInputValue({ ...variable, 'EQUAÇÕES E VALORES': rawVal });
+  });
 
   // Write-only dispatcher — no re-render subscription on this component.
   const updateGlobalValue = useSetAtom(updateVariableValueAtom);

@@ -176,6 +176,21 @@ class HarvestPlanOrderedItem(SQLModel, table=True):
     variable_id: Optional[str] = Field(default=None, foreign_key="variables.id", sa_column_kwargs={"nullable": True})
     label: Optional[str] = Field(default=None, sa_column_kwargs={"nullable": True})
 
+# ── SECTOR FLOWCHARTS ───────────────────────────────────────────────────────
+
+class SectorFlowchart(SQLModel, table=True):
+    __tablename__ = "sector_flowcharts"
+
+    sector_id: str = Field(primary_key=True, index=True)
+    view_mode: str = Field(default="full", sa_column_kwargs={"nullable": False}) # "full" or "summary"
+    summary_field_ids: List[str] = Field(default=[], sa_column=Column(JSON))
+    nodes: List[Dict[str, Any]] = Field(default=[], sa_column=Column(JSON))
+    edges: List[Dict[str, Any]] = Field(default=[], sa_column=Column(JSON))
+    updated_at: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow,
+        sa_column_kwargs={"nullable": False}
+    )
+
 # ── DATABASE CREATION & SESSION ────────────────────────────────────────────
 
 def create_db_and_tables():

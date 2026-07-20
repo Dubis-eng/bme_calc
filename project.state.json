@@ -1,12 +1,12 @@
 {
   "$schema": "antigravity_sdd_v2",
   "project_status": {
-    "current_phase": "5_VERIFICATION",
+    "current_phase": "3_EXECUTION",
     "execution_locked": false
   },
   "phase_gates": {
     "discovery_completed": true,
-    "socratic_questions_answered": 4,
+    "socratic_questions_answered": 3,
     "human_review_token": "APPROVED",
     "architecture_approved": true
   },
@@ -17,214 +17,34 @@
   },
   "atomic_tasks": [
     {
-      "id": "TASK-1401",
-      "description": "Implementar rotina de substituição de variáveis com preservação de precedência matemática utilizando o módulo ast do Python em backend/engine.py.",
-      "scope": "backend/engine.py",
-      "status": "DONE"
+      "id": "TASK-2701",
+      "description": "Frontend: Corrigir carregamento e retenção do layout salvo no banco em ProcessFlowCanvas.tsx impedindo reset ao trocar de abas.",
+      "scope": "frontend/src/components/calculator/ProcessFlowCanvas.tsx",
+      "status": "COMPLETED"
     },
     {
-      "id": "TASK-1402",
-      "description": "Implementar endpoints /api/variables/{id}/replace-preview e /api/variables/{id}/replace-confirm no backend.",
-      "scope": "backend/main.py, backend/services_variables.py",
-      "status": "DONE"
+      "id": "TASK-2702",
+      "description": "Frontend: Implementar dropdowns ativos e independentes de Ano Safra e Cenário/Versão na toolbar do fluxograma.",
+      "scope": "frontend/src/components/calculator/ProcessFlowToolbar.tsx, ProcessFlowCanvas.tsx",
+      "status": "COMPLETED"
     },
     {
-      "id": "TASK-1403",
-      "description": "Desenvolver modal de substituição de variáveis no frontend com seleção, chave de recursividade e visualização de impacto.",
-      "scope": "frontend/src/components/VariableModal.tsx, frontend/App.tsx",
-      "status": "DONE"
+      "id": "TASK-2703",
+      "description": "Frontend: Reformular NodeVariableSelectorModal.tsx com edição/renomeação do título do bloco + seletores cascata (Setor → Etapa → Ponto de Controle).",
+      "scope": "frontend/src/components/calculator/NodeVariableSelectorModal.tsx, nodes/ProcessNode.tsx, nodes/IoNode.tsx",
+      "status": "COMPLETED"
     },
     {
-      "id": "TASK-1404",
-      "description": "Integrar a lógica de descontinuação (soft-delete) ou remoção física de variáveis órfãs na UI.",
-      "scope": "frontend/src/components/VariableModal.tsx",
-      "status": "DONE"
+      "id": "TASK-2704",
+      "description": "Frontend: Implementar gerenciamento dinâmico de abas de setores (Adicionar novo setor customizado / Ocultar setor).",
+      "scope": "frontend/src/App.tsx, ProcessFlowCanvas.tsx",
+      "status": "COMPLETED"
     },
     {
-      "id": "TASK-1405",
-      "description": "Criar suíte de testes unitários e de integração para o algoritmo de substituição e os novos endpoints.",
-      "scope": "backend/test_engine.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1501",
-      "description": "Implementar a segregação e renomeação de variáveis inativas em todo o ecossistema (backend, banco de dados, testes e frontend).",
-      "scope": "backend/database.py, backend/services_variables.py, backend/services_harvest_plan.py, backend/services_scenarios.py, frontend/src/components/SectorModules.tsx, frontend/src/types/index.ts",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1601",
-      "description": "Elevar o estado do filtro de status (activeStatusFilter, setActiveStatusFilter) para App.tsx e integrá-lo com StatusDashboard.tsx.",
-      "scope": "frontend/src/App.tsx, frontend/src/components/StatusDashboard.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1602",
-      "description": "Implementar a barra de filtro de status (Todos, Convergido, Com Erro, Pendente) no componente SectorModules.tsx.",
-      "scope": "frontend/src/components/SectorModules.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1603",
-      "description": "Implementar a lógica de filtragem por status na listagem de variáveis de SectorModules.tsx conforme regras definidas.",
-      "scope": "frontend/src/components/SectorModules.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1604",
-      "description": "Executar verificação com checklist.py, testar o fluxo de filtragem e validar as diretrizes de código limpo (limite de 300 linhas).",
-      "scope": "frontend/src/App.tsx, frontend/src/components/SectorModules.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1701",
-      "description": "Adicionar colunas casas_decimais, tipo_exibicao e percent_base em Variable (backend/database.py) e ajustar a migração de banco (backend/migrations.py).",
-      "scope": "backend/database.py, backend/migrations.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1702",
-      "description": "Atualizar schemas Pydantic (backend/schemas.py) e ajustar endpoints e serviços de CRUD de variáveis no backend.",
-      "scope": "backend/schemas.py, backend/services_variables.py, backend/main.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1703",
-      "description": "Ajustar lógica de formatação de valores nas exportações de PDF e Excel (backend/exports.py) com base nos novos metadados da variável.",
-      "scope": "backend/exports.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1704",
-      "description": "Atualizar o modal de cadastro de variáveis no frontend (VariableModal.tsx) para permitir edição de casas_decimais, tipo_exibicao e percent_base.",
-      "scope": "frontend/src/components/VariableModal.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1705",
-      "description": "Ajustar o grid de cenários e inputs do frontend (SectorModules.tsx, App.tsx) para formatar e tratar a exibição e entrada de dados das variáveis do tipo PERCENTAGE.",
-      "scope": "frontend/src/components/SectorModules.tsx, frontend/src/App.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1706",
-      "description": "Criar testes unitários/integração no backend e frontend para validar a precisão, conversão de percentuais, exportação e formatação decimal, executando o checklist.",
-      "scope": "backend/test_variables_formatting.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1801",
-      "description": "Modelagem das tabelas Stage e ControlPoint no database.py, relacionamento em Variable com control_point_id, e script de migração no migrations.py (com baseline alfabético +10).",
-      "scope": "backend/database.py, migrations.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1802",
-      "description": "Atualizar schemas Pydantic em schemas.py e lógica de criação/listagem em services_variables.py para resolver os relacionamentos de Etapa/Ponto de Controle.",
-      "scope": "backend/schemas.py, backend/services_variables.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1803",
-      "description": "Implementar endpoints PATCH de reordenação em lote para Stages, ControlPoints e Variables no backend com validações de escopo.",
-      "scope": "backend/main.py, backend/services_variables.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1804",
-      "description": "Criar utilitário de ordenação frontend/src/utils/sorting.ts para separar a lógica de agrupamento e ordenação da UI de SectorModules.tsx.",
-      "scope": "frontend/src/utils/sorting.ts",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1805",
-      "description": "Desenvolver interface visual de Drag-and-Drop nativo e botões de reordenação (WCAG) nos três níveis do painel reativo (SectorModules.tsx).",
-      "scope": "frontend/src/components/SectorModules.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1806",
-      "description": "Criar suíte de testes unitários para a reordenação no backend, ajustar ordenação do gerador de PDF/Excel em exports.py e executar o checklist.py.",
-      "scope": "backend/test_cascade_sorting.py, backend/exports.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1901",
-      "description": "Modificar a modelagem da tabela Scenario no database.py adicionando a coluna cycle_start_month e atualizar a rotina de migração em migrations.py, seeding.py e migrations_legacy.py.",
-      "scope": "backend/database.py, backend/migrations.py, backend/seeding.py, backend/migrations_legacy.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1902",
-      "description": "Implementar os endpoints de configuração centralizados em router_settings.py (GET/POST/DELETE settings/years, GET/PATCH settings/months, PATCH settings/months/reorder, GET/POST/PUT settings/cycle) com validações e transação atômica, e remover endpoints legados de main.py.",
-      "scope": "backend/router_settings.py, backend/main.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1903",
-      "description": "Ajustar o frontend (useScenario.ts, SystemSettingsModal.tsx, HarvestPlan.tsx, ScenarioManager.tsx, App.tsx) para consumir as novas rotas centralizadas, implementar o envio completo do array de reordenação e exibir banner com botão de recálculo manual para ciclos desatualizados.",
-      "scope": "frontend/src/utils/useScenario.ts, frontend/src/components/SystemSettingsModal.tsx, frontend/src/components/HarvestPlan.tsx, frontend/src/components/ScenarioManager.tsx, frontend/src/App.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-1904",
-      "description": "Atualizar as suítes de testes no backend (test_scenarios.py, test_harvest_plan.py) para as novas rotas, adicionar teste para reordenação de meses e persistência do ciclo no cenário, e executar checklist.py.",
-      "scope": "backend/test_scenarios.py, backend/test_harvest_plan.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2001",
-      "description": "Desenvolver o componente FormattedVariableInput.tsx para encapsular o estado local e evitar perda de decimais.",
-      "scope": "frontend/src/components/FormattedVariableInput.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2002",
-      "description": "Integrar FormattedVariableInput.tsx nos componentes SectorVariableRow.tsx e ScenarioPremises.tsx.",
-      "scope": "frontend/src/components/SectorVariableRow.tsx, frontend/src/components/ScenarioPremises.tsx",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2003",
-      "description": "Validar a conformidade de linter, limites de linha (300 linhas) e testes através do checklist.py.",
-      "scope": "frontend/src/components/*",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2101",
-      "description": "Criar a tabela harvest_plan_ordered_items no banco de dados e atualizar migrations.py.",
-      "scope": "backend/database.py, backend/migrations.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2102",
-      "description": "Implementar endpoints GET/POST /api/harvest-plan/structure e serviços associados para persistência e ordenação ordenada no backend.",
-      "scope": "backend/router_harvest_plan.py, backend/services_harvest_plan.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2103",
-      "description": "Atualizar a consolidação do plano de safra para refletir a ordenação e os divisores.",
-      "scope": "backend/services_harvest_plan_calc.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2104",
-      "description": "Desenvolver controles de cadeado de edição, drag-and-drop e botões rápidos (WCAG) no frontend.",
-      "scope": "frontend/src/components/HarvestPlan.tsx, frontend/src/components/HarvestPlanTable.tsx, frontend/src/hooks/useHarvestPlanState.ts",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2105",
-      "description": "Implementar a geração de relatórios PDF (ReportLab) e Excel (OpenPyXL) que replicam a estrutura ordenada.",
-      "scope": "backend/exports_harvest_plan.py",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-2106",
-      "description": "Criar suíte de testes test_harvest_plan_structure.py no backend e validar através do checklist.py.",
-      "scope": "backend/test_harvest_plan_structure.py",
-      "status": "DONE"
+      "id": "TASK-2705",
+      "description": "Testes & Auditoria: Atualizar suítes de testes automatizados e validar sanidade via python .agent/scripts/checklist.py .",
+      "scope": "backend/tests/test_flowcharts.py, frontend/src/lib/generateDynamicSectorFlow.test.ts, todo o repositório",
+      "status": "COMPLETED"
     }
   ]
 }

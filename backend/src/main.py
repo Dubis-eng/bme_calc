@@ -63,6 +63,9 @@ app.include_router(settings_router)
 from src.api.router_harvest_plan import router as harvest_plan_router
 app.include_router(harvest_plan_router)
 
+from src.api.router_flowcharts import router as flowcharts_router
+app.include_router(flowcharts_router)
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()

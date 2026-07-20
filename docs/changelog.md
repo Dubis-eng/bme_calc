@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.0] - 2026-07-19
+
+### Added
+- **Controle de Layout, Conexões e Exclusão Isolada de Setores Customizados (Épico 28)**:
+  - **Botão Calcular e Trava de Layout**: Inclusão de ação direta de cálculo (`⚡ Calcular`) e trava/destrava de edição (`🔒 Layout Travado / 🔓 Edição Liberada`) no fluxograma.
+  - **Setas Direcionais & Exclusão de Arestas**: Remoção de rótulos redundantes e inclusão de setas no sentido do fluxo (`MarkerType.ArrowClosed`), além de suporte à remoção de conexões.
+  - **Isolamento de Setores Customizados**: Setores criados no fluxograma são isolados no frontend (`customFlowSectors`) e backend (`sector_flowcharts`), sem poluir a Calculadora nem criar grupos indesejados de variáveis.
+  - **Exclusão Permanente no Banco (PostgreSQL)**: Integração do botão `🗑️ Excluir` no modal de gerenciamento exclusivamente para setores customizados (`isCustom: true`), executando `DELETE /api/flowcharts/{sector_id}` com remoção física no banco.
+  - **Persistência Imune à Limpeza de Cache**: Recuperação automática de todos os fluxogramas salvos via `GET /api/flowcharts` ao iniciar a aplicação.
+  - **Auditoria & Testes**: Suíte de testes Pytest (7/7 PASS) e Master Checklist (7/7 checks PASS).
+
+## [2.21.0] - 2026-07-19
+
+### Added
+- **Refinamento Interativo de Fluxogramas por Setor (Épico 27)**:
+  - **Retenção & Persistência de Layout**: Correção no efeito de carregamento de `ProcessFlowCanvas.tsx`, garantindo retenção contínua das posições salvas ao trocar de abas.
+  - **Seletores Independentes de Cenário & Safra**: Inclusão de dropdowns ativos na toolbar (`Ano Safra` e `Cenário/Versão` consultado via `GET /api/scenarios`), projetando em tempo real qualquer cenário.
+  - **Modal de Edição Completo & Filtro Cascata**: Reformulação do `NodeVariableSelectorModal.tsx` com campo para renomear título do bloco + seletores cascata (`Setor → Etapa/Processo → Ponto de Controle`).
+  - **Gerenciamento Dinâmico de Setores**: Inclusão de funcionalidade para adicionar novos setores customizados ao fluxograma.
+  - **Auditoria & Testes**: Pytest 7/7 PASS, Vitest 4/4 PASS e Master Checklist 7/7 PASS.
+
+## [2.20.0] - 2026-07-19
+
+### Added
+- **Refinamento Arquitetural de Fluxogramas Dinâmicos por Setor (Épico 26)**:
+  - **Exibição do Cenário Ativo na Toolbar**: Exibição do seletor e badges de cenário (Ano Safra, Mês, Versão e Status `Em Edição` / `Aprovado`) no topo do canvas, projetando valores calculados em tempo real pré-homologação.
+  - **Alternador Visão Resumida vs Completa**: Chave de visibilidade (`Visão Completa` vs `Visão Resumida / KPIs`) e persistência das preferências `view_mode` e `summary_field_ids` na tabela `sector_flowcharts`.
+  - **Modal de Anexo de Variáveis**: Componente `NodeVariableSelectorModal.tsx` com busca em tempo real para marcar/desmarcar variáveis vinculadas a cada nó por duplo clique.
+  - **Lixeira & Exclusão Nativa**: Botão `🗑️ Excluir Selecionados` e suporte nativo à tecla `Delete`/`Backspace` no canvas, removendo nós e arestas sem excluir dados do cadastro relacional.
+  - **Auditoria & Testes**: Aprovação de 100% dos testes Pytest (`test_flowcharts.py` 7/7 PASS), Vitest (`generateDynamicSectorFlow.test.ts` 4/4 PASS) e Master Checklist (7/7 checks PASS).
+
+## [2.19.0] - 2026-07-19
+
+### Added
+- **Fluxogramas Dinâmicos e Modeláveis por Setor (Épico 25)**:
+  - **Backend Model & Persistência**: Criação do modelo `SectorFlowchart` em `database.py` e rotas REST `/api/flowcharts/{sector_id}` em `router_flowcharts.py` (`GET`, `PUT`, `DELETE`).
+  - **Gerador de Topologia Dinâmica**: Implementação de `generateDynamicSectorFlow.ts` construindo diagramas interativos em tempo de execução baseados nos dados reais dos 10 setores do `bme_calc` (`Setor → Etapas → Pontos de Controle → Variáveis`).
+  - **Editor Interativo & Toolbar**: Desenvolvimento de `ProcessFlowToolbar.tsx` e atualização do `ProcessFlowCanvas.tsx` com suporte a adição de nós (`processNode`, `ioNode`), conexão de arestas via drag-and-drop, remoção de elementos e persistência no banco de dados.
+  - **Seletor Dinâmico de Setores**: Atualização em `App.tsx` para carregar dinamicamente as abas de fluxogramas de todos os 10 setores reais do `bme_calc`.
+  - **Validação & Auditoria**: Suíte de testes Pytest `test_flowcharts.py` (6/6 PASS), testes Vitest `generateDynamicSectorFlow.test.ts` (3/3 PASS) e 100% Master Checklist PASS (7/7 checks).
+
+## [2.18.0] - 2026-07-18
+
+### Added
+- **Framework de Fluxogramas de Processo (@xyflow/react) (Épico 24)**:
+  - Integração do motor de diagramas de processo `@xyflow/react` (ReactFlow v12) com tematização Dark Studio.
+  - Implementação dos módulos de topologia declarativa `processFlow.ts`, `processFlowMoagem.ts`, `processFlowPremissas.ts` e `processFlowBagaco.ts`.
+  - Desenvolvimento dos componentes de nós customizados `ValueTile.tsx`, `ProcessNode.tsx`, `IoNode.tsx` e `HubNode.tsx`.
+  - Integração das células de entrada `ValueTile` com `FormattedVariableInput` e com o estado global Jotai (`variableValueAtomFamily`, `resultsAtom`, `selectedFieldIdAtom`).
+  - Adição de seletor por abas no topo da visualização do fluxograma permitindo alternar livremente entre os diagramas da Moagem, Balanço de Bagaço e Premissas & Resultados.
+  - Aprovação de 100% dos testes de regressão (Pytest 31/31) e auditoria de qualidade Master Checklist (7/7 checks PASS).
+
 ## [2.17.0] - 2026-07-17
 
 ### Added

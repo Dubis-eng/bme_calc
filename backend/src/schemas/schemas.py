@@ -196,4 +196,18 @@ class SubstitutionConfirmResponse(BaseModel):
     affected_count: int
     becomes_unused: bool
 
+class SectorFlowchartUpdate(BaseModel):
+    view_mode: Optional[str] = "full"
+    summary_field_ids: Optional[List[str]] = []
+    nodes: List[Dict[str, Any]]
+    edges: List[Dict[str, Any]]
+
+class SectorFlowchartDetail(BaseModel):
+    sector_id: str
+    view_mode: str
+    summary_field_ids: List[str]
+    nodes: List[Dict[str, Any]]
+    edges: List[Dict[str, Any]]
+    updated_at: datetime.datetime
+
 
