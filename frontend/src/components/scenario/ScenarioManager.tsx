@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Variable, ScenarioMetadata } from '../../types';
 export type { ScenarioMetadata };
 import { formatHarvestYear } from '../../utils/helpers';
 import { SCENARIO_STATUS_BADGE } from '../../styles/design-system';
-
-
-
+import apiClient from '../../api/client';
+import { toast } from '../ui/Toast';
 
 interface ScenarioManagerProps {
     variables: Variable[];
@@ -51,7 +49,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
         setLoading(true);
         setListError('');
         try {
-            const res = await axios.get('http://localhost:8000/api/scenarios');
+            const res = await apiClient.get('/api/scenarios');
             setScenarios(res.data);
         } catch (err) {
             setListError('Erro ao carregar lista de cenários.');
@@ -67,7 +65,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
 
     const handleLoad = async (id: string) => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/scenarios/${id}`);
+            const res = await apiClient.get(`/api/scenarios/${id}`);
             const scenario = res.data;
             const meta: ScenarioMetadata = {
                 id: scenario.id,
@@ -78,8 +76,9 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                 cycle_start_month: scenario.cycle_start_month
             };
             onLoadScenario(scenario.variables, meta);
+            toast.success(`Cenário v${scenario.version} carregado com sucesso!`);
         } catch (err) {
-            alert('Erro ao carregar detalhes do cenário.');
+            toast.error('Erro ao carregar detalhes do cenário.');
             console.error(err);
         }
     };
@@ -87,16 +86,17 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
     const handleUpdateStatus = async (status: 'Em Edição' | 'Aprovado' | 'Final') => {
         if (!currentScenario) return;
         try {
-            const res = await axios.patch(`http://localhost:8000/api/scenarios/${currentScenario.id}/status`, { status });
+            const res = await apiClient.patch(`/api/scenarios/${currentScenario.id}/status`, { status });
             onStatusChange(res.data.status);
-            // Refresh list
+            toast.success(`Status alterado para "${res.data.status}".`);
             fetchScenarios();
         } catch (err) {
-            alert('Erro ao atualizar status.');
+            toast.error('Erro ao atualizar status do cenário.');
             console.error(err);
         }
     };
 
+    const baseURL = apiClient.defaults.baseURL || 'http://localhost:8000';
 
     return (
         <div className="glass-card p-4 space-y-4">
@@ -212,14 +212,14 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
                     {/* Export Actions */}
                     <div className="flex space-x-2 pt-2 border-t border-slate-800/40">
                         <a
-                            href={`http://localhost:8000/api/scenarios/${currentScenario.id}/export/pdf`}
+                            href={`${baseURL}/api/scenarios/${currentScenario.id}/export/pdf`}
                             download
                             className="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors flex items-center justify-center space-x-1"
                         >
                             <span>📄 Baixar PDF</span>
                         </a>
                         <a
-                            href={`http://localhost:8000/api/scenarios/${currentScenario.id}/export/xlsx`}
+                            href={`${baseURL}/api/scenarios/${currentScenario.id}/export/xlsx`}
                             download
                             className="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold py-1 px-2 rounded text-[10px] text-center transition-colors flex items-center justify-center space-x-1"
                         >

@@ -57,8 +57,9 @@ export const ProcessFlowCanvas: React.FC<ProcessFlowCanvasProps> = ({
         onCalculate={onCalculate}
         isCalculating={isCalculating}
         isLayoutLocked={flowState.isLayoutLocked}
-        onToggleLayoutLock={() => flowState.setIsLayoutLocked((prev) => !prev)}
+        onToggleLayoutLock={flowState.toggleLock}
         selectedYear={flowState.selectedYear}
+
         onYearChange={flowState.setSelectedYear}
         availableYears={flowState.availableYears}
         selectedScenarioId={flowState.selectedScenarioId}

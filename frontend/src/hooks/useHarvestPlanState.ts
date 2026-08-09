@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { ConsolidatedItem } from '../components/harvest-plan/HarvestPlanTable';
 import { VariableConfig } from '../components/harvest-plan/HarvestPlanConfigTable';
+import apiClient from '../api/client';
+import { toast } from '../components/ui/Toast';
 
 export function useHarvestPlanState() {
   const [activeSubTab, setActiveSubTab] = useState<'visualizacao' | 'configuracao'>('visualizacao');
@@ -25,10 +26,24 @@ export function useHarvestPlanState() {
   const [newDividerLabel, setNewDividerLabel] = useState('');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
+  const fetchConsolidation = useCallback(async () => {
+    if (!selectedYear) return;
+    try {
+      setLoading(true);
+      const res = await apiClient.get(`/api/harvest-plan/consolidation?year_harvest=${selectedYear}`);
+      setMonths(res.data.months);
+      setConsolidationData(res.data.data);
+    } catch (err) {
+      console.error('Erro ao calcular consolidação:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedYear]);
+
   const fetchSelections = useCallback(() => {
     if (!selectedYear) return;
     const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    axios.get(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`)
+    apiClient.get(`/api/harvest-plan/selections?year_harvest=${yearNum}`)
       .then(res => {
         setSelections(res.data.selections || []);
         setAvailableScenarios(res.data.available_scenarios || {});
@@ -39,22 +54,23 @@ export function useHarvestPlanState() {
     if (!selectedYear) return;
     setLoading(true);
     const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    axios.post(`http://localhost:8000/api/harvest-plan/selections?year_harvest=${yearNum}`, { month, scenario_id: scenarioId, exclude })
+    apiClient.post(`/api/harvest-plan/selections?year_harvest=${yearNum}`, { month, scenario_id: scenarioId, exclude })
       .then(async () => {
         await fetchConsolidation();
         fetchSelections();
+        toast.success(`Cenário para o mês ${month} atualizado.`);
       }).catch(err => {
         console.error('Erro ao salvar seleção de cenário:', err);
-        alert('Erro ao atualizar seleção de cenário do mês.');
+        toast.error('Erro ao atualizar seleção de cenário do mês.');
       }).finally(() => setLoading(false));
   };
 
   const fetchSettingsAndYears = useCallback(() => {
     setLoading(true);
-    axios.get('http://localhost:8000/api/settings/cycle')
+    apiClient.get('/api/settings/cycle')
       .then(settingsRes => {
         setStartMonth(settingsRes.data.start_month);
-        return axios.get('http://localhost:8000/api/harvest-plan/years');
+        return apiClient.get('/api/harvest-plan/years');
       })
       .then(yearsRes => {
         const yearStrings = yearsRes.data.map((y: string | number) => String(y));
@@ -64,24 +80,10 @@ export function useHarvestPlanState() {
   }, []);
 
   const fetchConfigs = useCallback(() => {
-    axios.get('http://localhost:8000/api/harvest-plan/config')
+    apiClient.get('/api/harvest-plan/config')
       .then(res => setVariablesConfig(res.data))
       .catch(err => console.error('Erro ao carregar configurações de variáveis:', err));
   }, []);
-
-  const fetchConsolidation = useCallback(async () => {
-    if (!selectedYear) return;
-    try {
-      setLoading(true);
-      const res = await axios.get(`http://localhost:8000/api/harvest-plan/consolidation?year_harvest=${selectedYear}`);
-      setMonths(res.data.months);
-      setConsolidationData(res.data.data);
-    } catch (err) {
-      console.error('Erro ao calcular consolidação:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedYear]);
 
   useEffect(() => {
     fetchSettingsAndYears();
@@ -97,13 +99,14 @@ export function useHarvestPlanState() {
 
   const handleStartMonthChange = (val: string) => {
     setLoading(true);
-    axios.post('http://localhost:8000/api/settings/cycle', { start_month: val })
+    apiClient.post('/api/settings/cycle', { start_month: val })
       .then(async () => {
         setStartMonth(val);
         await fetchConsolidation();
+        toast.success(`Mês inicial do ciclo alterado para "${val}".`);
       }).catch(err => {
         console.error('Erro ao salvar início do ciclo:', err);
-        alert('Erro ao atualizar mês de início.');
+        toast.error('Erro ao atualizar mês de início do ciclo.');
       }).finally(() => setLoading(false));
   };
 
@@ -113,14 +116,14 @@ export function useHarvestPlanState() {
 
   const handleSaveConfigs = () => {
     setSavingConfig(true);
-    axios.post('http://localhost:8000/api/harvest-plan/config', variablesConfig)
+    apiClient.post('/api/harvest-plan/config', variablesConfig)
       .then(async () => {
-        alert('Configurações salvas com sucesso!');
+        toast.success('Configurações do Plano de Safra salvas com sucesso!');
         fetchConfigs();
         await fetchConsolidation();
       }).catch(err => {
         console.error('Erro ao salvar configurações:', err);
-        alert('Erro ao salvar as configurações.');
+        toast.error('Erro ao salvar as configurações do Plano de Safra.');
       }).finally(() => setSavingConfig(false));
   };
 
@@ -132,9 +135,15 @@ export function useHarvestPlanState() {
         variable_id: item.tipo_item === 'divider' ? null : item.variable_id,
         label: item.tipo_item === 'divider' ? item.label : null
       }));
-      axios.post('http://localhost:8000/api/harvest-plan/structure', { items })
-        .then(() => fetchConsolidation())
-        .catch(err => console.error('Erro ao salvar estrutura:', err))
+      apiClient.post('/api/harvest-plan/structure', { items })
+        .then(() => {
+          fetchConsolidation();
+          toast.success('Estrutura do Plano de Safra salva com sucesso!');
+        })
+        .catch(err => {
+          console.error('Erro ao salvar estrutura:', err);
+          toast.error('Erro ao salvar a estrutura do plano.');
+        })
         .finally(() => {
           setIsEditing(false);
           setLoading(false);
@@ -174,6 +183,7 @@ export function useHarvestPlanState() {
 
   const handleDeleteDivider = (dividerId: string) => {
     setConsolidationData(prev => prev.filter(item => item.variable_id !== dividerId));
+    toast.info('Divisor removido da estrutura.');
   };
 
   const handleRenameDivider = (dividerId: string, newLabel: string) => {
@@ -193,6 +203,7 @@ export function useHarvestPlanState() {
     };
     setConsolidationData(prev => [...prev, newDiv]);
     setNewDividerLabel('');
+    toast.success(`Divisor "${newDividerLabel.trim()}" adicionado!`);
   };
 
   return {

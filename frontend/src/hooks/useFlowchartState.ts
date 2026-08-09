@@ -11,7 +11,8 @@ import {
   MarkerType,
 } from '@xyflow/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import axios from 'axios';
+import apiClient from '../api/client';
+import { toast } from '../components/ui/Toast';
 
 import { getProcessFlowForSector } from '../lib/processFlow';
 import { generateDynamicSectorFlow } from '../lib/generateDynamicSectorFlow';
@@ -43,7 +44,7 @@ export function useFlowchartState(sector: string) {
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/scenarios').then((res) => {
+    apiClient.get('/api/scenarios').then((res) => {
       if (Array.isArray(res.data)) {
         setAvailableScenarios(res.data);
         if (res.data.length > 0 && !selectedScenarioId) {
@@ -52,17 +53,17 @@ export function useFlowchartState(sector: string) {
       }
     }).catch(() => {});
 
-    axios.get('http://localhost:8000/api/harvest-plan/years').then((res) => {
+    apiClient.get('/api/harvest-plan/years').then((res) => {
       if (Array.isArray(res.data) && res.data.length > 0) {
         setAvailableYears(res.data);
       }
     }).catch(() => {});
-  }, []);
+  }, [selectedScenarioId]);
 
   const loadFlowchart = useCallback(async (sectorKey: string) => {
     setIsViewingDefault(false);
     try {
-      const res = await axios.get(`http://localhost:8000/api/flowcharts/${encodeURIComponent(sectorKey)}`);
+      const res = await apiClient.get(`/api/flowcharts/${encodeURIComponent(sectorKey)}`);
       if (res.data && res.data.nodes && res.data.nodes.length > 0) {
         setNodes(res.data.nodes);
         const mappedEdges = (res.data.edges || []).map((e: Edge) => ({
@@ -209,12 +210,14 @@ export function useFlowchartState(sector: string) {
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
-      await axios.put(`http://localhost:8000/api/flowcharts/${encodeURIComponent(sector)}`, { nodes, edges });
+      await apiClient.put(`/api/flowcharts/${encodeURIComponent(sector)}`, { nodes, edges });
       setSavedCustomLayout({ nodes, edges });
       setHasCustomLayout(true);
       setIsViewingDefault(false);
+      toast.success(`Layout do fluxograma (${sector}) salvo com sucesso!`);
     } catch (err) {
       console.error('Erro ao salvar layout:', err);
+      toast.error('Erro ao salvar layout do fluxograma.');
     } finally {
       setIsSaving(false);
     }
@@ -247,34 +250,63 @@ export function useFlowchartState(sector: string) {
       setNodes(defaultNodes);
       setEdges(defaultEdges);
       setIsViewingDefault(true);
+      toast.info('Visualizando layout padrão automático.');
     } else {
       if (savedCustomLayout) {
         setNodes(savedCustomLayout.nodes);
         setEdges(savedCustomLayout.edges);
       }
       setIsViewingDefault(false);
+      toast.info('Restaurado layout customizado do usuário.');
     }
   }, [isViewingDefault, nodes, edges, mergedVariables, sector, savedCustomLayout]);
+
+  const handleResetToDefault = useCallback(async () => {
+    try {
+      await apiClient.delete(`/api/flowcharts/${encodeURIComponent(sector)}`);
+    } catch {
+      // ignore
+    }
+    const generated = generateDynamicSectorFlow(mergedVariables, sector);
+    const flow = generated.nodes.length > 0 ? generated : getProcessFlowForSector(sector);
+
+    const defaultNodes: Node[] = flow.nodes.map((n) => ({
+      id: n.id,
+      type: NODE_KIND_TO_TYPE[n.kind] || 'processNode',
+      position: n.position,
+      data: { title: n.title, subtitle: n.subtitle, fieldIds: n.fieldIds },
+      draggable: true,
+    }));
+
+    const defaultEdges: Edge[] = flow.edges.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      type: 'smoothstep',
+      animated: true,
+      style: { strokeWidth: 2, stroke: '#0d9488' },
+      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#14b8a6' },
+    }));
+
+    setNodes(defaultNodes);
+    setEdges(defaultEdges);
+    setSavedCustomLayout(null);
+    setHasCustomLayout(false);
+    setIsViewingDefault(false);
+    toast.success(`Fluxograma (${sector}) restaurado para o padrão do sistema!`);
+  }, [sector, mergedVariables]);
+
+  const toggleLock = useCallback(() => {
+    setIsLayoutLocked((curr) => {
+      const nextState = !curr;
+      toast.info(nextState ? 'Edição de layout bloqueada.' : 'Edição de layout desbloqueada.');
+      return nextState;
+    });
+  }, []);
 
   return {
     nodes,
     edges,
-    isSaving,
-    hasCustomLayout,
-    isViewingDefault,
-    isLayoutLocked,
-    setIsLayoutLocked,
-    selectedScenarioId,
-    setSelectedScenarioId,
-    selectedYear,
-    setSelectedYear,
-    availableScenarios,
-    availableYears,
-    isModalOpen,
-    setIsModalOpen,
-    editingNodeTitle,
-    editingFieldIds,
-    selectedElementsCount,
     onNodesChange,
     onEdgesChange,
     onEdgesDelete,
@@ -282,10 +314,27 @@ export function useFlowchartState(sector: string) {
     handleNodeClick,
     handleNodeDoubleClick,
     handleDeleteSelected,
-    handleSaveNodeDetails,
+    selectedElementsCount,
+    isSaving,
+    handleSave,
+    hasCustomLayout,
+    handleResetToDefault,
+    isLayoutLocked,
+    toggleLock,
+    isViewingDefault,
+    handleToggleDefaultView,
     handleAddProcessNode,
     handleAddIoNode,
-    handleSave,
-    handleToggleDefaultView,
+    isModalOpen,
+    setIsModalOpen,
+    editingNodeTitle,
+    editingFieldIds,
+    handleSaveNodeDetails,
+    availableScenarios,
+    selectedScenarioId,
+    setSelectedScenarioId,
+    selectedYear,
+    setSelectedYear,
+    availableYears,
   };
 }

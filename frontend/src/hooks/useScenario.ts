@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAtom, useAtomValue } from 'jotai';
 import { Variable, Sector, BackendVariable, Result, ScenarioMetadata } from '../types';
+import apiClient from '../api/client';
+import { toast } from '../components/ui/Toast';
 
 import { parseHarvestYear, mapBackendVariableToFrontend } from '../utils/helpers';
 import {
@@ -53,21 +55,21 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   const checkConnection = useCallback(async () => {
     try {
-      await axios.get('http://localhost:8000/api/scenarios', { timeout: 2000 });
+      await apiClient.get('/api/scenarios', { timeout: 2000 });
       setIsOffline(false);
       return true;
     } catch {
       setIsOffline(true);
       return false;
     }
-  }, []);
+  }, [setIsOffline]);
 
   const handleApiError = useCallback((err: unknown) => {
     const error = err as { response?: { status: number }; code?: string; message?: string };
     if (!error.response || error.code === 'ERR_NETWORK' || error.message === 'Network Error' || (error.response && error.response.status >= 500)) {
       setIsOffline(true);
     }
-  }, []);
+  }, [setIsOffline]);
 
   const loadLocalFallback = useCallback(() => {
     fetch('/memorial_de_calculo_balanco.json')
@@ -77,14 +79,14 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         if (data.length > 0) setActiveSector(data[0].SETOR);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [setVariablesWithValues, setActiveSector, setLoading]);
 
   const triggerCalculate = useCallback(async (varsList: Variable[], tolVal?: number) => {
     if (isOffline) return;
     setCalculating(true);
     setConvergenceError(false);
     try {
-      const response = await axios.post('http://localhost:8000/api/calculate', {
+      const response = await apiClient.post('/api/calculate', {
         variables: varsList,
         tolerance: tolVal ?? tolerance
       });
@@ -95,11 +97,11 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     } catch (err) {
       console.error(err);
       handleApiError(err);
-      alert("Erro ao calcular.");
+      toast.error("Erro ao calcular o balanço de massa e energia.");
     } finally {
       setCalculating(false);
     }
-  }, [isOffline, tolerance, handleApiError]);
+  }, [isOffline, tolerance, setCalculating, setConvergenceError, setResults, setIterations, setResidual, handleApiError]);
 
   const onLoadScenario = useCallback((loadedVars: Variable[], meta: ScenarioMetadata) => {
     setVariablesWithValues(loadedVars); setCurrentScenario(meta);
@@ -107,7 +109,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     setAnoSafra(parsedYear); setMesReferencia(meta.reference_month); setHasUnsavedChanges(false);
     if (loadedVars.length > 0) setActiveSector(loadedVars[0].SETOR);
     triggerCalculate(loadedVars);
-  }, [triggerCalculate]);
+  }, [setVariablesWithValues, setCurrentScenario, setAnoSafra, setMesReferencia, setHasUnsavedChanges, setActiveSector, triggerCalculate]);
 
   useEffect(() => {
     if (!isOffline) return;
@@ -117,12 +119,12 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   useEffect(() => {
     fetchYearsAndMonths();
-    axios.get('http://localhost:8000/api/scenarios')
+    apiClient.get('/api/scenarios')
       .then(res => {
         setIsOffline(false);
         if (res.data?.length > 0) {
           const latest = res.data[0];
-          axios.get(`http://localhost:8000/api/scenarios/${latest.id}`)
+          apiClient.get(`/api/scenarios/${latest.id}`)
             .then(detailRes => {
               onLoadScenario(detailRes.data.variables, latest);
               setLoading(false);
@@ -133,7 +135,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         }
       })
       .catch(err => { handleApiError(err); setLoading(false); });
-  }, [fetchYearsAndMonths, onLoadScenario, handleApiError, loadLocalFallback]);
+  }, [fetchYearsAndMonths, onLoadScenario, handleApiError, loadLocalFallback, setIsOffline, setLoading]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -161,7 +163,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     if (isOffline) return;
     setSaving(true);
     try {
-      const res = await axios.post('http://localhost:8000/api/scenarios', {
+      const res = await apiClient.post('/api/scenarios', {
         year_harvest: anoSafra, reference_month: mesReferencia, variables: mergedVariables, status: 'Em Edição'
       });
       setCurrentScenario({
@@ -169,11 +171,11 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
         version: res.data.version, status: res.data.status, cycle_start_month: res.data.cycle_start_month
       });
       setHasUnsavedChanges(false);
-      alert(`Cenário salvo com sucesso! Versão: v${res.data.version}`);
+      toast.success(`Cenário salvo com sucesso! Versão: v${res.data.version}`);
       fetchSectors();
     } catch (err) {
       handleApiError(err);
-      alert("Erro ao salvar cenário.");
+      toast.error("Erro ao salvar o novo cenário.");
     } finally {
       setSaving(false);
     }
@@ -183,7 +185,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     if (!currentScenario || isOffline) return;
     setSavingActive(true);
     try {
-      const res = await axios.put(`http://localhost:8000/api/scenarios/${currentScenario.id}`, {
+      const res = await apiClient.put(`/api/scenarios/${currentScenario.id}`, {
         year_harvest: anoSafra, reference_month: mesReferencia, variables: mergedVariables, status: currentScenario.status
       });
       setHasUnsavedChanges(false);
@@ -197,10 +199,10 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
           cycle_start_month: res.data.cycle_start_month
         });
       }
-      alert('Alterações salvas com sucesso!');
+      toast.success('Alterações do cenário ativo salvas com sucesso!');
     } catch (err) {
       handleApiError(err);
-      alert('Erro ao salvar alterações do cenário.');
+      toast.error('Erro ao salvar alterações do cenário ativo.');
       console.error(err);
     } finally {
       setSavingActive(false);
@@ -217,7 +219,6 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     setHasUnsavedChanges(true);
   };
 
-
   const handleSaveVariable = async (newVar: Variable, isEdit: boolean, origId?: string) => {
     if (isLocked) return;
     await ensureSectorExists(newVar.SETOR, sectors, fetchSectors);
@@ -225,18 +226,19 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
     try {
       if (isEdit && origId) {
-        await axios.put(`http://localhost:8000/api/variables/${origId}`, payload);
+        await apiClient.put(`/api/variables/${origId}`, payload);
       } else {
-        await axios.post('http://localhost:8000/api/variables', payload);
+        await apiClient.post('/api/variables', payload);
       }
       
       const updated = isEdit && origId ? variables.map(v => v["ID - REF"] === origId ? newVar : v) : [...variables, newVar];
       setVariablesWithValues(updated);
       triggerCalculate(updated);
+      toast.success(isEdit ? 'Variável atualizada com sucesso!' : 'Nova variável cadastrada com sucesso!');
     } catch (err) {
       const error = err as { response?: { data?: { detail?: string } }; message?: string };
       console.error(error);
-      alert(`Erro ao salvar variável globalmente: ${error.response?.data?.detail || error.message}`);
+      toast.error(`Erro ao salvar variável: ${error.response?.data?.detail || error.message}`);
     }
   };
 
@@ -244,16 +246,16 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
     if (currentScenario) {
       setLoading(true);
       try {
-        const detailRes = await axios.get(`http://localhost:8000/api/scenarios/${currentScenario.id}`);
+        const detailRes = await apiClient.get(`/api/scenarios/${currentScenario.id}`);
         onLoadScenario(detailRes.data.variables, currentScenario);
       } catch (err) {
         console.error("Erro ao recarregar cenário:", err);
         if (axios.isAxiosError(err) && err.response?.status === 404) {
           try {
-            const listRes = await axios.get('http://localhost:8000/api/scenarios');
+            const listRes = await apiClient.get('/api/scenarios');
             if (listRes.data?.length > 0) {
               const latest = listRes.data[0];
-              const fallbackRes = await axios.get(`http://localhost:8000/api/scenarios/${latest.id}`);
+              const fallbackRes = await apiClient.get(`/api/scenarios/${latest.id}`);
               onLoadScenario(fallbackRes.data.variables, latest);
             } else {
               loadLocalFallback();
@@ -263,7 +265,7 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
       } finally { setLoading(false); }
     } else {
       try {
-        const res = await axios.get('http://localhost:8000/api/variables');
+        const res = await apiClient.get('/api/variables');
         const mapped: Variable[] = res.data.map((v: BackendVariable) => mapBackendVariableToFrontend(v));
         setVariablesWithValues(mapped);
         triggerCalculate(mapped);

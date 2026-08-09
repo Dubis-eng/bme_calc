@@ -12,6 +12,18 @@ export const TYPE_BADGE: Record<string, string> = {
 export const ERROR_BADGE: Record<string, string> = {
   DIV_BY_ZERO:  'bg-rose-500/15   text-rose-400   border-rose-500/25',
   MISSING_VAR:  'bg-amber-500/15  text-amber-400  border-amber-500/25',
+  PENDING:      'bg-slate-500/15  text-slate-400  border-slate-500/25',
+  SYNTAX_ERROR: 'bg-rose-500/15   text-rose-400   border-rose-500/25',
+};
+
+// ── Portuguese Human-Readable Error Labels ───────────────────
+export const ERROR_LABELS: Record<string, string> = {
+  DIV_BY_ZERO:  'Divisão por Zero',
+  MISSING_VAR:  'Variável Ausente',
+  PENDING:      'Aguardando Cálculo',
+  SYNTAX_ERROR: 'Erro na Fórmula',
+  INVALID_VALUE:'Valor Inválido',
+  MATH_ERROR:   'Erro Matemático',
 };
 
 // ── Scenario Status Badges ───────────────────────────────────
@@ -57,6 +69,11 @@ export type BmeIconName =
   | 'sun'
   | 'plus'
   | 'eye'
+  | 'calculator'
+  | 'calendar'
+  | 'workflow'
+  | 'search'
+  | 'zap'
   | 'default';
 
 interface BmeIconProps {
@@ -96,6 +113,16 @@ export const BmeIcon: React.FC<BmeIconProps> = ({ name, className = 'shrink-0', 
       case 'sun':
         return <><circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>;
       case 'plus': return <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />;
+      case 'calculator':
+        return <><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5" /><rect x="5" y="4" width="6" height="2.5" rx="0.5" fill="currentColor" opacity="0.3" /><circle cx="5.5" cy="9" r="0.75" fill="currentColor" /><circle cx="8" cy="9" r="0.75" fill="currentColor" /><circle cx="10.5" cy="9" r="0.75" fill="currentColor" /><circle cx="5.5" cy="11.5" r="0.75" fill="currentColor" /><circle cx="8" cy="11.5" r="0.75" fill="currentColor" /><circle cx="10.5" cy="11.5" r="0.75" fill="currentColor" /></>;
+      case 'calendar':
+        return <><rect x="2.5" y="3.5" width="11" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" /><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" /></>;
+      case 'workflow':
+        return <><rect x="2" y="2" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.5" /><rect x="9.5" y="9.5" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.5" /><path d="M6.5 4.25h3a2 2 0 0 1 2 2v3.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></>;
+      case 'search':
+        return <><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" /><path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></>;
+      case 'zap':
+        return <path d="M9 1.5L2.5 8.5h4.5l-1 6 6.5-7H8l1-6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />;
       default: return <path d="M8 2.5L10 6l3.5.5-2.5 2.5.5 3.5-3.5-2-3.5 2 .5-3.5-2.5-2.5 3.5-.5L8 2.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />;
     }
   };

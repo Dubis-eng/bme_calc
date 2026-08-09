@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScenarioMetadata } from '../../types';
+import { BmeIcon } from '../../styles/design-system';
 
 interface ProcessFlowToolbarProps {
   onAddProcessNode: () => void;
@@ -51,8 +52,9 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-t-xl border-b border-slate-800 bg-slate-900/90 px-4 py-3 backdrop-blur-md">
       <div className="flex flex-wrap items-center gap-2.5">
-        <span className="text-xs font-semibold uppercase tracking-wider text-teal-400">
-          🛠️ Editor de Topologia
+        <span className="text-xs font-semibold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+          <BmeIcon name="workflow" size={14} />
+          <span>Editor de Topologia</span>
         </span>
 
         {isViewingDefault ? (
@@ -117,7 +119,7 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
             className="flex items-center gap-1.5 rounded-lg border border-teal-500/50 bg-gradient-to-r from-teal-600 to-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white hover:from-teal-500 hover:to-emerald-500 disabled:opacity-50 transition-all shadow-md shadow-teal-950/40 active:scale-95 cursor-pointer"
             title="Executar motor de cálculo do balanço com os dados atuais"
           >
-            <span className={isCalculating ? 'animate-spin' : ''}>{isCalculating ? '🔄' : '⚡'}</span>
+            <BmeIcon name="zap" size={13} className={isCalculating ? 'animate-spin' : ''} />
             <span>{isCalculating ? 'Calculando...' : 'Calcular'}</span>
           </button>
         )}
@@ -136,7 +138,7 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
             }`}
             title={isLayoutLocked ? 'Layout Travado. Clique para liberar edição e movimentação dos blocos.' : 'Edição Liberada. Clique para travar o layout.'}
           >
-            <span>{isLayoutLocked ? '🔒' : '🔓'}</span>
+            <BmeIcon name="lock" size={13} />
             <span>{isLayoutLocked ? 'Layout Travado' : 'Edição Liberada'}</span>
           </button>
         )}
@@ -152,7 +154,8 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
               className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-600 hover:bg-slate-700 transition-colors"
               title="Adicionar Bloco de Processo"
             >
-              <span>➕</span> Processo
+              <BmeIcon name="plus" size={12} />
+              <span>Processo</span>
             </button>
 
             <button
@@ -161,7 +164,8 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
               className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-600 hover:bg-slate-700 transition-colors"
               title="Adicionar Bloco de E/S (Inputs / Outputs)"
             >
-              <span>📥</span> E/S
+              <BmeIcon name="plus" size={12} />
+              <span>E/S</span>
             </button>
 
             {selectedElementsCount > 0 && onDeleteSelected && (
@@ -171,7 +175,8 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
                 className="flex items-center gap-1.5 rounded-lg border border-rose-800/80 bg-rose-950/80 px-3 py-1.5 text-xs font-medium text-rose-200 hover:bg-rose-900 transition-colors"
                 title="Excluir elementos selecionados no canvas (tecla Delete/Backspace)"
               >
-                <span>🗑️</span> Excluir ({selectedElementsCount})
+                <BmeIcon name="close" size={12} />
+                <span>Excluir ({selectedElementsCount})</span>
               </button>
             )}
 
@@ -181,8 +186,8 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
               className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${isViewingDefault ? 'border-teal-500/60 bg-teal-950/80 text-teal-300 shadow-sm shadow-teal-900/30' : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-amber-900/50 hover:bg-amber-950/40 hover:text-amber-300'}`}
               title={isViewingDefault ? 'Voltar para o layout customizado salvo no banco' : 'Visualizar a topologia automática baseada no cadastro relacional'}
             >
-              <span>{isViewingDefault ? '🎨' : '🔄'}</span>
-              {isViewingDefault ? 'Ver Customizado' : 'Ver Padrão'}
+              <BmeIcon name="gear" size={12} />
+              <span>{isViewingDefault ? 'Ver Customizado' : 'Ver Padrão'}</span>
             </button>
 
             <button
@@ -191,8 +196,8 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
               disabled={isSaving}
               className="flex items-center gap-1.5 rounded-lg bg-teal-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-teal-500 disabled:opacity-50 transition-colors shadow-md shadow-teal-900/20"
             >
-              <span>{isSaving ? '⏳' : '💾'}</span>
-              {isSaving ? 'Salvando...' : 'Salvar Layout'}
+              <BmeIcon name="pencil" size={12} />
+              <span>{isSaving ? 'Salvando...' : 'Salvar Layout'}</span>
             </button>
           </>
         )}

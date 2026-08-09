@@ -4,6 +4,7 @@ import { BmeIcon } from '../../styles/design-system';
 import { HarvestPlanTable } from './HarvestPlanTable';
 import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
 import { useHarvestPlanState } from '../../hooks/useHarvestPlanState';
+import apiClient from '../../api/client';
 
 interface HarvestPlanProps { sectors: Sector[]; }
 const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -29,6 +30,8 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
     handleAddDivider
   } = useHarvestPlanState();
 
+  const baseURL = apiClient.defaults.baseURL || 'http://localhost:8000';
+
   const filteredConsolidated = consolidationData.filter(item => {
     if (item.tipo_item === 'divider') return true;
     const varId = item.variable_id || '';
@@ -53,7 +56,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
       <div className="bg-slate-900/40 text-white px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-880 space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <div className="h-9 w-9 bg-slate-800 border border-slate-700/60 rounded-lg flex items-center justify-center font-bold text-teal-400 shadow-sm text-sm">
-            <BmeIcon name="default" size={14} />
+            <BmeIcon name="calendar" size={16} />
           </div>
           <div>
             <h2 className="text-sm font-bold tracking-wider uppercase text-teal-400">Plano de Safra Consolidado</h2>
@@ -82,11 +85,13 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
       <div className="bg-slate-950/60 px-6 py-3 border-b border-slate-800/60 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
         <div className="flex space-x-1.5 p-1 bg-slate-900 border border-slate-800/60 rounded-lg">
-          <button onClick={() => setActiveSubTab('visualizacao')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'visualizacao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
-            📊 Visualização Consolidada
+          <button onClick={() => setActiveSubTab('visualizacao')} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'visualizacao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
+            <BmeIcon name="eye" size={13} />
+            <span>Visualização Consolidada</span>
           </button>
-          <button onClick={() => setActiveSubTab('configuracao')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'configuracao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
-            ⚙️ Configuração do Plano
+          <button onClick={() => setActiveSubTab('configuracao')} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'configuracao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
+            <BmeIcon name="gear" size={13} />
+            <span>Configuração do Plano</span>
           </button>
         </div>
 
@@ -96,25 +101,35 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
               onClick={handleToggleEdit}
               className={`btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5 ${isEditing ? 'bg-amber-600 hover:bg-amber-500 text-white' : ''}`}
             >
-              {isEditing ? <span>💾 Salvar Organização</span> : <span>🔓 Editar Estrutura</span>}
+              {isEditing ? (
+                <>
+                  <BmeIcon name="pencil" size={13} />
+                  <span>Salvar Organização</span>
+                </>
+              ) : (
+                <>
+                  <BmeIcon name="pencil" size={13} />
+                  <span>Editar Estrutura</span>
+                </>
+              )}
             </button>
           )}
 
           {activeSubTab === 'visualizacao' && !isEditing && selectedYear && (
             <div className="flex items-center gap-1.5">
               <a
-                href={`http://localhost:8000/api/harvest-plan/export/pdf?year_harvest=${selectedYear}`}
+                href={`${baseURL}/api/harvest-plan/export/pdf?year_harvest=${selectedYear}`}
                 className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-teal-450 hover:text-teal-350 border border-slate-800/60 rounded text-xs font-bold transition-all flex items-center gap-1 animate-fade-in"
                 title="Exportar PDF"
               >
-                📄 PDF
+                <span>📄 PDF</span>
               </a>
               <a
-                href={`http://localhost:8000/api/harvest-plan/export/xlsx?year_harvest=${selectedYear}`}
+                href={`${baseURL}/api/harvest-plan/export/xlsx?year_harvest=${selectedYear}`}
                 className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-teal-450 hover:text-teal-350 border border-slate-800/60 rounded text-xs font-bold transition-all flex items-center gap-1 animate-fade-in"
                 title="Exportar Excel"
               >
-                📊 Excel
+                <span>📊 Excel</span>
               </a>
             </div>
           )}
@@ -128,8 +143,9 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
                 onChange={(e) => setNewDividerLabel(e.target.value)}
                 className="px-2 py-0.5 input-field text-[11px] w-36 focus:outline-none"
               />
-              <button onClick={handleAddDivider} className="px-2 py-0.5 bg-teal-600 hover:bg-teal-500 text-[9px] font-bold rounded uppercase">
-                ➕ Divisor
+              <button onClick={handleAddDivider} className="px-2 py-0.5 bg-teal-600 hover:bg-teal-500 text-[9px] font-bold rounded uppercase flex items-center gap-1">
+                <BmeIcon name="plus" size={10} />
+                <span>Divisor</span>
               </button>
             </div>
           )}
@@ -147,7 +163,9 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
           </div>
 
           <div className="relative flex-1 md:flex-initial">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]">🔍</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+              <BmeIcon name="search" size={12} />
+            </span>
             <input type="search" placeholder="Pesquisar..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 pr-3 py-1 input-field w-full md:w-48 focus:outline-none" />
           </div>
 
@@ -158,7 +176,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
           {activeSubTab === 'configuracao' && (
             <button onClick={handleSaveConfigs} disabled={savingConfig} className="btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5">
-              {savingConfig ? <span className="flex items-center gap-1.5"><div className="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>Salvando...</span> : <span>💾 Salvar Configurações</span>}
+              {savingConfig ? <span className="flex items-center gap-1.5"><div className="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>Salvando...</span> : <span className="flex items-center gap-1"><BmeIcon name="pencil" size={13} /><span>Salvar Configurações</span></span>}
             </button>
           )}
         </div>

@@ -15,6 +15,8 @@ import { SystemSettingsModal } from './components/settings/SystemSettingsModal';
 import { StatusDashboard } from './components/calculator/StatusDashboard';
 import { ProcessFlowCanvas } from './components/calculator/ProcessFlowCanvas';
 import { ManageSectorsModal } from './components/calculator/ManageSectorsModal';
+import { ToastContainer } from './components/ui/Toast';
+
 import { useVariableSearch } from './hooks/useVariableSearch';
 import { useSearch } from './hooks/useSearch';
 import { useScenario } from './hooks/useScenario';
@@ -288,8 +290,10 @@ function App() {
         onRestoreAll={() => { setHiddenFlowSectors([]); localStorage.removeItem('bme_hidden_flow_sectors'); }}
         onDeleteSector={handleDeleteCustomFlowchartSector}
       />
+      <ToastContainer />
     </div>
   );
 }
+
 
 export default App;

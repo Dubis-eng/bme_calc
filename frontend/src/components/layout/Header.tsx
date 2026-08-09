@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { BmeIcon } from '../../styles/design-system';
+import apiClient from '../../api/client';
 
 type ActiveTab = 'calculator' | 'harvest_plan' | 'flowchart';
 
@@ -23,7 +25,7 @@ function useBackendStatus(): ConnectionStatus {
 
   useEffect(() => {
     const check = () => {
-      fetch('http://localhost:8000/api/sectors', { signal: AbortSignal.timeout(3000) })
+      apiClient.get('/api/sectors', { signal: AbortSignal.timeout(3000) })
         .then(() => setStatus('connected'))
         .catch(() => setStatus('disconnected'));
     };
@@ -36,9 +38,9 @@ function useBackendStatus(): ConnectionStatus {
 }
 
 const TABS: { id: ActiveTab; label: string; icon: string }[] = [
-  { id: 'calculator',   label: 'Calculadora',   icon: '⚙️' },
-  { id: 'harvest_plan', label: 'Plano de Safra', icon: '📆' },
-  { id: 'flowchart',   label: 'Fluxograma',    icon: '🔀' },
+  { id: 'calculator',   label: 'Calculadora',   icon: 'calculator' },
+  { id: 'harvest_plan', label: 'Plano de Safra', icon: 'calendar' },
+  { id: 'flowchart',   label: 'Fluxograma',    icon: 'workflow' },
 ];
 
 export function Header({
@@ -72,8 +74,8 @@ export function Header({
     <header className="flex items-center justify-between bg-slate-950 border-b border-slate-800/60 px-5 py-0 z-20 h-[56px] shrink-0">
       {/* ── Logo ── */}
       <div className="flex items-center gap-3 min-w-[200px]">
-        <div className="h-8 w-8 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-lg flex items-center justify-center font-black text-slate-950 text-lg shadow-glow-sm shrink-0">
-          ⚡
+        <div className="h-8 w-8 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-glow-sm shrink-0">
+          <BmeIcon name="zap" size={18} className="text-slate-950" />
         </div>
         <div className="leading-none">
           <p className="text-[13px] font-bold text-white tracking-tight">BME Calc</p>
@@ -94,7 +96,7 @@ export function Header({
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
-            <span>{tab.icon}</span>
+            <BmeIcon name={tab.icon} size={14} />
             <span>{tab.label}</span>
           </button>
         ))}
@@ -110,13 +112,18 @@ export function Header({
 
         {/* Lock badge */}
         {isLocked && (
-          <span className="badge-warn">🔒 Congelado</span>
+          <span className="badge-warn flex items-center gap-1">
+            <BmeIcon name="lock" size={12} />
+            <span>Congelado</span>
+          </span>
         )}
 
         {/* Search (calculator only) */}
         {activeTab === 'calculator' && (
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none">🔍</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+              <BmeIcon name="search" size={13} />
+            </span>
             <input
               id="global-search"
               type="search"
