@@ -57,3 +57,7 @@ backup_cenarios.sql
 .env.test.local
 .env.production.local
 .env*.local
+
+# Mantis Security Audit Workspace
+workspace/
+

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "BME Calc — Workflow do Plano de Safra",
+    "subtitle": "Definição do Ciclo Comercial, Substituição de Variáveis e Consolidação Mensal/Anual",
+    "output": "bme_calc_harvest_plan.workflow.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "config-phase", "label": "Configuração da Safra", "focus": ["select_year", "order_months"], "note": "Escolha do Ano Safra e ordenação dos meses no ciclo comercial." },
+      { "id": "variables-mapping", "label": "Mapeamento e Substituição", "focus": ["config_vars", "substitute"], "note": "Ajuste de fórmulas mensais e substituição em cadeia." },
+      { "id": "consolidation", "label": "Consolidação e Saída", "focus": ["run_consolidation", "export_plan"], "note": "Execução dos balanços e geração da planilha oficial." }
+    ]
+  },
+  "lanes": [
+    { "id": "config", "label": "Configuração da Safra" },
+    { "id": "variables", "label": "Variáveis & Substituições" },
+    { "id": "engine", "label": "Motor de Balanço" },
+    { "id": "export", "label": "Consolidação & Exportação" }
+  ],
+  "phases": [
+    { "id": "init", "label": "Inicialização", "fromCol": 0, "toCol": 1 },
+    { "id": "process", "label": "Processamento do Plano", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "consolidate", "label": "Exportação", "fromCol": 4, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["select_year", "order_months", "config_vars", "substitute", "run_consolidation", "export_plan"],
+  "nodes": [
+    { "id": "select_year", "lane": "config", "col": 0, "width": 84, "type": "frontend", "label": "Ano Safra", "sublabel": "Período" },
+    { "id": "order_months", "lane": "config", "col": 1, "width": 84, "type": "backend", "label": "Ciclo", "sublabel": "Meses" },
+    { "id": "config_vars", "lane": "variables", "col": 2, "width": 84, "type": "backend", "label": "Variáveis", "sublabel": "Ajustes" },
+    { "id": "substitute", "lane": "variables", "col": 3, "width": 84, "type": "security", "label": "Substituição", "sublabel": "Troca" },
+    { "id": "run_consolidation", "lane": "engine", "col": 3, "width": 84, "type": "database", "label": "Cálculo", "sublabel": "12 Meses" },
+    { "id": "export_plan", "lane": "export", "col": 4, "width": 84, "type": "external", "label": "Relatório", "sublabel": "Excel" }
+  ],
+  "edges": [
+    { "from": "select_year", "to": "order_months", "fromSide": "right", "toSide": "left", "variant": "emphasis" },
+    { "from": "order_months", "to": "config_vars", "fromSide": "bottom", "toSide": "top", "variant": "emphasis" },
+    { "from": "config_vars", "to": "substitute", "fromSide": "right", "toSide": "left", "variant": "emphasis" },
+    { "from": "substitute", "to": "run_consolidation", "fromSide": "bottom", "toSide": "top", "variant": "emphasis" },
+    { "from": "run_consolidation", "to": "export_plan", "fromSide": "bottom", "toSide": "top", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Parâmetros do Ciclo", "items": ["Seleção do ano de referência e ordenação personalizada dos meses do ciclo", "Ativação de variáveis específicas para meses de moagem e entressafra"] },
+    { "dot": "amber", "title": "Substituição e Propagação", "items": ["Substituição dinâmica de parâmetros em fórmulas de produção", "Validação das dependências entre moagem, vapor e energia"] },
+    { "dot": "emerald", "title": "Consolidação Oficial", "items": ["Execução do balanço consolidado anual para os 12 meses", "Geração do relatório final de planejamento em planilha Excel"] }
+  ]
+}

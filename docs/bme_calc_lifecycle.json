@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "BME Calc — Ciclo de Vida dos Cenários",
+    "subtitle": "Criação em Rascunho, Simulação, Revisão Técnica, Aprovação Oficial e Arquivamento",
+    "output": "bme_calc_lifecycle.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "main-rail", "label": "Fluxo Principal de Aprovação", "focus": ["draft", "calculating", "in_review", "approved"], "note": "Caminho do cenário desde a edição inicial até a aprovação oficial." },
+      { "id": "review-rejection", "label": "Ciclo de Revisão e Ajuste", "focus": ["in_review", "rejection", "draft"], "note": "Retorno ao rascunho em caso de inconsistência de balanço." },
+      { "id": "lifecycle-archive", "label": "Arquivamento de Versões", "focus": ["approved", "archived"], "note": "Preservação do histórico de versões de safras anteriores." }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "Fases Principais do Cenário" },
+    { "id": "review", "label": "Alça de Revisão / Ajustes" },
+    { "id": "terminal", "label": "Estado Final Preservado" }
+  ],
+  "states": [
+    { "id": "draft", "type": "start", "label": "Rascunho", "sublabel": "Edição de Parâmetros", "lane": "main", "col": 0, "step": "01", "tag": "rascunho" },
+    { "id": "calculating", "type": "active", "label": "Em Simulação", "sublabel": "Cálculo de Balanço", "lane": "main", "col": 1, "step": "02", "tag": "calculo" },
+    { "id": "in_review", "type": "waiting", "label": "Em Revisão", "sublabel": "Validação de Processo", "lane": "main", "col": 2, "step": "03", "tag": "revisao" },
+    { "id": "approved", "type": "success", "label": "Aprovado", "sublabel": "Cenário Base Oficial", "lane": "main", "col": 3, "step": "04", "tag": "aprovado" },
+    { "id": "rejection", "type": "failure", "label": "Necessita Ajuste", "sublabel": "Retorna ao Rascunho", "lane": "review", "col": 0, "tag": "rejeitado" },
+    { "id": "archived", "type": "success", "label": "Arquivado", "sublabel": "Versão Histórica", "lane": "terminal", "col": 2, "tag": "arquivado" }
+  ],
+  "transitions": [
+    { "from": "draft", "to": "calculating", "fromSide": "right", "toSide": "left", "variant": "emphasis" },
+    { "from": "calculating", "to": "in_review", "fromSide": "right", "toSide": "left", "variant": "emphasis" },
+    { "from": "in_review", "to": "approved", "fromSide": "right", "toSide": "left", "variant": "emphasis" },
+    { "from": "in_review", "to": "rejection", "fromSide": "bottom", "toSide": "right", "variant": "security" },
+    { "from": "rejection", "to": "draft", "fromSide": "top", "toSide": "bottom", "variant": "dashed" },
+    { "from": "approved", "to": "archived", "fromSide": "bottom", "toSide": "right", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Criação e Rascunho", "items": ["Novo cenário gerado para o Ano Safra e Mês de Referência", "Edição livre de variáveis de entrada e parâmetros de processo"] },
+    { "dot": "amber", "title": "Simulação e Validação", "items": ["Execução do cálculo de convergência pelo motor NetworkX", "Transição para 'Em Revisão' para conferência técnica do balanço"] },
+    { "dot": "emerald", "title": "Aprovação e Arquivo", "items": ["Cenário Aprovado torna-se a referência oficial da usina", "Cenários de safras passadas são arquivados com histórico mantido"] }
+  ]
+}

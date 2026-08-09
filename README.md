@@ -67,3 +67,10 @@ Toda a documentação técnica e de governança do projeto está centralizada no
 * [docs/DESIGN.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/DESIGN.md): **Sistema de Design Studio Dark** — tokens de cor HSL, tipografia, elevações e estados de campo.
 * [docs/AUDIT_RULES.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/AUDIT_RULES.md): Diretrizes de design system (Maestro UI), WCAG e comandos de validação.
 * [docs/changelog.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/changelog.md): Histórico de lançamentos e versões do sistema.
+
+### 📊 Diagramas de Arquitetura Interativos (Archify)
+- [Arquitetura Geral](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_architecture.html): Visão geral dos componentes (React, FastAPI, NetworkX, AST, SQLite, PDF/Excel).
+- [Sequência de Cálculo](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_sequence.html): Fluxo detalhado da execução de cálculo (`/api/calculate`) e IAPWS97.
+- [Ciclo de Vida de Cenários](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_lifecycle.html): Transições de estados (`Rascunho` → `Em Simulação` → `Em Revisão` → `Aprovado` → `Arquivado`).
+- [Workflow do Plano de Safra](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_harvest_plan.workflow.html): Workflow de reordenação de meses, substituição de variáveis e consolidação.
+

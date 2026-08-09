@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "BME Calc — Arquitetura do Sistema",
+    "subtitle": "Balanço de Massa e Energia para Usinas Sucroalcooleiras",
+    "output": "bme_calc_architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "calc-pipeline",
+        "label": "Pipeline de Cálculo",
+        "focus": ["client", "api", "engine", "evaluator", "steam"],
+        "note": "Fluxo principal de avaliação das variáveis e equações de balanço."
+      },
+      {
+        "id": "data-persistence",
+        "label": "Persistência e Cenários",
+        "focus": ["client", "api", "db", "schemas"],
+        "note": "Gestão de cenários, setores e controle de versões no banco de dados."
+      },
+      {
+        "id": "reports-export",
+        "label": "Geração de Relatórios",
+        "focus": ["client", "api", "exports"],
+        "note": "Exportação dos memoriais de cálculo em formatos PDF e Excel."
+      }
+    ]
+  },
+  "components": [
+    { "id": "client", "type": "frontend", "label": "React Frontend", "sublabel": "TypeScript UI", "pos": [40, 300], "size": [140, 60], "tag": "Vite + Tailwind" },
+    { "id": "api", "type": "backend", "label": "FastAPI Server", "sublabel": "REST API :8000", "pos": [270, 300], "size": [140, 60] },
+    { "id": "schemas", "type": "backend", "label": "Pydantic Models", "sublabel": "Validação de Dados", "pos": [270, 150], "size": [140, 60] },
+    { "id": "engine", "type": "backend", "label": "NetworkX Engine", "sublabel": "Ordenação Topológica", "pos": [500, 300], "size": [140, 60] },
+    { "id": "evaluator", "type": "backend", "label": "AST Evaluator", "sublabel": "Parse de Fórmulas", "pos": [730, 300], "size": [140, 60] },
+    { "id": "steam", "type": "external", "label": "IAPWS97 Engine", "sublabel": "Propriedades de Vapor", "pos": [730, 150], "size": [140, 60] },
+    { "id": "db", "type": "database", "label": "SQLite Database", "sublabel": "SQLModel / Alembic", "pos": [500, 450], "size": [140, 60] },
+    { "id": "exports", "type": "backend", "label": "Export Services", "sublabel": "ReportLab & OpenPyXL", "pos": [270, 450], "size": [140, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Backend System (Python 3.11)", "wraps": ["api", "schemas", "engine", "evaluator", "db", "exports"] },
+    { "kind": "security-group", "label": "Core Calculation Kernel", "wraps": ["engine", "evaluator", "steam"] }
+  ],
+  "connections": [
+    { "id": "client-to-api", "from": "client", "to": "api", "label": "HTTP / REST", "variant": "emphasis" },
+    { "id": "api-schema-val", "from": "api", "to": "schemas", "label": "Validação", "fromSide": "top", "toSide": "bottom" },
+    { "id": "api-to-engine", "from": "api", "to": "engine", "label": "Resolver Grafos", "labelAt": [434, 296] },
+    { "id": "engine-to-eval", "from": "engine", "to": "evaluator", "label": "Avaliar AST" },
+    { "id": "eval-to-steam", "from": "evaluator", "to": "steam", "label": "VAPOR_H / T_SAT", "fromSide": "top", "toSide": "bottom" },
+    { "id": "api-to-db", "from": "api", "to": "db", "label": "CRUD Cenários", "fromSide": "right", "toSide": "left" },
+    { "id": "api-to-exports", "from": "api", "to": "exports", "label": "PDF / XLSX", "fromSide": "bottom", "toSide": "top", "labelAt": [340, 385] }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Frontend", "items": ["Interface web interativa em React + TypeScript", "Exibição de balanços, tabelas e parâmetros em tempo real"] },
+    { "dot": "emerald", "title": "Motor de Cálculo Kernel", "items": ["Resolução topológica de dependências via NetworkX", "Avaliador de AST seguro sem eval() dinâmico", "Tabelas de propriedades termodinâmicas IAPWS97"] },
+    { "dot": "rose", "title": "Persistência e Documentos", "items": ["Persistência de cenários e safras com SQLModel", "Relatórios profissionais exportáveis em PDF e Excel"] }
+  ]
+}

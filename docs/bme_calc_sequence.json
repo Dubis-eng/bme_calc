@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "BME Calc — Fluxo de Sequência de Cálculo",
+    "subtitle": "Requisição HTTP, ordenação topológica de dependências e avaliação de fórmulas AST",
+    "output": "bme_calc_sequence.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "request", "label": "Chegada da Requisição", "focus": ["client", "api"], "note": "Recebimento do payload com variáveis e nível de tolerância." },
+      { "id": "graph-resolution", "label": "Ordenação Topológica", "focus": ["api", "engine", "evaluator"], "note": "Construção e ordenação do grafo de dependências via NetworkX." },
+      { "id": "steam-lookup", "label": "Avaliação Termodinâmica", "focus": ["evaluator", "steam"], "note": "Parse de nós AST e consulta de propriedades de vapor IAPWS97." }
+    ]
+  },
+  "participants": [
+    { "id": "client", "type": "external", "label": "Frontend", "sublabel": "React UI" },
+    { "id": "api", "type": "backend", "label": "FastAPI", "sublabel": "REST API" },
+    { "id": "engine", "type": "backend", "label": "NetworkX", "sublabel": "Engine" },
+    { "id": "evaluator", "type": "backend", "label": "Evaluator", "sublabel": "AST Parser" },
+    { "id": "steam", "type": "external", "label": "IAPWS97", "sublabel": "Vapor Engine" }
+  ],
+  "segments": [
+    { "from": 150, "to": 240, "label": "Requisição HTTP" },
+    { "from": 252, "to": 450, "label": "Resolução de Grafos e Equações AST" },
+    { "from": 462, "to": 540, "label": "Retorno dos Resultados" }
+  ],
+  "messages": [
+    { "from": "client", "to": "api", "y": 180, "label": "POST /api/calculate", "variant": "emphasis" },
+    { "from": "api", "to": "engine", "y": 222, "label": "calculate_state(variables)", "variant": "emphasis" },
+    { "from": "engine", "to": "evaluator", "y": 306, "label": "parse_equation(formula, state)", "variant": "emphasis" },
+    { "from": "evaluator", "to": "steam", "y": 348, "label": "IAPWS97(P, T / x)", "variant": "default" },
+    { "from": "steam", "to": "evaluator", "y": 390, "label": "Propriedades (h, s, T_sat)", "variant": "return" },
+    { "from": "evaluator", "to": "engine", "y": 432, "label": "ok_res(Decimal)", "variant": "return" },
+    { "from": "engine", "to": "api", "y": 474, "label": "results + convergence_error", "variant": "return" },
+    { "from": "api", "to": "client", "y": 516, "label": "200 CalculateResponse", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "api", "from": 174, "to": 524, "type": "backend" },
+    { "participant": "engine", "from": 216, "to": 482, "type": "backend" },
+    { "participant": "evaluator", "from": 300, "to": 440, "type": "backend" },
+    { "participant": "steam", "from": 342, "to": 396, "type": "external" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Início da Execução", "items": ["Cliente envia o conjunto de variáveis com seus valores ou equações", "Payload é validado usando schemas Pydantic"] },
+    { "dot": "emerald", "title": "Resolução de Grafos e Fórmulas", "items": ["NetworkX monta o grafo direcionado de dependências", "Fórmulas são processadas de forma isolada via AST sem eval()", "Funções especiais como VAPOR_H consultam a biblioteca IAPWS97"] },
+    { "dot": "rose", "title": "Validação da Convergência", "items": ["Grafos com ciclos são calculados iterativamente até atingir a tolerância", "Resposta detalha erro de convergência, iterações e erro residual"] }
+  ]
+}

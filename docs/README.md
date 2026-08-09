@@ -31,7 +31,13 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] [feat-022-architecture-modernization.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-022-architecture-modernization.md)** — Modernização Arquitetural, Reestruturação de Diretórios e Design System Studio Dark.
 * **[DONE] [architecture/README.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/architecture/README.md)** — Registro e catalogação das Decisões de Arquitetura (ADRs) usando o framework global.
 
+---
 
+## 📊 Diagramas de Arquitetura Interativos (Archify)
+- [Arquitetura Geral](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_architecture.html) — Mapeamento de componentes frontend/backend, motor AST NetworkX e serviços de relatórios.
+- [Sequência de Cálculo](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_sequence.html) — Fluxo passo a passo de cálculo da rota `/api/calculate` e consultas termodinâmicas IAPWS97.
+- [Ciclo de Vida de Cenários](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_lifecycle.html) — Transição de estados dos cenários (`Rascunho`, `Em Simulação`, `Em Revisão`, `Aprovado`, `Arquivado`).
+- [Workflow do Plano de Safra](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_harvest_plan.workflow.html) — Fluxo de configuração do ciclo comercial, substituição de variáveis e exportação de planilha.
 
 ---
 
