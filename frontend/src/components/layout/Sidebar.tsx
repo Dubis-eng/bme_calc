@@ -109,7 +109,7 @@ export function Sidebar({
               >
                 {/* Icon */}
                 <span className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-sm font-bold transition-colors ${
-                  isActive ? 'bg-teal-600/30 text-teal-400' : 'bg-slate-800/60 text-slate-500'
+                  isActive ? 'bg-teal-600/30 text-teal-400' : 'bg-slate-800/60 text-teal-100/70'
                 }`}>
                   <BmeIcon name={sectorId} size={14} />
                 </span>
@@ -118,10 +118,10 @@ export function Sidebar({
                   <>
                     <span className="flex-1 text-xs font-medium truncate text-left">{friendly}</span>
                     <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${STATUS_DOT[status]}`} />
-                    <span className="shrink-0 text-[10px] text-slate-600 font-mono">{count}</span>
+                    <span className="shrink-0 text-[10px] text-slate-500 font-mono">{count}</span>
                     <BmeIcon
                       name="chevron-right"
-                      className={`shrink-0 text-slate-600 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                      className={`shrink-0 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
                       size={10}
                     />
                   </>
@@ -141,15 +141,15 @@ export function Sidebar({
                       <div key={stage}>
                         <button
                           onClick={e => toggleStage(e, sectorId, stage)}
-                          className="w-full flex items-center gap-1.5 py-1 px-2 rounded text-[11px] font-semibold text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors"
+                          className="w-full flex items-center gap-1.5 py-1 px-2 rounded text-[11px] font-semibold text-teal-100/70 hover:text-slate-200 hover:bg-white/5 transition-colors"
                         >
                           <BmeIcon
                             name="chevron-right"
-                            className={`shrink-0 text-slate-600 transition-transform ${isStageExp ? 'rotate-90' : ''}`}
+                            className={`shrink-0 text-slate-500 transition-transform ${isStageExp ? 'rotate-90' : ''}`}
                             size={8}
                           />
                           <span className="truncate">{stage}</span>
-                          <span className="ml-auto text-[9px] text-slate-700">{stageVars.length}</span>
+                          <span className="ml-auto text-[9px] text-slate-500">{stageVars.length}</span>
                         </button>
 
                         {isStageExp && controlPoints.map(cp => {
@@ -161,11 +161,11 @@ export function Sidebar({
                             <div key={cp} className="ml-3 border-l border-slate-800/40 pl-2">
                               <div
                                 onClick={() => onSubgroupClick(sectorId, cp)}
-                                className="flex items-center gap-1.5 py-0.5 px-1 rounded text-[10px] text-slate-600 hover:text-teal-400 hover:bg-teal-950/20 cursor-pointer transition-colors"
+                                className="flex items-center gap-1.5 py-0.5 px-1 rounded text-[10px] text-teal-100/70 hover:text-teal-300 hover:bg-teal-950/40 cursor-pointer transition-colors"
                               >
                                 <button
                                   onClick={e => toggleCp(e, sectorId, stage, cp)}
-                                  className="text-slate-700 hover:text-slate-400 transition-colors p-0.5"
+                                  className="text-slate-500 hover:text-slate-300 transition-colors p-0.5"
                                   aria-label={isCpExp ? 'Recolher' : 'Expandir'}
                                 >
                                   <BmeIcon
@@ -175,18 +175,18 @@ export function Sidebar({
                                   />
                                 </button>
                                 <span className="truncate flex-1" title={cp}>{cp}</span>
-                                <span className="text-[9px] text-slate-700">{cpVars.length}</span>
+                                <span className="text-[9px] text-slate-500">{cpVars.length}</span>
                               </div>
                               {isCpExp && cpVars.map(v => (
                                 <button
                                   key={v['ID - REF']}
                                   onClick={() => onVariableClick(v['ID - REF'])}
                                   title={`${v['ID - REF']}: ${v['DESCRIÇÃO']}`}
-                                  className="w-full text-left flex items-center gap-1.5 py-0.5 px-2 ml-3 text-[9px] text-slate-600 hover:text-teal-400 hover:bg-teal-950/10 rounded transition-colors"
+                                  className="w-full text-left flex items-center gap-1.5 py-0.5 px-2 ml-3 text-[9px] text-teal-100/70 hover:text-teal-300 hover:bg-teal-950/40 rounded transition-colors"
                                 >
-                                  <span className="text-teal-800">•</span>
-                                  <span className="font-mono font-semibold text-teal-700 shrink-0">{v['ID - REF']}</span>
-                                  <span className="truncate text-slate-600">— {v['DESCRIÇÃO']}</span>
+                                  <span className="text-teal-500">•</span>
+                                  <span className="font-mono font-semibold text-teal-400 shrink-0">{v['ID - REF']}</span>
+                                  <span className="truncate text-teal-100/70">— {v['DESCRIÇÃO']}</span>
                                 </button>
                               ))}
                             </div>

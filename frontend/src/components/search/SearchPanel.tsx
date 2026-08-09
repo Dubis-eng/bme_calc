@@ -67,7 +67,7 @@ function ResultCard({ result, onScrollTo, onEdit }: {
         <button
           type="button"
           onClick={e => { e.stopPropagation(); onEdit(varId); }}
-          className="flex-shrink-0 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 p-1.5 rounded transition-all focus:outline-none focus:opacity-100"
+          className="flex-shrink-0 opacity-0 group-hover:opacity-100 text-teal-100/70 hover:text-teal-300 hover:bg-teal-950/40 p-1.5 rounded transition-all focus:outline-none focus:opacity-100"
           aria-label={`Editar variável ${varId}`}
           title="Editar variável"
         >

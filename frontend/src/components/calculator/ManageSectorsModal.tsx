@@ -52,7 +52,7 @@ export const ManageSectorsModal: React.FC<ManageSectorsModalProps> = ({
                 className={`flex items-center justify-between p-2.5 rounded-lg border transition-all ${
                   isHidden
                     ? 'border-slate-800 bg-slate-950/50 text-slate-500'
-                    : 'border-teal-500/30 bg-teal-950/20 text-slate-200'
+                    : 'border-teal-500/30 bg-teal-950/20 text-teal-100'
                 }`}
               >
                 <div

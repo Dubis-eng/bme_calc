@@ -244,7 +244,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
 
                 {loading ? (
                     <div className="flex items-center justify-center flex-1 py-4">
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-teal-500"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-teal-500/20 border-t-teal-500"></div>
                     </div>
                 ) : listError ? (
                     <p className="text-xs text-red-500 text-center py-2">{listError}</p>

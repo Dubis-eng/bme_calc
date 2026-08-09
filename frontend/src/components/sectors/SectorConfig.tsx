@@ -242,7 +242,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                   onClick={() => handleDelete(sector.id)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleDelete(sector.id); } }}
                   disabled={isLocked}
-                  className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 flex items-center justify-center"
+                  className="text-rose-100/70 hover:text-rose-400 p-1.5 rounded hover:bg-rose-950/40 flex items-center justify-center"
                   title="Excluir"
                 >
                   <BmeIcon name="close" size={12} className="text-rose-400" />

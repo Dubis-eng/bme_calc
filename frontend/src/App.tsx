@@ -181,7 +181,7 @@ function App() {
           <div className="flex items-center justify-between gap-2 mb-3 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800/80">
             <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
               {visibleFlowSectors.map(tab => (
-                <button key={tab.id} onClick={() => setActiveFlowSector(tab.id)} className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${activeFlowSector === tab.id ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'}`}>
+                <button key={tab.id} onClick={() => setActiveFlowSector(tab.id)} className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${activeFlowSector === tab.id ? 'bg-teal-600 text-white shadow-sm' : 'text-teal-200 hover:text-white hover:bg-slate-800/60'}`}>
                   {tab.label}
                 </button>
               ))}

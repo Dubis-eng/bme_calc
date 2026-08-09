@@ -183,7 +183,7 @@ export const ProcessFlowToolbar: React.FC<ProcessFlowToolbarProps> = ({
             <button
               type="button"
               onClick={onReset}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${isViewingDefault ? 'border-teal-500/60 bg-teal-950/80 text-teal-300 shadow-sm shadow-teal-900/30' : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-amber-900/50 hover:bg-amber-950/40 hover:text-amber-300'}`}
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${isViewingDefault ? 'border-teal-500/60 bg-teal-950/80 text-teal-300 shadow-sm shadow-teal-900/30' : 'border-slate-800 bg-slate-900 text-teal-100/70 hover:border-amber-900/50 hover:bg-amber-950/40 hover:text-amber-300'}`}
               title={isViewingDefault ? 'Voltar para o layout customizado salvo no banco' : 'Visualizar a topologia automática baseada no cadastro relacional'}
             >
               <BmeIcon name="gear" size={12} />

@@ -230,7 +230,7 @@ export const GoalSeekModal: React.FC<GoalSeekModalProps> = ({
                         disabled={running}
                         className="bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white font-bold py-1.5 px-5 rounded text-xs transition-colors shadow-sm flex items-center space-x-1.5"
                     >
-                        {running && <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>}
+                        {running && <div className="animate-spin rounded-full h-3 w-3 border-2 border-white/20 border-t-white"></div>}
                         <span>{running ? 'Buscando...' : 'Calcular Meta'}</span>
                     </button>
                 </div>

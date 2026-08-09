@@ -58,7 +58,7 @@ export const ConfirmPipelineOverlay: React.FC<{ activeStep: number; progress: nu
 
       {/* Progress bar */}
       <div style={{ background: '#1e293b', borderRadius: '99px', height: '6px', overflow: 'hidden', marginBottom: '20px' }}>
-        <div style={{ height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg,#0d9488,#2dd4bf)', borderRadius: '99px', transition: 'width 0.4s ease' }} />
+        <div style={{ height: '100%', width: '100%', transform: `scaleX(${progress / 100})`, transformOrigin: 'left', background: 'linear-gradient(90deg,#0d9488,#2dd4bf)', borderRadius: '99px', transition: 'transform 0.4s ease' }} />
       </div>
 
       {/* Steps checklist */}

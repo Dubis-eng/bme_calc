@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -49,7 +49,7 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -60,7 +60,7 @@ body {
 
 /* Tabular numbers for all monospace data */
 code, .font-mono, .tabular-nums {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
   font-feature-settings: 'tnum' 1;
 }
 
@@ -118,8 +118,9 @@ code, .font-mono, .tabular-nums {
 
   /* Row highlight for selected variable */
   .var-row-highlight {
-    background: rgba(20, 184, 166, 0.06);
-    box-shadow: inset 3px 0 0 var(--bme-teal);
+    background: rgba(20, 184, 166, 0.08);
+    border-radius: var(--bme-radius);
+    outline: 1px solid rgba(20, 184, 166, 0.3);
   }
 
   /* Status dots */
@@ -133,7 +134,7 @@ code, .font-mono, .tabular-nums {
   .badge-warn  { @apply text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20; }
   .badge-error { @apply text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/20; }
   .badge-info  { @apply text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/20; }
-  .badge-idle  { @apply text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-400 border border-slate-600/30; }
+  .badge-idle  { @apply text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-700/60 text-white/80 border border-slate-600/30; }
 
   /* Buttons */
   .btn-primary {
@@ -192,7 +193,7 @@ code, .font-mono, .tabular-nums {
   .bme-table         { @apply min-w-full divide-y divide-slate-800/30; }
   .bme-table-header-row { @apply border-b border-slate-800/40; }
   .bme-table-header-cell {
-    @apply py-2.5 px-4 text-left text-[9px] font-bold text-slate-600 uppercase tracking-widest;
+    @apply py-2.5 px-4 text-left text-[9px] font-bold text-teal-100/70 uppercase tracking-widest;
   }
   .bme-table-row     { @apply transition-colors hover:bg-teal-500/5; }
   .bme-table-cell    { @apply py-2.5 px-4 text-xs font-medium; }

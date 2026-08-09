@@ -88,7 +88,7 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
           <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             <span onClick={() => setActiveFormulaPopover({ varId: id, formula: String(v['EQUAÇÕES E VALORES']) })} className="truncate max-w-[110px] hover:text-teal-400 cursor-pointer transition-colors">{v['EQUAÇÕES E VALORES']}</span>
             <div className="absolute left-0 bottom-full mb-1.5 hidden group-hover:block z-50 bg-slate-950 text-slate-300 font-mono text-[10px] p-2 rounded-lg border border-slate-800 shadow-xl max-w-xs whitespace-pre-wrap break-all pointer-events-none">{v['EQUAÇÕES E VALORES']}</div>
-            <button type="button" onClick={() => setAuditVarId(prev => prev === id ? null : id)} className={`p-1 rounded transition-colors ${isAuditedOrigin ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-600 hover:text-teal-400 hover:bg-slate-800/40'}`} title="Auditar fluxo de variáveis"><BmeIcon name="eye" size={10} /></button>
+            <button type="button" onClick={() => setAuditVarId(prev => prev === id ? null : id)} className={`p-1 rounded transition-colors ${isAuditedOrigin ? 'bg-cyan-500/20 text-cyan-400' : 'text-cyan-100/70 hover:text-teal-400 hover:bg-slate-800/40'}`} title="Auditar fluxo de variáveis"><BmeIcon name="eye" size={10} /></button>
           </div>
         );
       },
@@ -116,7 +116,7 @@ export const SectorControlPointTable: React.FC<SectorControlPointTableProps> = (
         const v = info.row.original;
         const isInactive = v.STATUS === 'inativa';
         return (
-          <button type="button" disabled={isLocked || isInactive} onClick={(e) => { e.stopPropagation(); onEditVariable(v); }} className="text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 disabled:opacity-35 disabled:hover:bg-transparent p-1.5 rounded-md transition-all focus:outline-none" title="Editar variável"><BmeIcon name="pencil" /></button>
+          <button type="button" disabled={isLocked || isInactive} onClick={(e) => { e.stopPropagation(); onEditVariable(v); }} className="text-teal-100/70 hover:text-teal-400 hover:bg-teal-950/40 disabled:opacity-35 disabled:hover:bg-transparent p-1.5 rounded-md transition-all focus:outline-none" title="Editar variável"><BmeIcon name="pencil" /></button>
         );
       },
     }),

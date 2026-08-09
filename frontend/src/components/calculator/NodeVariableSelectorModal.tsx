@@ -220,7 +220,7 @@ export const NodeVariableSelectorModal: React.FC<NodeVariableSelectorModalProps>
                 <label
                   key={id}
                   onClick={() => toggleVariable(id)}
-                  className={`flex items-center justify-between p-2.5 rounded-lg border cursor-pointer transition-all ${isChecked ? 'border-teal-500/50 bg-teal-950/30 text-teal-200' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'}`}
+                  className={`flex items-center justify-between p-2.5 rounded-lg border cursor-pointer transition-all ${isChecked ? 'border-teal-500/50 bg-teal-950/30 text-teal-200' : 'border-slate-800 bg-slate-900/40 text-teal-100/70 hover:border-slate-700'}`}
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
                     <input

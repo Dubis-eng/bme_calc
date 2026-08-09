@@ -155,7 +155,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
               <button
                 key={opt.id}
                 onClick={() => setActiveTypeFilter(opt.id)}
-                className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase transition-all ${activeTypeFilter === opt.id ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm' : 'text-slate-500 hover:text-slate-350 bg-transparent border border-transparent'}`}
+                className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase transition-all ${activeTypeFilter === opt.id ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40 shadow-sm' : 'text-teal-200/60 hover:text-teal-100 bg-transparent border border-transparent'}`}
               >
                 {opt.label}
               </button>
@@ -176,7 +176,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
           {activeSubTab === 'configuracao' && (
             <button onClick={handleSaveConfigs} disabled={savingConfig} className="btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5">
-              {savingConfig ? <span className="flex items-center gap-1.5"><div className="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>Salvando...</span> : <span className="flex items-center gap-1"><BmeIcon name="pencil" size={13} /><span>Salvar Configurações</span></span>}
+              {savingConfig ? <span className="flex items-center gap-1.5"><div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>Salvando...</span> : <span className="flex items-center gap-1"><BmeIcon name="pencil" size={13} /><span>Salvar Configurações</span></span>}
             </button>
           )}
         </div>
@@ -185,7 +185,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
       <div className="flex-1 overflow-auto min-h-0 bg-slate-950/10 p-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500 mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-teal-500/20 border-t-teal-500 mb-4"></div>
             <p className="text-xs font-semibold">Carregando dados do plano...</p>
           </div>
         ) : activeSubTab === 'visualizacao' ? (

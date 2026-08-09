@@ -39,10 +39,10 @@ export const ValueTile: React.FC<ValueTileProps> = ({ id, isLocked = false }) =>
   return (
     <div
       onClick={handleSelect}
-      className={`group flex w-full items-center justify-between gap-2 rounded-md border-l-2 px-2.5 py-1.5 text-left transition-all ${
+      className={`group flex w-full items-center justify-between gap-2 rounded-md border px-2.5 py-1.5 text-left transition-all ${
         isInput
-          ? 'border-l-amber-500 bg-amber-950/20 hover:bg-amber-950/40'
-          : 'border-l-teal-500 bg-slate-900/60 hover:bg-slate-800/60'
+          ? 'border-amber-500/40 bg-amber-950/20 hover:bg-amber-950/40'
+          : 'border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/60'
       } ${isSelected ? 'ring-1 ring-teal-400 shadow-glow-teal' : ''}`}
     >
       <div className="flex min-w-0 flex-1 flex-col">
