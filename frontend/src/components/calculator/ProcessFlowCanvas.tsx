@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ReactFlow, Background, BackgroundVariant, Controls, MiniMap } from '@xyflow/react';
+import { ReactFlow, Background, BackgroundVariant, Controls, MiniMap, MarkerType } from '@xyflow/react';
 import { useAtomValue } from 'jotai';
 
 import '@xyflow/react/dist/style.css';
@@ -34,12 +34,13 @@ export const ProcessFlowCanvas: React.FC<ProcessFlowCanvasProps> = ({
     animated: true,
     style: { strokeWidth: 2, stroke: '#0d9488' },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 18,
       height: 18,
       color: '#14b8a6',
     },
   }), []);
+
 
   return (
     <div className="process-flow-canvas-host relative flex h-[720px] w-full flex-col overflow-hidden rounded-xl border border-slate-800 shadow-2xl">

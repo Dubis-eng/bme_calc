@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAtom, useAtomValue } from 'jotai';
-import { Variable, Sector, BackendVariable } from '../types';
-import { ScenarioMetadata } from '../components/scenario/ScenarioManager';
+import { Variable, Sector, BackendVariable, Result, ScenarioMetadata } from '../types';
+
 import { parseHarvestYear, mapBackendVariableToFrontend } from '../utils/helpers';
 import {
   variablesAtom,
@@ -209,9 +209,14 @@ export function useScenario(sectors: Sector[], fetchSectors: () => void) {
 
   const onApplyOptimalValue = (inputId: string, val: number, newRes: Record<string, number>) => {
     setVariablesWithValues(variables.map(v => v["ID - REF"] === inputId ? { ...v, "EQUAÇÕES E VALORES": val } : v));
-    setResults(newRes);
+    const formattedRes: Record<string, Result> = {};
+    Object.entries(newRes).forEach(([k, v]) => {
+      formattedRes[k] = { value: v, status: "OK", error_message: "" };
+    });
+    setResults(formattedRes);
     setHasUnsavedChanges(true);
   };
+
 
   const handleSaveVariable = async (newVar: Variable, isEdit: boolean, origId?: string) => {
     if (isLocked) return;

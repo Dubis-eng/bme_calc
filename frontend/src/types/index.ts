@@ -50,11 +50,14 @@ export interface BackendVariable {
 }
 
 export interface ScenarioMetadata {
-  id?: string;
-  year_harvest: number | string;
-  reference_month: string;
-  version?: number;
-  status?: string;
-  cycle_start_month?: string;
+    id: string;
+    year_harvest: string | number;
+    reference_month: string;
+    version: number;
+    status: 'Em Edição' | 'Aprovado' | 'Final' | string;
+    cycle_start_month?: string;
+    created_at?: string;
+    updated_at?: string;
 }
+
 

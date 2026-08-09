@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Variable } from '../../types';
+import { Variable, ScenarioMetadata } from '../../types';
+export type { ScenarioMetadata };
 import { formatHarvestYear } from '../../utils/helpers';
 import { SCENARIO_STATUS_BADGE } from '../../styles/design-system';
 
-export interface ScenarioMetadata {
-    id: string;
-    year_harvest: string | number;
-    reference_month: string;
-    version: number;
-    status: 'Em Edição' | 'Aprovado' | 'Final';
-    cycle_start_month?: string;
-    created_at?: string;
-    updated_at?: string;
-}
+
+
 
 interface ScenarioManagerProps {
     variables: Variable[];
