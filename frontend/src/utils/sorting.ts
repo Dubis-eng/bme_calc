@@ -15,25 +15,29 @@ export interface GroupedStage {
 }
 
 /**
- * Groups and sorts variables by Stage and Control Point while preserving the backend sorted order.
+ * Groups and sorts variables by Stage and Control Point.
+ * Groups by normalized Stage Name & Control Point Name to guarantee variables with matching names stay together.
  */
 export function groupAndSortVariables(variables: Variable[]): GroupedStage[] {
   const stagesList: GroupedStage[] = [];
   const stageIndexMap: Record<string, number> = {};
 
   variables.forEach((v) => {
-    const stageName = v.ETAPA || 'GERAL';
-    const stageId = v.stage_id || 'GERAL';
+    const rawStage = (v.ETAPA || 'GERAL').trim();
+    const stageName = rawStage.toUpperCase();
+    const stageId = v.stage_id || stageName;
     const stageOrdem = v.ordem || 0;
-    const cpName = v['PONTO DE CONTROLE'] || 'GERAL';
-    const cpId = v.control_point_id || 'GERAL';
 
-    let stageIdx = stageIndexMap[stageId];
+    const rawCp = (v['PONTO DE CONTROLE'] || 'GERAL').trim();
+    const cpName = rawCp.toUpperCase();
+    const cpId = v.control_point_id || cpName;
+
+    let stageIdx = stageIndexMap[stageName];
     if (stageIdx === undefined) {
       stageIdx = stagesList.length;
-      stageIndexMap[stageId] = stageIdx;
+      stageIndexMap[stageName] = stageIdx;
       stagesList.push({
-        stageName,
+        stageName: rawStage,
         stageId,
         stageOrdem,
         controlPoints: []
@@ -41,10 +45,10 @@ export function groupAndSortVariables(variables: Variable[]): GroupedStage[] {
     }
 
     const stageObj = stagesList[stageIdx];
-    let cpObj = stageObj.controlPoints.find((cp) => cp.cpId === cpId);
+    let cpObj = stageObj.controlPoints.find((cp) => cp.cpName.trim().toUpperCase() === cpName);
     if (!cpObj) {
       cpObj = {
-        cpName,
+        cpName: rawCp,
         cpId,
         cpOrdem: v.ordem || 0,
         variables: []

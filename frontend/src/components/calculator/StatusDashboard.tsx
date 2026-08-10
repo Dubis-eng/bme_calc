@@ -48,9 +48,9 @@ function buildSectorSummary(
 }
 
 const STATUS_CONFIG = {
-  ok:    { label: 'Convergido',  dot: 'status-dot-ok',    badge: 'badge-ok',    card: 'border-emerald-500/20 hover:border-emerald-500/40' },
-  error: { label: 'Com Erro',    dot: 'status-dot-error',  badge: 'badge-error', card: 'border-rose-500/20 hover:border-rose-500/40' },
-  idle:  { label: 'Pendente',    dot: 'status-dot-idle',   badge: 'badge-idle',  card: 'border-slate-700/40 hover:border-teal-500/30' },
+  ok:    { label: 'Convergido',  dot: 'status-dot-ok',    badge: 'badge-ok',    card: 'border-slate-200 hover:border-emerald-500' },
+  error: { label: 'Com Erro',    dot: 'status-dot-error',  badge: 'badge-error', card: 'border-rose-300 hover:border-rose-500 bg-rose-50/20' },
+  idle:  { label: 'Pendente',    dot: 'status-dot-idle',   badge: 'badge-idle',  card: 'border-slate-200 hover:border-teal-500' },
 };
 
 const FILTER_TABS: { id: FilterStatus; label: string }[] = [
@@ -61,7 +61,6 @@ const FILTER_TABS: { id: FilterStatus; label: string }[] = [
 ];
 
 export function StatusDashboard({ sectors, variables, results, filter, setFilter, onSectorClick }: StatusDashboardProps) {
-
   const uniqueSectorIds = useMemo(() => Array.from(new Set([
     ...sectors.map(s => s.id),
     ...variables.map(v => v.SETOR),
@@ -78,38 +77,38 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
   const okCount  = summaries.filter(s => s.status === 'ok').length;
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 animate-fade-in-up">
+    <div className="flex-1 overflow-y-auto p-6 bg-white animate-fade-in-up">
       {/* ── Top Metrics ── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Setores',        value: uniqueSectorIds.length, color: 'text-slate-300'  },
-          { label: 'Variáveis',      value: totalVars,              color: 'text-teal-400'   },
-          { label: 'Convergidos',    value: okCount,                color: 'text-emerald-400'},
-          { label: 'Erros Ativos',   value: errorTotal,             color: errorTotal > 0 ? 'text-rose-400' : 'text-emerald-400' },
+          { label: 'Setores',        value: uniqueSectorIds.length, color: 'text-black'  },
+          { label: 'Variáveis',      value: totalVars,              color: 'text-teal-700'   },
+          { label: 'Convergidos',    value: okCount,                color: 'text-emerald-700'},
+          { label: 'Erros Ativos',   value: errorTotal,             color: errorTotal > 0 ? 'text-rose-700' : 'text-emerald-700' },
         ].map(m => (
-          <div key={m.label} className="glass-card p-4">
-            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</p>
-            <p className={`text-2xl font-bold font-mono ${m.color}`}>{m.value}</p>
+          <div key={m.label} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">{m.label}</p>
+            <p className={`text-3xl font-extrabold font-mono ${m.color}`}>{m.value}</p>
           </div>
         ))}
       </div>
 
       {/* ── Title + Filter ── */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-bold text-white">Visão Geral dos Setores</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Selecione um setor para editar as variáveis</p>
+          <h2 className="text-lg font-extrabold text-black">Visão Geral dos Setores</h2>
+          <p className="text-xs text-slate-600 font-medium mt-0.5">Selecione um setor para visualizar e editar as variáveis</p>
         </div>
-        <div className="flex gap-1 bg-slate-900/60 border border-slate-800/60 rounded-lg p-1">
+        <div className="flex gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-sm">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
               aria-label={`Filtrar por ${tab.label}`}
-              className={`px-3 py-1 rounded text-[11px] font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 filter === tab.id
-                  ? 'bg-teal-600/20 text-teal-400 border border-teal-500/30'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-white text-teal-800 border border-slate-300 shadow-sm font-bold'
+                  : 'text-slate-600 hover:text-black hover:bg-white/60'
               }`}
             >
               {tab.label}
@@ -119,7 +118,7 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
       </div>
 
       {/* ── Sector Cards Grid ── */}
-      <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filtered.map(s => {
           const cfg = STATUS_CONFIG[s.status];
           return (
@@ -127,7 +126,7 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
               key={s.id}
               id={`sector-card-${s.id}`}
               onClick={() => onSectorClick(s.id)}
-              className={`glass-card p-5 text-left group cursor-pointer border ${cfg.card} transition-all duration-200 hover:shadow-glow-teal`}
+              className={`bg-white p-5 text-left group cursor-pointer border ${cfg.card} rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md`}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -139,16 +138,16 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
                 )}
               </div>
 
-              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-teal-300 transition-colors">
+              <h3 className="text-base font-bold text-black mb-1 group-hover:text-teal-700 transition-colors">
                 {s.name}
               </h3>
-              <p className="text-[10px] text-slate-600 mb-3 font-mono">{s.id}</p>
+              <p className="text-xs text-slate-500 mb-3 font-mono font-semibold">{s.id}</p>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-500 pt-3 border-t border-slate-800/60">
+              <div className="flex items-center justify-between text-xs text-slate-700 font-semibold pt-3 border-t border-slate-200">
                 <span>{s.totalVars} variáveis</span>
                 <div className="flex gap-3">
-                  <span className="text-teal-600">{s.inputVars} in</span>
-                  <span className="text-cyan-700">{s.outputVars} out</span>
+                  <span className="text-teal-700 font-mono">{s.inputVars} in</span>
+                  <span className="text-indigo-700 font-mono">{s.outputVars} out</span>
                 </div>
               </div>
             </button>
@@ -157,9 +156,9 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
       </div>
 
       {filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-48 text-slate-600">
+        <div className="flex flex-col items-center justify-center h-48 text-slate-500 bg-white border border-slate-200 rounded-2xl mt-4">
           <span className="text-3xl mb-2">◎</span>
-          <p className="text-sm">Nenhum setor com status "{filter}"</p>
+          <p className="text-sm font-semibold">Nenhum setor com status "{filter}"</p>
         </div>
       )}
     </div>

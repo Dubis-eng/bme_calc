@@ -204,11 +204,12 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
 
       {/* Tables list */}
       {groupedStages.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-8 glass-card text-slate-500">
-          <span className="text-2xl mb-3 opacity-40">◈</span>
-          <p className="text-sm font-semibold text-slate-400 mb-1">Nenhuma variável encontrada</p>
+        <div className="flex flex-col items-center justify-center p-12 bme-card text-bme-text-sec">
+          <span className="text-3xl mb-3 opacity-40">◈</span>
+          <p className="text-sm font-semibold text-bme-text mb-1">Nenhuma variável cadastrada neste setor</p>
+          <p className="text-xs text-bme-text-muted mb-4">Clique no botão abaixo para adicionar a primeira variável.</p>
           {activeTypeFilter === 'ALL' && (
-            <button onClick={() => onAddVariable(activeSector, 'GERAL')} disabled={isLocked} className="btn-primary px-4 py-1.5 text-xs mt-4 disabled:opacity-50">+ Cadastrar Primeira Variável</button>
+            <button onClick={() => onAddVariable(activeSector, 'GERAL')} disabled={isLocked} className="btn-primary px-4 py-2 text-xs disabled:opacity-50">+ Cadastrar Primeira Variável</button>
           )}
         </div>
       ) : (
@@ -219,30 +220,30 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
           return (
             <div
               key={stage.stageId}
-              className="glass-card overflow-hidden animate-fade-in-up"
+              className="bme-card overflow-hidden animate-fade-in-up"
               draggable={!isLocked}
               onDragStart={(e) => handleDragStart(e, 'stage', stage.stageId)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, 'stage', stage.stageId)}
             >
-              <div className="px-5 py-3 flex justify-between items-center border-b border-slate-800/60 bg-slate-900/40">
+              <div className="px-5 py-3 flex justify-between items-center border-b border-bme-border bg-slate-100/90">
                 <div className="flex items-center gap-3">
-                  <span className="cursor-grab text-slate-500 hover:text-teal-400 select-none font-bold text-xs" title="Arrastar para reordenar etapa">⋮⋮</span>
-                  <button onClick={() => setCollapsedGroups(prev => ({ ...prev, [stage.stageId]: !prev[stage.stageId] }))} className="btn-ghost p-1 rounded text-slate-500">
-                    <BmeIcon name={isCollapsed ? 'chevron-right' : 'chevron-down'} size={10} />
+                  <span className="cursor-grab text-bme-text-muted hover:text-bme-teal select-none font-bold text-xs" title="Arrastar para reordenar etapa">⋮⋮</span>
+                  <button onClick={() => setCollapsedGroups(prev => ({ ...prev, [stage.stageId]: !prev[stage.stageId] }))} className="btn-ghost p-1.5 rounded-lg text-bme-text-sec">
+                    <BmeIcon name={isCollapsed ? 'chevron-right' : 'chevron-down'} size={12} />
                   </button>
-                  <h3 className="text-[11px] font-bold text-slate-300 tracking-widest uppercase">{stage.stageName}</h3>
+                  <h3 className="text-xs font-bold text-bme-text tracking-wider uppercase font-mono">{stage.stageName}</h3>
                   <span className="badge-idle">{totalVars}</span>
                   <div className="flex items-center gap-1.5 ml-2">
-                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'up')} disabled={isLocked} className="text-slate-500 hover:text-teal-400 disabled:opacity-30 text-[10px]" title="Subir etapa">▲</button>
-                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'down')} disabled={isLocked} className="text-slate-500 hover:text-teal-400 disabled:opacity-30 text-[10px]" title="Descer etapa">▼</button>
+                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'up')} disabled={isLocked} className="text-bme-text-muted hover:text-bme-teal disabled:opacity-30 text-[10px]" title="Subir etapa">▲</button>
+                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'down')} disabled={isLocked} className="text-bme-text-muted hover:text-bme-teal disabled:opacity-30 text-[10px]" title="Descer etapa">▼</button>
                   </div>
                 </div>
-                <button onClick={() => onAddVariable(activeSector, stage.stageName)} disabled={isLocked} className="text-[10px] font-semibold text-teal-500 hover:text-teal-300 disabled:text-slate-700 border border-teal-600/30 hover:border-teal-500/50 disabled:border-slate-800 rounded px-2.5 py-1 transition-all">+ Nova Variável</button>
+                <button onClick={() => onAddVariable(activeSector, stage.stageName)} disabled={isLocked} className="btn-outline px-3 py-1 text-xs text-teal-700 border-teal-200 hover:bg-teal-50 disabled:opacity-50">+ Nova Variável</button>
               </div>
 
               {!isCollapsed && (
-                <div className="divide-y divide-slate-800/40">
+                <div className="divide-y divide-bme-border">
                   {stage.controlPoints.map(cp => (
                     <SectorControlPointTable
                       key={cp.cpId}

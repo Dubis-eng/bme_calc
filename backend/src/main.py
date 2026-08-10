@@ -204,7 +204,7 @@ def reorder_stages_endpoint(sector_id: str, req: List[uuid.UUID], db=Depends(get
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.patch("/api/stages/{stage_id}/control-points/reorder")
-def reorder_control_points_endpoint(stage_id: uuid.UUID, req: List[uuid.UUID], db=Depends(get_session)):
+def reorder_control_points_endpoint(stage_id: str, req: List[Any], db=Depends(get_session)):
     try:
         services.reorder_control_points(stage_id, req, db)
         return {"success": True, "message": "Pontos de controle reordenados com sucesso."}
@@ -214,7 +214,7 @@ def reorder_control_points_endpoint(stage_id: uuid.UUID, req: List[uuid.UUID], d
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.patch("/api/control-points/{cp_id}/variables/reorder")
-def reorder_variables_endpoint(cp_id: uuid.UUID, req: List[str], db=Depends(get_session)):
+def reorder_variables_endpoint(cp_id: str, req: List[str], db=Depends(get_session)):
     try:
         services.reorder_variables(cp_id, req, db)
         return {"success": True, "message": "Variáveis reordenadas com sucesso."}

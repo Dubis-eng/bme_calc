@@ -117,14 +117,14 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
   };
 
   return (
-    <div className="glass-card p-4 space-y-4 text-xs">
-      <div className="flex justify-between items-center border-b border-slate-800/40 pb-2">
-        <h3 className="font-bold text-slate-300 text-sm uppercase tracking-wide">Cadastro de Setores</h3>
+    <div className="bg-white border border-slate-300 rounded-2xl p-5 space-y-4 text-xs shadow-sm">
+      <div className="flex justify-between items-center border-b border-slate-300 pb-3">
+        <h3 className="font-extrabold text-black text-xs uppercase tracking-wider">Cadastro de Setores</h3>
         {editingSector && (
           <button 
             onClick={resetForm}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { resetForm(); } }}
-            className="text-[10px] text-slate-500 hover:text-slate-350 font-semibold"
+            className="text-xs text-amber-800 hover:text-amber-950 font-bold"
           >
             Cancelar Edição
           </button>
@@ -132,21 +132,21 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
       </div>
 
       {error && (
-        <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg font-medium leading-4">
+        <div className="p-3 bg-red-50 border border-red-300 text-red-900 rounded-xl font-bold leading-5">
           ⚠️ {error}
         </div>
       )}
 
       {success && (
-        <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-450 rounded-lg font-medium">
+        <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-xl font-bold">
           ✓ {success}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="grid grid-cols-4 gap-2">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
+        <div className="grid grid-cols-4 gap-2.5">
           <div className="col-span-1 flex flex-col">
-            <label htmlFor="sector-id-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">ID (Ref)</label>
+            <label htmlFor="sector-id-input" className="text-[11px] uppercase font-bold text-black mb-1">ID (Ref)</label>
             <input
               id="sector-id-input"
               aria-label="ID de Referência do Setor"
@@ -154,13 +154,13 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               disabled={!!editingSector || isLocked}
               value={id}
               onChange={(e) => setId(e.target.value)}
-              placeholder="Ex: DESTILARIA"
-              className="input-field p-1.5 font-bold uppercase disabled:bg-slate-900 disabled:text-slate-600 disabled:border-slate-800 focus:outline-none"
+              placeholder="EX: DESTILARIA"
+              className="bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold uppercase text-black focus:outline-none focus:border-teal-600 disabled:bg-slate-100 disabled:opacity-60 shadow-sm"
               required
             />
           </div>
           <div className="col-span-2 flex flex-col">
-            <label htmlFor="sector-nome-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Nome do Setor</label>
+            <label htmlFor="sector-nome-input" className="text-[11px] uppercase font-bold text-black mb-1">Nome do Setor</label>
             <input
               id="sector-nome-input"
               aria-label="Nome do Setor"
@@ -169,12 +169,12 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Destilação & Retificação"
-              className="input-field p-1.5 focus:outline-none"
+              className="bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold text-black focus:outline-none focus:border-teal-600 shadow-sm"
               required
             />
           </div>
           <div className="col-span-1 flex flex-col">
-            <label htmlFor="sector-ordem-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Ordem</label>
+            <label htmlFor="sector-ordem-input" className="text-[11px] uppercase font-bold text-black mb-1">Ordem</label>
             <input
               id="sector-ordem-input"
               aria-label="Ordem do Setor"
@@ -183,7 +183,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
               value={ordem}
               onChange={(e) => setOrdem(e.target.value)}
               placeholder="Ex: 10"
-              className="input-field p-1.5 focus:outline-none"
+              className="bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold text-black focus:outline-none focus:border-teal-600 shadow-sm"
               required
               min="1"
             />
@@ -191,7 +191,7 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
         </div>
 
         <div className="flex flex-col">
-          <label htmlFor="sector-desc-input" className="text-[9px] uppercase font-bold text-slate-500 mb-1">Descrição</label>
+          <label htmlFor="sector-desc-input" className="text-[11px] uppercase font-bold text-black mb-1">Descrição</label>
           <input
             id="sector-desc-input"
             aria-label="Descrição do Setor"
@@ -200,31 +200,31 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
             value={descricao}
             onChange={(e) => setDescricao(e.target.value)}
             placeholder="Opcional. Ex: Produção de etanol hidratado/anidro."
-            className="input-field p-1.5 focus:outline-none"
+            className="bg-white border border-slate-300 rounded-xl p-2 text-xs font-bold text-black focus:outline-none focus:border-teal-600 shadow-sm"
           />
         </div>
 
         <button
           type="submit"
           disabled={submitting || isLocked}
-          className="btn-primary w-full py-2 text-xs font-bold"
+          className="w-full bg-teal-700 hover:bg-teal-800 disabled:bg-slate-300 text-white font-bold py-2.5 text-xs rounded-xl shadow-sm transition-all"
         >
           {submitting ? 'Salvando...' : editingSector ? 'Atualizar Setor' : 'Cadastrar Setor'}
         </button>
       </form>
 
-      <div className="border-t border-slate-800/40 pt-3">
-        <h4 className="font-bold text-slate-500 text-[10px] uppercase tracking-wider mb-2">Setores Cadastrados ({sectors.length})</h4>
-        <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+      <div className="border-t border-slate-300 pt-3.5">
+        <h4 className="font-extrabold text-black text-xs uppercase tracking-wider mb-2.5">Setores Cadastrados ({sectors.length})</h4>
+        <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
           {sectors.map((sector) => (
-            <div key={sector.id} className="flex items-center justify-between p-2 bg-slate-900/60 rounded border border-slate-800/40 hover:bg-slate-900/80 transition-colors">
+            <div key={sector.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-300 hover:bg-slate-100 transition-colors shadow-sm">
               <div className="min-w-0 pr-2 flex-1">
-                <div className="flex items-baseline space-x-1.5">
-                  <span className="font-bold text-[10px] text-teal-400">{sector.id}</span>
-                  <span className="font-semibold text-slate-200 truncate">{sector.nome}</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded font-bold">#{sector.ordem}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-bold text-xs text-teal-800 font-mono">{sector.id}</span>
+                  <span className="font-bold text-xs text-black truncate">{sector.nome}</span>
+                  <span className="text-[10px] bg-slate-200 text-black px-2 py-0.5 rounded-full font-bold">#{sector.ordem}</span>
                 </div>
-                {sector.descricao && <p className="text-[10px] text-slate-500 truncate mt-0.5">{sector.descricao}</p>}
+                {sector.descricao && <p className="text-xs text-black font-semibold truncate mt-0.5">{sector.descricao}</p>}
               </div>
               <div className="flex items-center space-x-1.5 flex-shrink-0">
                 <button
@@ -232,20 +232,20 @@ export function SectorConfig({ sectors, onRefreshSectors, isLocked }: SectorConf
                   onClick={() => handleEdit(sector)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleEdit(sector); } }}
                   disabled={isLocked}
-                  className="text-slate-500 hover:text-slate-300 p-1.5 rounded hover:bg-slate-800/60 flex items-center justify-center"
+                  className="text-black hover:text-teal-800 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-300 flex items-center justify-center transition-all"
                   title="Editar"
                 >
-                  <BmeIcon name="pencil" size={12} />
+                  <BmeIcon name="pencil" size={14} />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(sector.id)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleDelete(sector.id); } }}
                   disabled={isLocked}
-                  className="text-rose-100/70 hover:text-rose-400 p-1.5 rounded hover:bg-rose-950/40 flex items-center justify-center"
+                  className="text-red-700 hover:text-red-900 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-red-300 flex items-center justify-center transition-all"
                   title="Excluir"
                 >
-                  <BmeIcon name="close" size={12} className="text-rose-400" />
+                  <BmeIcon name="close" size={14} className="text-red-700" />
                 </button>
               </div>
             </div>

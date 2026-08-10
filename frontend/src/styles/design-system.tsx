@@ -2,18 +2,18 @@ import React from 'react';
 
 // ── Variable Type Badges ─────────────────────────────────────
 export const TYPE_BADGE: Record<string, string> = {
-  INPUT:    'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
-  CENARIO:  'bg-blue-500/15    text-blue-400    border-blue-500/25',
-  DERIVADA: 'bg-cyan-500/15    text-cyan-400    border-cyan-500/25',
-  OUTPUT:   'bg-teal-500/15  text-teal-400  border-teal-500/25',
+  INPUT:    'bg-amber-50 text-amber-700 border-amber-200 font-semibold',
+  CENARIO:  'bg-violet-50 text-violet-700 border-violet-200 font-semibold',
+  DERIVADA: 'bg-indigo-50 text-indigo-700 border-indigo-200 font-semibold',
+  OUTPUT:   'bg-teal-50 text-teal-700 border-teal-200 font-semibold',
 };
 
 // ── Convergence & Calculation Errors ─────────────────────────
 export const ERROR_BADGE: Record<string, string> = {
-  DIV_BY_ZERO:  'bg-rose-500/15   text-rose-400   border-rose-500/25',
-  MISSING_VAR:  'bg-amber-500/15  text-amber-400  border-amber-500/25',
-  PENDING:      'bg-slate-500/15  text-slate-400  border-slate-500/25',
-  SYNTAX_ERROR: 'bg-rose-500/15   text-rose-400   border-rose-500/25',
+  DIV_BY_ZERO:  'bg-rose-50 text-rose-700 border-rose-200 font-semibold',
+  MISSING_VAR:  'bg-amber-50 text-amber-700 border-amber-200 font-semibold',
+  PENDING:      'bg-slate-100 text-slate-600 border-slate-200 font-semibold',
+  SYNTAX_ERROR: 'bg-rose-50 text-rose-700 border-rose-200 font-semibold',
 };
 
 // ── Portuguese Human-Readable Error Labels ───────────────────

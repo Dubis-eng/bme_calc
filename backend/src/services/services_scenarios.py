@@ -1,229 +1,126 @@
-import uuid
 import datetime
+import uuid
 from typing import List, Dict, Any
-from sqlmodel import select, Session
-from src.db.database import (
-    Scenario, Variable, Equation, Dependency, Result, Sector, Stage, ControlPoint,
-    ScenarioStatus, VariableType, VariableStatus, ResultStatus, HarvestPlanOrderedItem
-)
+from sqlmodel import Session, select
+from sqlalchemy import func
+
+from src.db.database import Scenario, ScenarioStatus, Equation, Result, Variable as DBVariable
 from src.schemas.schemas import ScenarioDetail
 from src.core import engine
 
-def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str, Any]]:
-    results = db.exec(select(Result).where(Result.scenario_id == scenario_id)).all()
-    results_map = {r.variable_id: r for r in results}
-    
-    stages = db.exec(select(Stage)).all()
-    stage_map = {s.id: s for s in stages}
-    cps = db.exec(select(ControlPoint)).all()
-    cp_map = {c.id: c for c in cps}
-
-    ordered_items = db.exec(select(HarvestPlanOrderedItem).order_by(HarvestPlanOrderedItem.ordem.asc())).all()
-    current_group = None
-    var_grouping_map = {}
-    for item in ordered_items:
-        if item.tipo == "divider":
-            current_group = item.label
-        elif item.tipo == "variable" and item.variable_id:
-            var_grouping_map[item.variable_id] = current_group
-    
-    stmt = (
-        select(Variable)
-        .join(Sector, Variable.setor_id == Sector.id, isouter=True)
-        .join(ControlPoint, Variable.control_point_id == ControlPoint.id, isouter=True)
-        .join(Stage, ControlPoint.stage_id == Stage.id, isouter=True)
-        .order_by(Sector.ordem.asc(), Stage.ordem.asc(), ControlPoint.ordem.asc(), Variable.ordem.asc())
-    )
-    db_vars = db.exec(stmt).all()
-    
-    variables_list = []
-    for var in db_vars:
-        res = results_map.get(var.id)
-        eq_val = ""
-        if var.tipo in {VariableType.OUTPUT, VariableType.DERIVADA}:
-            db_eq = db.exec(select(Equation).where(Equation.variable_id == var.id, Equation.status == "ativa")).first()
-            if db_eq:
-                eq_val = db_eq.expression_original
-        else:
-            if res and res.value is not None:
-                eq_val = str(res.value)
-                
-        etapa_name = ""
-        cp_name = ""
-        stage_id = None
-        if var.control_point_id:
-            cp_obj = cp_map.get(var.control_point_id)
-            if cp_obj:
-                cp_name = cp_obj.nome
-                stage_id = cp_obj.stage_id
-                stage_obj = stage_map.get(cp_obj.stage_id)
-                if stage_obj:
-                    etapa_name = stage_obj.nome
-        if not etapa_name:
-            etapa_name = var.etapa or ""
-        if not cp_name:
-            cp_name = var.ponto_controle or ""
-            
-        variables_list.append({
-            "ID - REF": var.id,
-            "SETOR": var.setor_id,
-            "ETAPA": etapa_name,
-            "PONTO DE CONTROLE": cp_name,
-            "DESCRIÇÃO": var.descricao,
-            "TIPO": var.tipo.value if hasattr(var.tipo, 'value') else str(var.tipo),
-            "UNIDADE DE MEDIDA": var.unidade,
-            "EQUAÇÕES E VALORES": eq_val,
-            "STATUS": var.status.value if hasattr(var.status, 'value') else str(var.status),
-            "casas_decimais": var.casas_decimais,
-            "tipo_exibicao": var.tipo_exibicao,
-            "percent_base": var.percent_base,
-            "control_point_id": var.control_point_id,
-            "stage_id": stage_id,
-            "ordem": var.ordem,
-            "in_harvest_plan": var.in_harvest_plan,
-            "harvest_plan_op": var.harvest_plan_op,
-            "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
-            "agrupamento": var_grouping_map.get(var.id)
-        })
-    return variables_list
-def _resolve_stage_and_cp(sector_id: str, etapa_name: str, cp_name: str, db: Session) -> uuid.UUID:
-    et = etapa_name.strip() if etapa_name else "GERAL"
-    cp = cp_name.strip() if cp_name else "GERAL"
-    
-    stmt_stage = select(Stage).where(Stage.sector_id == sector_id, Stage.nome == et)
-    stage_obj = db.exec(stmt_stage).first()
-    if not stage_obj:
-        stage_orders = db.exec(select(Stage.ordem).where(Stage.sector_id == sector_id)).all()
-        next_stage_order = max(stage_orders) + 10 if stage_orders else 10
-        stage_obj = Stage(nome=et, sector_id=sector_id, ordem=next_stage_order)
-        db.add(stage_obj)
-        db.flush()
-        
-    stmt_cp = select(ControlPoint).where(ControlPoint.stage_id == stage_obj.id, ControlPoint.nome == cp)
-    cp_obj = db.exec(stmt_cp).first()
-    if not cp_obj:
-        cp_orders = db.exec(select(ControlPoint.ordem).where(ControlPoint.stage_id == stage_obj.id)).all()
-        next_cp_order = max(cp_orders) + 10 if cp_orders else 10
-        cp_obj = ControlPoint(nome=cp, stage_id=stage_obj.id, ordem=next_cp_order)
-        db.add(cp_obj)
-        db.flush()
-        
-    return cp_obj.id
-
-def _ensure_variable(v: Dict[str, Any], db: Session) -> Variable:
+def _ensure_variable(v: Dict[str, Any], db: Session) -> DBVariable:
     var_id = v["ID - REF"]
-    db_var = db.get(Variable, var_id)
-    etapa_val = v.get("ETAPA", "").strip()
-    cp_val = v.get("PONTO DE CONTROLE", "").strip()
-    sector_str = v.get("SETOR", "OUTROS").strip().upper()
-    
-    db_sector = db.get(Sector, sector_str)
-    if not db_sector:
-        all_orders = db.exec(select(Sector.ordem)).all()
-        next_ordem = max(all_orders) + 10 if all_orders else 10
-        db_sector = Sector(id=sector_str, nome=sector_str.title(), descricao="Criado automaticamente no cenário", ordem=next_ordem)
-        db.add(db_sector)
-        db.flush()
-        
-    cp_id = _resolve_stage_and_cp(sector_str, etapa_val, cp_val, db)
-    
-    if db_var:
-        if etapa_val:
-            db_var.etapa = etapa_val
-        if cp_val:
-            db_var.ponto_controle = cp_val
-        db_var.control_point_id = cp_id
+    db_var = db.get(DBVariable, var_id)
+    if not db_var:
+        db_var = DBVariable(
+            id=var_id,
+            nome=var_id,
+            descricao=v.get("DESCRIÇÃO", ""),
+            setor_id=(v.get("SETOR") or "OUTROS").strip().upper(),
+            tipo=v.get("TIPO", "INPUT"),
+            unidade=v.get("UNIDADE DE MEDIDA", "")
+        )
         db.add(db_var)
         db.flush()
-        return db_var
-        
-    tipo_str = v.get("TIPO", "INPUT")
-    tipo = VariableType.INPUT
-    if tipo_str == "OUTPUT": tipo = VariableType.OUTPUT
-    elif tipo_str == "DERIVADA": tipo = VariableType.DERIVADA
-    elif tipo_str == "CENARIO": tipo = VariableType.CENARIO
-    if var_id in {"J3", "J16", "J20"}:
-        tipo = VariableType.CENARIO
-    nome = v.get("DESCRIÇÃO", "").strip() or var_id
-    
-    db_var = Variable(
-        id=var_id, nome=nome, descricao=v.get("DESCRIÇÃO", ""),
-        setor_id=sector_str, tipo=tipo, unidade=v.get("UNIDADE DE MEDIDA", ""),
-        status=VariableStatus.ATIVA,
-        etapa=etapa_val,
-        ponto_controle=cp_val,
-        control_point_id=cp_id
-    )
-    db.add(db_var)
-    db.flush()
     return db_var
 
-def _ensure_equation(var_id: str, eq_val: str, db_var: Variable, db: Session):
-    if not (isinstance(eq_val, str) and eq_val.startswith("=")):
-        return
-    stmt_eq = select(Equation).where(Equation.variable_id == var_id, Equation.expression_original == eq_val)
-    db_eq = db.exec(stmt_eq).first()
-    if db_eq:
-        return
-    db_eq = Equation(
-        variable_id=var_id, expression_original=eq_val,
-        expression_normalized=engine.normalize_formula(eq_val),
-        version=1, status="ativa"
-    )
-    db.add(db_eq)
-    db.flush()
-    deps = engine.extract_dependencies(engine.normalize_formula(eq_val))
-    for idx, dep_id in enumerate(sorted(deps)):
-        dep_var = db.get(Variable, dep_id)
-        if not dep_var:
-            dep_cp_id = _resolve_stage_and_cp(db_var.setor_id, "GERAL", "GERAL", db)
-            dep_var = Variable(
-                id=dep_id, nome=dep_id, descricao="Auto-criado por dependência",
-                setor_id=db_var.setor_id, tipo=VariableType.INPUT, status=VariableStatus.PENDENTE,
-                etapa="GERAL", ponto_controle="GERAL",
-                control_point_id=dep_cp_id
-            )
-            db.add(dep_var)
-            db.flush()
-        db_dep = Dependency(equation_id=db_eq.id, dependency_var_id=dep_id, evaluation_order=idx)
-        db.add(db_dep)
+def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str, Any]]:
+    vars_stmt = select(Scenario).where(Scenario.id == scenario_id)
+    sc = db.exec(vars_stmt).first()
+    if not sc:
+        return []
+        
+    res_stmt = select(Result).where(Result.scenario_id == scenario_id)
+    results = db.exec(res_stmt).all()
+    results_map = {r.variable_id: r for r in results}
+    
+    from src.services.services_variables import list_variables
+    all_vars = list_variables(db)
+    
+    frontend_vars = []
+    for v in all_vars:
+        var_id = v["id"]
+        res = results_map.get(var_id)
+        
+        val_display = None
+        if res and res.value is not None:
+            if res.value.is_integer():
+                val_display = str(int(res.value))
+            else:
+                val_display = str(res.value)
+        elif v.get("tipo") == 'CONSTANT' and v.get("equation_value"):
+            val_display = str(v.get("equation_value"))
 
-def _upsert_result(var_id: str, scenario_id: uuid.UUID, eq_val: Any, var_calc: Dict[str, Any], db: Session):
-    val_float = var_calc.get("value")
-    if not (isinstance(eq_val, str) and eq_val.startswith("=")):
-        try: val_float = float(str(eq_val).replace(",", "."))
-        except: pass
-    status_str = var_calc.get("status", "OK")
-    if status_str not in {"OK", "DIV_BY_ZERO", "MISSING_VAR", "PENDING"}:
-        status_db = ResultStatus.PENDING
-    else:
-        status_db = ResultStatus(status_str)
-    db_res = db.exec(
-        select(Result).where(Result.scenario_id == scenario_id, Result.variable_id == var_id)
-    ).first()
-    if db_res:
-        db_res.value = val_float
-        db_res.status = status_db
-        db_res.error_message = var_calc.get("error_message", "")
-        db_res.timestamp = datetime.datetime.utcnow()
+        eq_val = v.get("equation_value") or ""
+        v_tipo = (v.get("tipo") or "INPUT").upper()
+
+        if v_tipo in ["INPUT", "CENARIO"]:
+            if val_display is not None:
+                eq_val = val_display
+
+        fv = {
+            "ID - REF": var_id,
+            "DESCRIÇÃO": v.get("descricao") or "",
+            "SETOR": v.get("setor_id") or "",
+            "ETAPA": v.get("etapa") or "",
+            "PONTO DE CONTROLE": v.get("ponto_controle") or "",
+            "control_point_id": str(v.get("control_point_id")) if v.get("control_point_id") else None,
+            "stage_id": str(v.get("stage_id")) if v.get("stage_id") else None,
+            "ordem": v.get("ordem") or 0,
+            "TIPO": v_tipo,
+            "EQUAÇÕES E VALORES": eq_val,
+            "VALOR": val_display,
+            "UNIDADE DE MEDIDA": v.get("unidade") or "",
+            "CRITICIDADE": "MEDIA",
+            "tipo_exibicao": v.get("tipo_exibicao") or "FLOAT",
+            "decimais": v.get("casas_decimais") if v.get("casas_decimais") is not None else 2,
+            "casas_decimais": v.get("casas_decimais"),
+            "percent_base": v.get("percent_base") or "DECIMAL",
+            "in_harvest_plan": v.get("in_harvest_plan") or False,
+            "harvest_plan_op": v.get("harvest_plan_op"),
+            "harvest_plan_weight_var_id": v.get("harvest_plan_weight_var_id"),
+            "agrupamento": v.get("agrupamento"),
+            "STATUS": v.get("status") or "ativa",
+            "RESULT_STATUS": res.status if res else "PENDING",
+            "RESULT_ERROR": res.error_message if res else ""
+        }
+        frontend_vars.append(fv)
+        
+    return frontend_vars
+
+def _upsert_result(var_id: str, scenario_id: uuid.UUID, expression: str, var_calc: Dict[str, Any], db: Session):
+    stmt = select(Result).where(Result.variable_id == var_id, Result.scenario_id == scenario_id)
+    res = db.exec(stmt).first()
+    
+    val = var_calc.get("value")
+    val_float = float(val) if val is not None else None
+    status_db = var_calc.get("status", "PENDING")
+    
+    if res:
+        res.value = val_float
+        res.status = status_db
+        res.error_message = var_calc.get("error_message", "")
+        res.timestamp = datetime.datetime.utcnow()
     else:
         db_res = Result(
             variable_id=var_id, scenario_id=scenario_id, value=val_float,
             status=status_db, error_message=var_calc.get("error_message", ""),
             timestamp=datetime.datetime.utcnow()
         )
-    db.add(db_res)
+        db.add(db_res)
 
 def create_new_scenario(req, db: Session) -> ScenarioDetail:
     from src.db.database import parse_year
     from src.services.services_harvest_plan import get_harvest_plan_settings
     year_harvest_int = parse_year(req.year_harvest)
-    stmt = select(Scenario.version).where(
+    
+    max_ver_stmt = select(func.max(Scenario.version)).where(
         Scenario.year_harvest == year_harvest_int,
         Scenario.reference_month == req.reference_month
-    ).order_by(Scenario.version.desc())
-    versions = db.exec(stmt).all()
-    next_version = (versions[0] + 1) if versions else 1
+    )
+    current_max = db.exec(max_ver_stmt).first()
+    next_version = (current_max + 1) if (current_max is not None and current_max >= 1) else 1
+    
     scenario_id = uuid.uuid4()
     setting = get_harvest_plan_settings(db)
     db_scenario = Scenario(
@@ -298,10 +195,5 @@ def _force_global_formulas(variables: List[Dict[str, Any]], db: Session):
     db_equations = {eq.variable_id: eq.expression_original for eq in db.exec(select(Equation).where(Equation.status == "ativa")).all()}
     for v in variables:
         var_id = v["ID - REF"]
-        db_var = db.get(Variable, var_id)
-        if db_var and db_var.tipo in {VariableType.OUTPUT, VariableType.DERIVADA}:
-            v["EQUAÇÕES E VALORES"] = db_equations.get(var_id, "")
-        elif not db_var:
-            tipo_str = v.get("TIPO", "INPUT")
-            if tipo_str in {"OUTPUT", "DERIVADA"} and var_id in db_equations:
-                v["EQUAÇÕES E VALORES"] = db_equations[var_id]
+        if var_id in db_equations:
+            v["EQUAÇÕES E VALORES"] = db_equations[var_id]

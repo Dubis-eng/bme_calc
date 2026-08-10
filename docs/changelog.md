@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.25.0] - 2026-08-10
+
+### Added & Refactored (Épico 30)
+- **Padronização Global do Design System Pure White & High Contrast Black**:
+  - **Tooltips & FieldTooltips (`Tooltip.tsx`)**: Reestilização dos balões do portal `Tooltip` com fundo dark de alta definição (`#0f172a`), tipografia branca pura e nítida, e ícones `FieldTooltip` com bordas e texto em preto em negrito.
+  - **Módulo Plano Safra (`HarvestPlan.tsx` & `HarvestPlanTable.tsx`)**: Tabelas de acúmulo mensal, divisores, totais consolidados e badges com fundo Pure White (`#FFFFFF`) e fonte **Preto Nítido BME (`#000000` / `font-bold text-black`)**.
+  - **Módulo Configurações (`SystemSettingsModal.tsx` & `ConfigModal.tsx`)**: Modais e abas de safras, meses, ciclo comercial e tolerância do solver padronizados em alto contraste.
+  - **Modais de Ferramentas & Fórmulas (`GoalSeekModal.tsx`, `SubstitutionModal.tsx` & `ThermodynamicGuide.tsx`)**: Busca de Metas, Substituição de Fórmulas e Biblioteca Termodinâmica IAPWS com botões vibrantes e tipografia preta nítida.
+  - **Módulo Fluxograma & Nós (`ProcessFlowToolbar.tsx`, `NodeVariableSelectorModal.tsx`, `ManageSectorsModal.tsx`, `ProcessNode.tsx`, `IoNode.tsx`, `ValueTile.tsx`)**: Canvas, cartões de nós e células com bordas marcadas e textos em preto em negrito.
+  - **Cenários & Audit Cards (`ScenarioManager.tsx`, `ScenarioPremises.tsx`, `RightPanel.tsx`, `SectorAuditCard.tsx`)**: Gerenciador de versões, premissas e card de auditoria de fórmulas atualizados.
+
+## [2.24.0] - 2026-08-10
+
+### Added & Refactored (Épico 29)
+- **Redesenho do Layout & Navegação Principal**:
+  - **Barra Lateral Principal (`NavSidebar.tsx`)**: Menu retrátil no lado esquerdo com suporte a alternância entre os módulos principais (*Calculadora*, *Plano Safra*, *Fluxograma*, *Configurações*).
+  - **Sidebar Secundária de Setores (`Sidebar.tsx`)**: Painel aninhado retrátil exclusivamente no módulo da Calculadora.
+  - **CalculatorTopBar Interna (`CalculatorTopBar.tsx`)**: Barra superior integrada com pílula interativa do cenário ativo, busca global sem sobreposição, seletores de Safra/Mês e ações de cálculo/salvamento.
+  - **Identidade Visual & Tipografia Nítida**: Substituição de cinzas lavados por fundo Pure White (`#FFFFFF`) e fonte **Preto Nítido BME (`#000000` / `font-bold text-black`)** em tabelas, descrições, IDs e células numéricas (`ValueCell.tsx`).
+- **Seleção de Cenários em Dropdown Flutuante & Desduplicação**:
+  - **ScenarioSelectDropdown (`ScenarioSelectDropdown.tsx`)**: Dropdown via React Portal disparado ao clicar no badge do Cenário Ativo na TopBar, permitindo alternar de versão com 1 clique.
+  - **Auto-incremento Seguro no Backend (`services_scenarios.py`)**: Cálculo de versão utilizando `MAX(version)` SQL (ex: v1 → v2 → v3 → v4), eliminando concorrência e versões duplicadas.
+  - **Script de Limpeza de Banco**: Remoção de 9 registros de testes redundantes no PostgreSQL.
+- **Resiliência do Sistema de Variáveis & Reordenação**:
+  - **Preenchimento de Inputs (`INPUT` e `CENARIO`)**: Garantido populamento da chave `'EQUAÇÕES E VALORES'` no backend para variáveis de entrada, exibindo com nitidez todos os 287 valores salvos.
+  - **Rotas Flexíveis de Reordenação (`main.py` e `services_reorder.py`)**: Suporte transparente a UUIDs e strings de nomes amigáveis (`'PREMISSAS'`), sanando erros 422 e 500.
+  - **Unificação de Grupos (`sorting.ts` e `services_variables.py`)**: Agrupamento por nome normalizado de Etapa (`AGRÍCOLA`) e Ponto de Controle (`PREMISSAS`), resolvendo a fragmentação visual de variáveis como `J181` e `J163`.
+- **Busca de Variáveis Avançada & Destaque Dourado**:
+  - **Mecanismo de Retentativa (`useSearch.ts`)**: Execução de polling automático de 60ms para aguardar a montagem da tabela no DOM após troca de setor.
+  - **Destaque Visual Chamativo**: Efeito de destaque dourado (`ring-2 ring-amber-400 bg-amber-100`) aplicado por 2.5 segundos à linha da variável encontrada.
+
 ## [2.23.0] - 2026-08-09
 
 ### Added & Refactored

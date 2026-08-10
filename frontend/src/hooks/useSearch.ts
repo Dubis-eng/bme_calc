@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Variable } from '../types';
 
-// --- Types ---
-
 interface SearchState {
   searchQuery: string;
   isSearchPanelOpen: boolean;
@@ -17,8 +15,6 @@ interface SearchActions {
 }
 
 export type UseSearchReturn = SearchState & SearchActions & { debouncedQuery: string };
-
-// --- Hook ---
 
 export function useSearch(variables: Variable[]): UseSearchReturn {
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,31 +34,40 @@ export function useSearch(variables: Variable[]): UseSearchReturn {
   };
 
   const handleScrollTo = useCallback((varId: string) => {
-    const targetVar = variables.find(v => v['ID - REF'] === varId);
-    if (targetVar) {
-      // Caller (App) must setActiveSector — we emit via returned state instead.
-      // We expose this as a return value so App can react.
-    }
     if (timerRef.current) clearTimeout(timerRef.current);
     setHighlightedVarId(varId);
 
-    setTimeout(() => {
+    let attempts = 0;
+    const tryScroll = () => {
       const row = document.querySelector(`[data-var-id="${varId}"]`);
-      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 80);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('bg-amber-100/90', 'ring-2', 'ring-amber-400');
+        setTimeout(() => {
+          row.classList.remove('bg-amber-100/90', 'ring-2', 'ring-amber-400');
+        }, 2500);
+      } else if (attempts < 10) {
+        attempts++;
+        setTimeout(tryScroll, 60);
+      }
+    };
 
+    setTimeout(tryScroll, 30);
     timerRef.current = setTimeout(() => setHighlightedVarId(null), 3000);
-  }, [variables]);
+  }, []);
 
   const handleSearchEdit = useCallback(
     (varId: string, onEdit: (v: Variable) => void) => {
       const targetVar = variables.find(v => v['ID - REF'] === varId);
       if (targetVar) onEdit(targetVar);
     },
-    [variables],
+    [variables]
   );
 
-  const closeSearchPanel = () => setIsSearchPanelOpen(false);
+  const closeSearchPanel = () => {
+    setIsSearchPanelOpen(false);
+    setSearchQuery('');
+  };
 
   return {
     searchQuery,

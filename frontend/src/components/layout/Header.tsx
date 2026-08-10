@@ -71,20 +71,20 @@ export function Header({
   };
 
   return (
-    <header className="flex items-center justify-between bg-slate-950 border-b border-slate-800/60 px-5 py-0 z-20 h-[56px] shrink-0">
+    <header className="flex items-center justify-between bg-white border-b border-bme-border px-5 py-0 z-20 h-[56px] shrink-0 shadow-sm">
       {/* ── Logo ── */}
       <div className="flex items-center gap-3 min-w-[200px]">
-        <div className="h-8 w-8 bg-gradient-to-tr from-teal-500 to-cyan-400 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-glow-sm shrink-0">
-          <BmeIcon name="zap" size={18} className="text-slate-950" />
+        <div className="h-8 w-8 bg-bme-teal rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+          <BmeIcon name="zap" size={18} className="text-white" />
         </div>
         <div className="leading-none">
-          <p className="text-[13px] font-bold text-white tracking-tight">BME Calc</p>
-          <p className="text-[10px] text-slate-500 tracking-wide">Balanço de Massa & Energia</p>
+          <p className="text-[13px] font-bold text-bme-text tracking-tight">BME Calc</p>
+          <p className="text-[10px] text-bme-text-muted tracking-wide">Balanço de Massa &amp; Energia</p>
         </div>
       </div>
 
       {/* ── Tabs ── */}
-      <nav className="flex items-center gap-0.5 bg-slate-900/60 border border-slate-800/60 rounded-xl p-1">
+      <nav className="flex items-center gap-0.5 bg-bme-muted border border-bme-border rounded-xl p-1">
         {TABS.map(tab => (
           <button
             key={tab.id}
@@ -92,8 +92,8 @@ export function Header({
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
               activeTab === tab.id
-                ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                ? 'bg-white text-bme-teal shadow-sm border border-bme-border'
+                : 'text-bme-text-sec hover:text-bme-text hover:bg-white/60'
             }`}
           >
             <BmeIcon name={tab.icon} size={14} />
@@ -104,10 +104,10 @@ export function Header({
 
       {/* ── Right Side ── */}
       <div className="flex items-center gap-3 min-w-[200px] justify-end">
-        {/* Connection status */}
+        {/* Status de conexão */}
         <div className="flex items-center gap-1.5">
           <span className={`w-1.5 h-1.5 rounded-full ${statusColors[connStatus]} animate-pulse-dot`} />
-          <span className="text-[10px] text-slate-500 hidden lg:block">{statusLabels[connStatus]}</span>
+          <span className="text-[10px] text-bme-text-muted hidden lg:block">{statusLabels[connStatus]}</span>
         </div>
 
         {/* Lock badge */}
@@ -118,10 +118,10 @@ export function Header({
           </span>
         )}
 
-        {/* Search (calculator only) */}
+        {/* Busca (calculadora) */}
         {activeTab === 'calculator' && (
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-bme-text-muted pointer-events-none">
               <BmeIcon name="search" size={13} />
             </span>
             <input

@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
+from sqlalchemy import func
 from src.db.database import (
     Variable, Equation, Dependency, Sector,
     VariableType, VariableStatus, Stage, ControlPoint, HarvestPlanOrderedItem
@@ -126,7 +127,10 @@ def list_variables(db: Session) -> List[Dict[str, Any]]:
 
 def _resolve_control_point(sector_id: str, etapa_str: str, pc_str: str, db: Session) -> ControlPoint:
     stage_name = etapa_str.strip() if etapa_str else "GERAL"
-    stmt = select(Stage).where(Stage.sector_id == sector_id, Stage.nome == stage_name)
+    stmt = select(Stage).where(
+        Stage.sector_id == sector_id,
+        func.lower(func.trim(Stage.nome)) == stage_name.lower()
+    )
     db_stage = db.exec(stmt).first()
     if not db_stage:
         all_orders = db.exec(select(Stage.ordem).where(Stage.sector_id == sector_id)).all()
@@ -136,7 +140,10 @@ def _resolve_control_point(sector_id: str, etapa_str: str, pc_str: str, db: Sess
         db.flush()
         
     cp_name = pc_str.strip() if pc_str else "GERAL"
-    stmt = select(ControlPoint).where(ControlPoint.stage_id == db_stage.id, ControlPoint.nome == cp_name)
+    stmt = select(ControlPoint).where(
+        ControlPoint.stage_id == db_stage.id,
+        func.lower(func.trim(ControlPoint.nome)) == cp_name.lower()
+    )
     db_cp = db.exec(stmt).first()
     if not db_cp:
         all_orders = db.exec(select(ControlPoint.ordem).where(ControlPoint.stage_id == db_stage.id)).all()

@@ -24,29 +24,29 @@ export const SectorAuditCard: React.FC<SectorAuditCardProps> = ({
   if (!auditVarId) return null;
 
   return (
-    <div className="glass-card p-4 border border-teal-500/40 bg-slate-950 shadow-2xl space-y-3 max-w-md w-full sticky top-0 z-40 animate-fade-in-up">
-      <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-        <span className="text-xs font-bold text-slate-300">
-          Auditoria de Fluxo: <span className="font-mono text-teal-400">{auditVarId}</span>
+    <div className="p-4 border border-teal-600 bg-white shadow-2xl space-y-3 max-w-md w-full sticky top-0 z-40 animate-fade-in-up rounded-2xl">
+      <div className="flex justify-between items-center border-b border-slate-300 pb-2.5">
+        <span className="text-xs font-bold text-black">
+          Auditoria de Fluxo: <span className="font-mono font-bold text-teal-800">{auditVarId}</span>
         </span>
         <button
           onClick={() => setAuditVarId(null)}
-          className="btn-ghost p-1 text-slate-500 hover:text-white"
+          className="text-black hover:text-red-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
           aria-label="Fechar"
         >
-          <BmeIcon name="close" size={10} />
+          <BmeIcon name="close" size={14} />
         </button>
       </div>
-      <div className="text-xs space-y-2">
-        <p className="text-slate-400">
+      <div className="text-xs space-y-2 text-black">
+        <p className="font-semibold text-black">
           {internalAuditDeps.length > 0
             ? `Destacando ${internalAuditDeps.length} células dependentes neste setor.`
             : 'Nenhuma célula dependente no setor ativo.'}
         </p>
         {externalAuditDeps.length > 0 && (
           <>
-            <p className="font-bold text-teal-500 mt-2">Dependências Externas:</p>
-            <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+            <p className="font-extrabold text-teal-900 mt-2">Dependências Externas:</p>
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {externalAuditDeps.map((depId) => {
                 const depVar = variables.find((v) => v['ID - REF'] === depId);
                 const depRes = results[depId];
@@ -54,19 +54,19 @@ export const SectorAuditCard: React.FC<SectorAuditCardProps> = ({
                 return (
                   <div
                     key={depId}
-                    className="flex justify-between items-center bg-slate-900/60 p-2 rounded border border-slate-800/40"
+                    className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-300 shadow-sm"
                   >
                     <div className="min-w-0">
-                      <p className="font-mono text-slate-200 font-semibold truncate">
+                      <p className="font-mono text-black font-bold truncate">
                         {depId}{' '}
-                        <span className="text-[9px] text-slate-500 uppercase">
+                        <span className="text-[10px] text-black font-extrabold uppercase">
                           ({depVar.SETOR})
                         </span>
                       </p>
-                      <p className="text-[10px] text-slate-500 truncate">{depVar['DESCRIÇÃO']}</p>
+                      <p className="text-[11px] text-black font-semibold truncate">{depVar['DESCRIÇÃO']}</p>
                     </div>
                     <div className="flex items-center gap-2 ml-4 shrink-0">
-                      <span className="font-mono text-slate-300">
+                      <span className="font-mono font-bold text-black text-xs">
                         {depRes?.status === 'OK' && depRes.value !== null
                           ? depRes.value.toLocaleString('pt-BR', {
                               minimumFractionDigits: 4,
@@ -76,7 +76,7 @@ export const SectorAuditCard: React.FC<SectorAuditCardProps> = ({
                       </span>
                       <button
                         onClick={() => onNavigateToVariable && onNavigateToVariable(depId)}
-                        className="text-[10px] text-teal-400 hover:text-teal-300 border border-teal-500/20 hover:border-teal-500/50 px-1.5 py-0.5 rounded transition-all"
+                        className="text-[10px] font-bold text-teal-800 hover:text-teal-950 bg-teal-50 border border-teal-300 hover:bg-teal-100 px-2 py-0.5 rounded-lg transition-all shadow-sm"
                       >
                         Ir para
                       </button>

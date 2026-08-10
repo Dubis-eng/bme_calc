@@ -37,14 +37,14 @@ export const FormulaEditor: React.FC<FormulaEditorProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
 
-  // 1. Syntax highlighting formatter
+  // 1. Syntax highlighting formatter (light mode)
   const renderHighlightedText = (text: string) => {
     if (!text.startsWith('=')) {
-      return <span className="text-slate-300">{text}</span>;
+      return <span className="text-gray-700">{text}</span>;
     }
 
     // Split text into tokens keeping whitespaces/newlines
-    const tokens = text.split(/([a-zA-Z_][a-zA-Z0-9_]*|\d+(?:\.\d+)?|"[^"]*"|'[^']*'|[+\-*^=<>!\u002f]+|[()])/);
+    const tokens = text.split(/([a-zA-Z_][a-zA-Z0-9_]*|\d+(?:\.\d+)?|"[^"]*"|'[^']*'|[+\-*^=<>!\/]+|[()])/);
     const knownIds = new Set(variables.map(v => v['ID - REF'].toUpperCase()));
 
     return tokens.map((token, index) => {
@@ -53,30 +53,30 @@ export const FormulaEditor: React.FC<FormulaEditorProps> = ({
       const upperToken = token.toUpperCase();
       // Functions
       if (FUNCTIONS.has(upperToken)) {
-        return <span key={index} className="text-cyan-400 font-semibold">{token}</span>;
+        return <span key={index} className="text-blue-600 font-semibold">{token}</span>;
       }
       // Known Variables
       if (knownIds.has(upperToken)) {
-        return <span key={index} className="text-teal-400 font-bold">{token}</span>;
+        return <span key={index} className="text-teal-700 font-bold">{token}</span>;
       }
       // Operators
-      if (/^[+\-*^=<>!\u002f]+$/.test(token)) {
-        return <span key={index} className="text-white font-medium">{token}</span>;
+      if (/^[+\-*^=<>!\/]+$/.test(token)) {
+        return <span key={index} className="text-gray-500 font-medium">{token}</span>;
       }
       // Parentheses
       if (token === '(' || token === ')') {
-        return <span key={index} className="text-slate-300 font-bold">{token}</span>;
+        return <span key={index} className="text-gray-600 font-bold">{token}</span>;
       }
       // Numbers
       if (/^\d+(?:\.\d+)?$/.test(token)) {
-        return <span key={index} className="text-amber-400 font-mono">{token}</span>;
+        return <span key={index} className="text-amber-600 font-mono">{token}</span>;
       }
       // Strings
       if (/^(?:"[^"]*"|'[^']*')$/.test(token)) {
-        return <span key={index} className="text-emerald-400">{token}</span>;
+        return <span key={index} className="text-emerald-600">{token}</span>;
       }
       // Default
-      return <span key={index} className="text-slate-500">{token}</span>;
+      return <span key={index} className="text-gray-400">{token}</span>;
     });
   };
 
@@ -145,17 +145,18 @@ export const FormulaEditor: React.FC<FormulaEditorProps> = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative w-full rounded-lg bg-slate-900 border border-slate-700/60 focus-within:ring-2 focus-within:ring-teal-500/50 focus-within:border-teal-500/40 overflow-hidden min-h-[64px]">
-        {/* Underlay Highlighted Text */}
+      {/* Container com highlight + textarea transparente sobrepostos */}
+      <div className="formula-editor-wrap">
+        {/* Underlay: texto com highlight de sintaxe */}
         <div
           ref={highlightRef}
-          className="absolute inset-0 p-2.5 text-xs font-mono whitespace-pre-wrap break-all pointer-events-none border border-transparent overflow-hidden leading-relaxed text-slate-500"
+          className="absolute inset-0 p-3 text-sm font-mono whitespace-pre-wrap break-all pointer-events-none border border-transparent overflow-hidden leading-relaxed text-gray-400"
           style={{ boxSizing: 'border-box' }}
         >
           {renderHighlightedText(value)}
         </div>
 
-        {/* Textarea Input Overlay */}
+        {/* Textarea transparente sobre o highlight */}
         <textarea
           ref={textareaRef}
           value={value}
@@ -165,30 +166,43 @@ export const FormulaEditor: React.FC<FormulaEditorProps> = ({
           onBlur={onBlur}
           disabled={isLocked}
           placeholder={placeholder}
-          className="absolute inset-0 w-full p-2.5 text-xs font-mono bg-transparent text-transparent caret-slate-200 resize-none outline-none border border-transparent overflow-hidden leading-relaxed focus:ring-0 focus:outline-none"
+          className="absolute inset-0 w-full p-3 text-sm font-mono bg-transparent text-transparent caret-gray-700 resize-none outline-none border border-transparent overflow-hidden leading-relaxed focus:ring-0 focus:outline-none placeholder-gray-300"
           style={{ boxSizing: 'border-box' }}
-          rows={2}
+          rows={3}
           autoComplete="off"
           spellCheck="false"
         />
       </div>
 
-      {/* Real-time Alerts */}
+      {/* Alertas inline */}
       {validationError && (
-        <div className="text-[11px] font-semibold text-rose-400 bg-rose-950/20 border border-rose-900/40 px-3 py-1.5 rounded-md flex items-center gap-1.5">
-          <span>⚠️ Erro:</span>
-          <span>{validationError}</span>
+        <div className="flex items-start gap-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg animate-fade-in-up">
+          <span className="shrink-0">⚠️</span>
+          <div>
+            <span className="font-semibold">Erro na fórmula: </span>
+            <span>{validationError}</span>
+          </div>
         </div>
       )}
 
       {!validationError && warnings.length > 0 && (
-        <div className="text-[11px] font-semibold text-amber-400 bg-amber-950/20 border border-amber-900/40 px-3 py-1.5 rounded-md flex flex-col gap-1">
+        <div className="flex flex-col gap-1 text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg animate-fade-in-up">
           {warnings.map((warn, i) => (
-            <div key={i} className="flex items-center gap-1.5">
-              <span>⚠️ Aviso:</span>
-              <span>{warn}</span>
+            <div key={i} className="flex items-start gap-2">
+              <span className="shrink-0">⚠️</span>
+              <div>
+                <span className="font-semibold">Aviso: </span>
+                <span>{warn}</span>
+              </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {!validationError && warnings.length === 0 && value.startsWith('=') && (
+        <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-lg animate-check-in">
+          <span>✅</span>
+          <span className="font-medium">Fórmula válida — sem erros de sintaxe detectados</span>
         </div>
       )}
     </div>
