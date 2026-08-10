@@ -1,8 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConsolidatedItem } from '../components/harvest-plan/HarvestPlanTable';
-import { VariableConfig } from '../components/harvest-plan/HarvestPlanConfigTable';
 import apiClient from '../api/client';
 import { toast } from '../components/ui/Toast';
+
+export interface VariableConfig {
+  id: string;
+  nome: string;
+  descricao: string;
+  setor_id: string;
+  unidade: string;
+  tipo: string;
+  in_harvest_plan: boolean;
+  harvest_plan_op: 'SUM' | 'AVERAGE' | 'WEIGHTED_AVERAGE' | 'CALCULATE' | null;
+  harvest_plan_weight_var_id: string | null;
+}
 
 export function useHarvestPlanState() {
   const [activeSubTab, setActiveSubTab] = useState<'visualizacao' | 'configuracao'>('visualizacao');

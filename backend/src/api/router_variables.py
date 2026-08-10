@@ -33,6 +33,8 @@ def update_variable_endpoint(id: str, req: VariableUpdate, db=Depends(get_sessio
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{id}/replace-preview", response_model=SubstitutionPreviewResponse)

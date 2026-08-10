@@ -14,6 +14,10 @@ export interface Variable {
     "control_point_id"?: string;
     "stage_id"?: string;
     "ordem"?: number;
+    "in_harvest_plan"?: boolean;
+    "harvest_plan_op"?: 'SUM' | 'AVERAGE' | 'WEIGHTED_AVERAGE' | 'CALCULATE' | null;
+    "harvest_plan_weight_var_id"?: string | null;
+    "agrupamento"?: string | null;
 }
 
 export interface Result {
@@ -47,6 +51,10 @@ export interface BackendVariable {
   casas_decimais?: number | null;
   tipo_exibicao?: "NUMBER" | "PERCENTAGE";
   percent_base?: "DECIMAL" | "INTEGER";
+  in_harvest_plan?: boolean;
+  harvest_plan_op?: 'SUM' | 'AVERAGE' | 'WEIGHTED_AVERAGE' | 'CALCULATE' | null;
+  harvest_plan_weight_var_id?: string | null;
+  agrupamento?: string | null;
 }
 
 export interface ScenarioMetadata {

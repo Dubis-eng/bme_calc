@@ -101,6 +101,10 @@ class VariableCreate(BaseModel):
     casas_decimais: Optional[int] = None
     tipo_exibicao: Optional[str] = "NUMBER"
     percent_base: Optional[str] = "DECIMAL"
+    in_harvest_plan: Optional[bool] = False
+    harvest_plan_op: Optional[str] = None
+    harvest_plan_weight_var_id: Optional[str] = None
+    agrupamento: Optional[str] = None
 
 class VariableUpdate(BaseModel):
     nome: str
@@ -117,6 +121,10 @@ class VariableUpdate(BaseModel):
     casas_decimais: Optional[int] = None
     tipo_exibicao: Optional[str] = "NUMBER"
     percent_base: Optional[str] = "DECIMAL"
+    in_harvest_plan: Optional[bool] = False
+    harvest_plan_op: Optional[str] = None
+    harvest_plan_weight_var_id: Optional[str] = None
+    agrupamento: Optional[str] = None
 
 class VariableDetail(BaseModel):
     id: str
@@ -135,6 +143,11 @@ class VariableDetail(BaseModel):
     casas_decimais: Optional[int] = None
     tipo_exibicao: str
     percent_base: str
+    in_harvest_plan: bool = False
+    harvest_plan_op: Optional[str] = None
+    harvest_plan_weight_var_id: Optional[str] = None
+    agrupamento: Optional[str] = None
+
 
 class HarvestPlanSettingUpdate(BaseModel):
     start_month: str

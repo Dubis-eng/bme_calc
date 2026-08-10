@@ -2,7 +2,6 @@ import React from 'react';
 import { Sector } from '../../types';
 import { BmeIcon } from '../../styles/design-system';
 import { HarvestPlanTable } from './HarvestPlanTable';
-import { HarvestPlanConfigTable } from './HarvestPlanConfigTable';
 import { useHarvestPlanState } from '../../hooks/useHarvestPlanState';
 import apiClient from '../../api/client';
 
@@ -11,18 +10,14 @@ const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
 
 export function HarvestPlan({ sectors }: HarvestPlanProps) {
   const {
-    activeSubTab, setActiveSubTab,
     years, selectedYear, setSelectedYear,
-    startMonth, months, variablesConfig,
+    startMonth, months,
     consolidationData, loading, selections, availableScenarios,
-    savingConfig, searchQuery, setSearchQuery,
+    searchQuery, setSearchQuery,
     selectedSector, setSelectedSector,
     activeTypeFilter, setActiveTypeFilter,
-    focusedVarId, setFocusedVarId,
-    weightSearchQuery, setWeightSearchQuery,
     isEditing, newDividerLabel, setNewDividerLabel,
     handleSelectScenario, handleStartMonthChange,
-    handleConfigChange, handleSaveConfigs,
     handleToggleEdit, handleDragStart,
     handleDragOver, handleDrop,
     handleMoveUp, handleMoveDown,
@@ -35,15 +30,6 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
   const filteredConsolidated = consolidationData.filter(item => {
     if (item.tipo_item === 'divider') return true;
     const varId = item.variable_id || '';
-    const nome = item.nome || '';
-    const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
-    const matchesType = activeTypeFilter === 'ALL' || item.tipo === activeTypeFilter;
-    return matchesSearch && matchesSector && matchesType;
-  });
-
-  const filteredConfigs = variablesConfig.filter(item => {
-    const varId = item.id || '';
     const nome = item.nome || '';
     const matchesSearch = varId.toLowerCase().includes(searchQuery.toLowerCase()) || nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'TODOS' || item.setor_id === selectedSector;
@@ -84,38 +70,25 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
       </div>
 
       <div className="bg-slate-950/60 px-6 py-3 border-b border-slate-800/60 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
-        <div className="flex space-x-1.5 p-1 bg-slate-900 border border-slate-800/60 rounded-lg">
-          <button onClick={() => setActiveSubTab('visualizacao')} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'visualizacao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
-            <BmeIcon name="eye" size={13} />
-            <span>Visualização Consolidada</span>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleToggleEdit}
+            className={`btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5 ${isEditing ? 'bg-amber-600 hover:bg-amber-500 text-white' : ''}`}
+          >
+            {isEditing ? (
+              <>
+                <BmeIcon name="pencil" size={13} />
+                <span>Salvar Organização</span>
+              </>
+            ) : (
+              <>
+                <BmeIcon name="pencil" size={13} />
+                <span>Editar Estrutura</span>
+              </>
+            )}
           </button>
-          <button onClick={() => setActiveSubTab('configuracao')} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeSubTab === 'configuracao' ? 'bg-slate-800 text-teal-400 border border-slate-700/60' : 'text-slate-500 hover:text-slate-300'}`}>
-            <BmeIcon name="gear" size={13} />
-            <span>Configuração do Plano</span>
-          </button>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          {activeSubTab === 'visualizacao' && (
-            <button
-              onClick={handleToggleEdit}
-              className={`btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5 ${isEditing ? 'bg-amber-600 hover:bg-amber-500 text-white' : ''}`}
-            >
-              {isEditing ? (
-                <>
-                  <BmeIcon name="pencil" size={13} />
-                  <span>Salvar Organização</span>
-                </>
-              ) : (
-                <>
-                  <BmeIcon name="pencil" size={13} />
-                  <span>Editar Estrutura</span>
-                </>
-              )}
-            </button>
-          )}
-
-          {activeSubTab === 'visualizacao' && !isEditing && selectedYear && (
+          {!isEditing && selectedYear && (
             <div className="flex items-center gap-1.5">
               <a
                 href={`${baseURL}/api/harvest-plan/export/pdf?year_harvest=${selectedYear}`}
@@ -134,7 +107,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
             </div>
           )}
 
-          {isEditing && activeSubTab === 'visualizacao' && (
+          {isEditing && (
             <div className="flex items-center space-x-2 bg-slate-900/60 p-1 border border-slate-800/60 rounded-lg animate-fade-in">
               <input
                 type="text"
@@ -149,7 +122,9 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
               </button>
             </div>
           )}
+        </div>
 
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <div className="flex items-center gap-1 bg-slate-900/60 p-1 border border-slate-800/60 rounded-lg">
             {[{ id: 'ALL', label: 'Todos' }, { id: 'INPUT', label: 'INPUT' }, { id: 'OUTPUT', label: 'OUTPUT' }].map(opt => (
               <button
@@ -173,12 +148,6 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
             <option value="TODOS">Todos os Setores</option>
             {sectors.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
           </select>
-
-          {activeSubTab === 'configuracao' && (
-            <button onClick={handleSaveConfigs} disabled={savingConfig} className="btn-primary py-1 px-4 text-xs font-bold flex items-center space-x-1.5">
-              {savingConfig ? <span className="flex items-center gap-1.5"><div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>Salvando...</span> : <span className="flex items-center gap-1"><BmeIcon name="pencil" size={13} /><span>Salvar Configurações</span></span>}
-            </button>
-          )}
         </div>
       </div>
 
@@ -188,7 +157,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-teal-500/20 border-t-teal-500 mb-4"></div>
             <p className="text-xs font-semibold">Carregando dados do plano...</p>
           </div>
-        ) : activeSubTab === 'visualizacao' ? (
+        ) : (
           <HarvestPlanTable
             months={months}
             filteredConsolidated={filteredConsolidated}
@@ -204,10 +173,9 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           />
-        ) : (
-          <HarvestPlanConfigTable filteredConfigs={filteredConfigs} variablesConfig={variablesConfig} focusedVarId={focusedVarId} weightSearchQuery={weightSearchQuery} setFocusedVarId={setFocusedVarId} setWeightSearchQuery={setWeightSearchQuery} handleConfigChange={handleConfigChange} />
         )}
       </div>
     </div>
   );
 }
+

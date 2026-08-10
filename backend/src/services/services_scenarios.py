@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from sqlmodel import select, Session
 from src.db.database import (
     Scenario, Variable, Equation, Dependency, Result, Sector, Stage, ControlPoint,
-    ScenarioStatus, VariableType, VariableStatus, ResultStatus
+    ScenarioStatus, VariableType, VariableStatus, ResultStatus, HarvestPlanOrderedItem
 )
 from src.schemas.schemas import ScenarioDetail
 from src.core import engine
@@ -17,6 +17,15 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
     stage_map = {s.id: s for s in stages}
     cps = db.exec(select(ControlPoint)).all()
     cp_map = {c.id: c for c in cps}
+
+    ordered_items = db.exec(select(HarvestPlanOrderedItem).order_by(HarvestPlanOrderedItem.ordem.asc())).all()
+    current_group = None
+    var_grouping_map = {}
+    for item in ordered_items:
+        if item.tipo == "divider":
+            current_group = item.label
+        elif item.tipo == "variable" and item.variable_id:
+            var_grouping_map[item.variable_id] = current_group
     
     stmt = (
         select(Variable)
@@ -70,7 +79,11 @@ def get_scenario_variables(scenario_id: uuid.UUID, db: Session) -> List[Dict[str
             "percent_base": var.percent_base,
             "control_point_id": var.control_point_id,
             "stage_id": stage_id,
-            "ordem": var.ordem
+            "ordem": var.ordem,
+            "in_harvest_plan": var.in_harvest_plan,
+            "harvest_plan_op": var.harvest_plan_op,
+            "harvest_plan_weight_var_id": var.harvest_plan_weight_var_id,
+            "agrupamento": var_grouping_map.get(var.id)
         })
     return variables_list
 def _resolve_stage_and_cp(sector_id: str, etapa_name: str, cp_name: str, db: Session) -> uuid.UUID:

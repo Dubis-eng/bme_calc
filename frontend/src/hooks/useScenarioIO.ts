@@ -51,7 +51,11 @@ export function useScenarioIO() {
       equation_value: String(newVar["EQUAÇÕES E VALORES"] || ""),
       casas_decimais: (newVar.casas_decimais === undefined || newVar.casas_decimais === null || (newVar.casas_decimais as unknown) === '') ? null : Number(newVar.casas_decimais),
       tipo_exibicao: newVar.tipo_exibicao || "NUMBER",
-      percent_base: newVar.percent_base || "DECIMAL"
+      percent_base: newVar.percent_base || "DECIMAL",
+      in_harvest_plan: newVar.in_harvest_plan || false,
+      harvest_plan_op: newVar.harvest_plan_op || null,
+      harvest_plan_weight_var_id: newVar.harvest_plan_weight_var_id || null,
+      agrupamento: newVar.agrupamento || null
     };
   };
 

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.23.0] - 2026-08-09
+
+### Added & Refactored
+- **Centralização do Plano de Safra no Cadastro de Variáveis**:
+  - **Modal de Variáveis (`VariableModal.tsx`)**: Inclusão de seção dedicada "Configurações do Plano de Safra" permitindo definir a inclusão no Plano (`in_harvest_plan`), Método de Acúmulo (`Soma`, `Média Simples`, `Média Ponderada`, `Cálculo por Fórmula`), Variável de Peso (com autocomplete) e o Agrupamento/Divisor da variável.
+  - **Sincronização de Divisores (`_sync_variable_harvest_grouping`)**: Atualização automática da ordem e criação de divisores na tabela `HarvestPlanOrderedItem` sempre que uma variável é cadastrada ou editada.
+  - **Simplificação da Tela Plano de Safra (`HarvestPlan.tsx`)**: Remoção da sub-aba obsoleta de configuração em lote e exclusão do componente `HarvestPlanConfigTable.tsx`. A tela agora é 100% focada na Visualização Consolidada e Reordenação da Estrutura.
+  - **Sincronização de Cenários (`get_scenario_variables`)**: Atualização do serviço backend de cenários em `services_scenarios.py` e mappers do frontend (`helpers.ts` e `useScenarioIO.ts`) para incluir e manter os campos do Plano de Safra em todas as requisições de cenários ativos.
+  - **Proteção contra Atributos Nulos**: Adicionada sanitização defensiva contra valores `null` na atualização de variáveis em `services_variables.py` e traceback no handler REST.
+
 ## [2.22.0] - 2026-07-19
 
 ### Added

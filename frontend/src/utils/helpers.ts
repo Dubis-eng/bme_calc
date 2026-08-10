@@ -44,7 +44,11 @@ export const mapBackendVariableToFrontend = (v: BackendVariable): Variable => ({
   percent_base: v.percent_base,
   control_point_id: v.control_point_id,
   stage_id: v.stage_id,
-  ordem: v.ordem
+  ordem: v.ordem,
+  in_harvest_plan: v.in_harvest_plan,
+  harvest_plan_op: v.harvest_plan_op,
+  harvest_plan_weight_var_id: v.harvest_plan_weight_var_id,
+  agrupamento: v.agrupamento
 });
 
 export const FUNCTIONS = new Set([
