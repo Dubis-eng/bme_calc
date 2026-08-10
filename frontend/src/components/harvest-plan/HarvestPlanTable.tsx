@@ -77,37 +77,37 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
 
   const renderStatusBadge = (status: string) => {
     if (status === 'DIV_BY_ZERO') {
-      return <span className="badge-error" title="Divisão por Zero">⚠️ Div/0</span>;
+      return <span className="badge-error font-bold" title="Divisão por Zero">⚠️ Div/0</span>;
     }
     if (status === 'MISSING_VAR') {
-      return <span className="badge-warn" title="Variável Faltando">⚠️ Var Faltando</span>;
+      return <span className="badge-warn font-bold" title="Variável Faltando">⚠️ Var Faltando</span>;
     }
     if (status === 'PENDING') {
-      return <span className="badge-idle">Pendente</span>;
+      return <span className="badge-idle font-bold text-slate-700">Pendente</span>;
     }
-    return <span className="badge-idle">{status}</span>;
+    return <span className="badge-idle font-bold text-slate-700">{status}</span>;
   };
 
   return (
-    <div className="border border-slate-800/60 rounded-xl overflow-hidden">
+    <div className="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-xl">
       <div className="overflow-x-auto max-w-full">
-        <table className="bme-table">
-          <thead className="bg-slate-950 text-slate-200">
-            <tr className="divide-x divide-slate-900/60 border-b border-slate-850">
-              <th className="bme-table-header-cell min-w-[130px] sticky left-0 bg-slate-950 z-10">ID</th>
-              <th className="bme-table-header-cell min-w-[150px] sticky left-[130px] bg-slate-950 z-10">Descrição</th>
-              <th className="bme-table-header-cell min-w-[70px]">Setor</th>
-              <th className="bme-table-header-cell min-w-[50px] text-center">Un.</th>
-              <th className="bme-table-header-cell min-w-[70px] text-center">Regra</th>
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-slate-100 text-black border-b border-slate-300">
+            <tr className="divide-x divide-slate-200">
+              <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider min-w-[130px] sticky left-0 bg-slate-100 z-10 text-black">ID</th>
+              <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider min-w-[150px] sticky left-[130px] bg-slate-100 z-10 text-black">Descrição</th>
+              <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider min-w-[70px] text-black">Setor</th>
+              <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider min-w-[50px] text-center text-black">Un.</th>
+              <th className="px-3 py-3 text-xs font-bold uppercase tracking-wider min-w-[70px] text-center text-black">Regra</th>
               {months.map(m => {
                 const currentSel = selections.find(s => s.month === m);
                 const availScs = availableScenarios[m] || [];
                 const value = currentSel?.exclude ? 'exclude' : (currentSel?.scenario_id || 'auto');
 
                 return (
-                  <th key={m} className="bme-table-header-cell min-w-[125px] text-right bg-slate-950 sticky top-0">
+                  <th key={m} className="px-3 py-2 min-w-[125px] text-right bg-slate-100 sticky top-0 border-l border-slate-200">
                     <div className="flex flex-col items-end">
-                      <span className="text-[9px] text-slate-500 mb-0.5">{m}</span>
+                      <span className="text-[11px] font-bold text-black uppercase mb-1">{m}</span>
                       <select
                         value={value}
                         disabled={isEditing}
@@ -122,7 +122,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                             handleSelectScenario(m, val, false);
                           }
                         }}
-                        className="bg-slate-900 text-slate-300 border border-slate-750 text-[8px] py-0.5 px-1 rounded cursor-pointer max-w-[115px] focus:outline-none focus:ring-1 focus:ring-teal-500 font-bold uppercase disabled:opacity-50"
+                        className="bg-white text-black border border-slate-300 text-[10px] py-1 px-1.5 rounded-lg cursor-pointer max-w-[115px] focus:outline-none focus:border-teal-600 font-bold uppercase shadow-sm disabled:opacity-50"
                       >
                         <option value="auto">⚙️ Padrão</option>
                         {availScs.map(sc => (
@@ -134,10 +134,10 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                   </th>
                 );
               })}
-              <th className="bme-table-header-cell min-w-[120px] text-right bg-teal-950/40 text-teal-400">Acumulado</th>
+              <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider min-w-[120px] text-right bg-teal-100/60 text-teal-950 border-l border-teal-200">Acumulado</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/30 bg-slate-950/20">
+          <tbody className="divide-y divide-slate-200 bg-white">
             {filteredConsolidated.map((item, idx) => {
               if (item.tipo_item === 'divider') {
                 return (
@@ -145,41 +145,41 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                     key={item.variable_id}
                     onDragOver={(e) => onDragOver(e, idx)}
                     onDrop={(e) => onDrop(e, idx)}
-                    className="bg-slate-900/80 border-y border-slate-800 text-xs font-bold text-teal-400 select-none"
+                    className="bg-teal-50/90 border-y border-teal-200 text-xs font-bold text-teal-950 select-none"
                   >
-                    <td colSpan={months.length + 6} className="px-4 py-2 bg-slate-900/90 text-left tracking-wider uppercase">
+                    <td colSpan={months.length + 6} className="px-4 py-2.5 text-left tracking-wider uppercase">
                       {isEditing ? (
                         <div className="flex items-center space-x-2.5 w-full">
                           <span
-                            className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-300 select-none font-normal text-sm"
+                            className="cursor-grab active:cursor-grabbing text-teal-700 hover:text-teal-900 select-none font-bold text-sm"
                             draggable
                             onDragStart={(e) => onDragStart(e, idx)}
                             title="Arrastar"
                           >
                             ⋮⋮
                           </span>
-                          <button type="button" onClick={() => onMoveUp(idx)} className="text-slate-500 hover:text-teal-400 p-0.5" title="Subir">▲</button>
-                          <button type="button" onClick={() => onMoveDown(idx)} className="text-slate-500 hover:text-teal-400 p-0.5" title="Descer">▼</button>
+                          <button type="button" onClick={() => onMoveUp(idx)} className="text-teal-700 hover:text-teal-950 p-0.5 font-bold" title="Subir">▲</button>
+                          <button type="button" onClick={() => onMoveDown(idx)} className="text-teal-700 hover:text-teal-950 p-0.5 font-bold" title="Descer">▼</button>
                           <input
                             type="text"
                             aria-label="Título do divisor"
                             value={item.label || ''}
                             onChange={(e) => onRenameDivider(item.variable_id, e.target.value)}
-                            className="bg-slate-950 text-teal-400 border border-slate-800 rounded px-2 py-0.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-teal-500 w-64 uppercase"
+                            className="bg-white text-teal-950 border border-teal-300 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500 w-64 uppercase shadow-sm"
                           />
                           <button
                             type="button"
                             onClick={() => onDeleteDivider(item.variable_id)}
-                            className="text-red-500 hover:text-red-400 font-bold px-2 py-0.5 bg-red-950/30 border border-red-800/40 rounded text-[10px]"
+                            className="text-red-700 hover:text-red-800 font-bold px-2.5 py-1 bg-red-100 border border-red-300 rounded-lg text-xs"
                             title="Excluir agrupador"
                           >
                             🗑️ Excluir
                           </button>
                         </div>
                       ) : (
-                        <div className="flex items-center">
-                          <span className="w-1.5 h-3 bg-teal-500 rounded mr-2 inline-block"></span>
-                          <span>{item.label}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="w-2 h-4 bg-teal-600 rounded-sm inline-block"></span>
+                          <span className="font-bold text-teal-950 text-xs">{item.label}</span>
                         </div>
                       )}
                     </td>
@@ -197,43 +197,43 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                   key={item.variable_id}
                   onDragOver={(e) => onDragOver(e, idx)}
                   onDrop={(e) => onDrop(e, idx)}
-                  className="bme-table-row divide-x divide-slate-900/40 text-xs"
+                  className="hover:bg-slate-50 transition-colors divide-x divide-slate-200 text-xs"
                 >
                   {/* Variable ID (Sticky) */}
-                  <td className="bme-table-cell font-mono font-bold text-teal-400 bg-slate-950 sticky left-0 z-10 border-r border-slate-850 truncate max-w-[130px]" title={item.variable_id}>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black bg-white sticky left-0 z-10 border-r border-slate-200 truncate max-w-[130px]" title={item.variable_id}>
                     <div className="flex items-center space-x-1.5">
                       {isEditing && (
                         <>
                           <span
-                            className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-350 select-none text-[10px]"
+                            className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-black select-none text-xs font-bold"
                             draggable
                             onDragStart={(e) => onDragStart(e, idx)}
                             title="Arrastar"
                           >
                             ⋮⋮
                           </span>
-                          <button type="button" onClick={() => onMoveUp(idx)} className="text-slate-500 hover:text-teal-400 text-[8px] p-0.5" title="Subir">▲</button>
-                          <button type="button" onClick={() => onMoveDown(idx)} className="text-slate-500 hover:text-teal-400 text-[8px] p-0.5" title="Descer">▼</button>
+                          <button type="button" onClick={() => onMoveUp(idx)} className="text-slate-500 hover:text-black text-[9px] p-0.5 font-bold" title="Subir">▲</button>
+                          <button type="button" onClick={() => onMoveDown(idx)} className="text-slate-500 hover:text-black text-[9px] p-0.5 font-bold" title="Descer">▼</button>
                         </>
                       )}
                       <span>{item.variable_id}</span>
                     </div>
                   </td>
                   {/* Description (Sticky) */}
-                  <td className="bme-table-cell font-medium text-slate-200 bg-slate-950 sticky left-[130px] z-10 border-r border-slate-850 truncate max-w-[150px]" title={item.descricao}>
+                  <td className="px-4 py-2.5 font-semibold text-black bg-white sticky left-[130px] z-10 border-r border-slate-200 truncate max-w-[150px]" title={item.descricao}>
                     {item.nome}
                   </td>
                   {/* Sector */}
-                  <td className="bme-table-cell text-slate-500 font-semibold truncate max-w-[80px]" title={item.setor_id}>
+                  <td className="px-3 py-2.5 text-black font-semibold truncate max-w-[80px]" title={item.setor_id}>
                     {item.setor_id}
                   </td>
                   {/* Unit */}
-                  <td className="bme-table-cell text-slate-400 font-semibold text-center">
+                  <td className="px-3 py-2.5 text-black font-mono font-semibold text-center">
                     {item.unidade}
                   </td>
                   {/* Op Rule */}
-                  <td className="bme-table-cell text-center" title={item.harvest_plan_op === 'WEIGHTED_AVERAGE' ? `Média ponderada por ${item.harvest_plan_weight_var_id}` : opLabel}>
-                    <span className="px-1.5 py-0.5 inline-flex leading-4 font-bold rounded-full bg-slate-900 text-slate-400 border border-slate-800/60 text-[9px]">
+                  <td className="px-3 py-2.5 text-center" title={item.harvest_plan_op === 'WEIGHTED_AVERAGE' ? `Média ponderada por ${item.harvest_plan_weight_var_id}` : opLabel}>
+                    <span className="px-2 py-0.5 inline-flex leading-4 font-bold rounded-full bg-slate-100 text-slate-800 border border-slate-300 text-[10px]">
                       {opLabel}
                     </span>
                   </td>
@@ -242,7 +242,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                     const val = item.monthly_values[m];
                     const status = item.monthly_statuses[m];
                     return (
-                      <td key={m} className="bme-table-cell text-right font-mono font-semibold text-slate-400">
+                      <td key={m} className="px-3 py-2.5 text-right font-mono font-bold text-black">
                         {status === 'OK' && val !== null ? (
                           formatConsolidatedValue(val, item)
                         ) : (
@@ -252,7 +252,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                     );
                   })}
                   {/* Accumulated column */}
-                  <td className="bme-table-cell text-right font-mono font-bold bg-teal-500/10 text-teal-300 border-l border-slate-850">
+                  <td className="px-4 py-2.5 text-right font-mono font-bold bg-teal-50/70 text-teal-950 border-l border-teal-200">
                     {item.accumulated.status === 'OK' && item.accumulated.value !== null ? (
                       formatConsolidatedValue(item.accumulated.value, item)
                     ) : (

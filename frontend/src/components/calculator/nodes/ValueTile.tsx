@@ -20,7 +20,7 @@ export const ValueTile: React.FC<ValueTileProps> = ({ id, isLocked = false }) =>
 
   if (!variable) {
     return (
-      <div className="rounded border border-dashed border-rose-500/40 bg-rose-950/20 px-2 py-1 text-[10px] text-rose-400 font-mono">
+      <div className="rounded-lg border border-dashed border-red-300 bg-red-50 px-2 py-1 text-[10px] text-red-900 font-mono font-bold">
         {id} (não encontrado)
       </div>
     );
@@ -39,17 +39,17 @@ export const ValueTile: React.FC<ValueTileProps> = ({ id, isLocked = false }) =>
   return (
     <div
       onClick={handleSelect}
-      className={`group flex w-full items-center justify-between gap-2 rounded-md border px-2.5 py-1.5 text-left transition-all ${
+      className={`group flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-1.5 text-left transition-all ${
         isInput
-          ? 'border-amber-500/40 bg-amber-950/20 hover:bg-amber-950/40'
-          : 'border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/60'
-      } ${isSelected ? 'ring-1 ring-teal-400 shadow-glow-teal' : ''}`}
+          ? 'border-amber-300 bg-amber-50 hover:bg-amber-100'
+          : 'border-slate-300 bg-white hover:bg-slate-50'
+      } ${isSelected ? 'ring-2 ring-teal-600 border-teal-600 shadow-md' : ''}`}
     >
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-1.5 truncate text-[10px] font-medium text-slate-400">
-          <span className="font-mono font-bold text-slate-300">{id}</span>
+        <div className="flex items-center gap-1.5 truncate text-[10px] font-bold text-black">
+          <span className="font-mono font-bold text-black">{id}</span>
           <span>·</span>
-          <span className="truncate text-slate-400">{variable['DESCRIÇÃO']}</span>
+          <span className="truncate text-black font-semibold">{variable['DESCRIÇÃO']}</span>
         </div>
 
         {isInput ? (
@@ -59,33 +59,20 @@ export const ValueTile: React.FC<ValueTileProps> = ({ id, isLocked = false }) =>
               id={`input-tile-${id}`}
               variable={variable}
               isLocked={isLocked}
-              className="h-6 w-full max-w-[130px] rounded border border-slate-700 bg-slate-950 px-2 text-xs font-semibold text-amber-300 font-mono focus:border-amber-500 focus:outline-none"
+              className="w-full px-2 py-0.5 text-xs font-mono font-bold text-black bg-white border border-slate-300 rounded-lg text-right focus:outline-none focus:border-teal-600 shadow-sm"
             />
           </label>
         ) : (
-          <div className="mt-0.5 font-mono text-xs font-semibold text-slate-100">
-            {result?.status === 'OK' && result.value !== null ? (
-              <span className="text-teal-300 font-bold">
-                {formatVariableValue(result.value, variable)}
-              </span>
-            ) : result?.status && result.status !== 'OK' && result.status !== 'PENDING' ? (
-              <span className="text-rose-400 text-[11px]" title={result.error_message}>
-                ⚠️ Erro ({result.status})
-              </span>
-            ) : (
-              <span className="text-slate-500 italic text-[11px]">
-                {String(variable['EQUAÇÕES E VALORES'] || '—')}
-              </span>
-            )}
+          <div className="mt-0.5 flex items-center justify-between text-xs font-mono font-bold text-black">
+            <span>
+              {result && result.status === 'OK' && result.value !== null
+                ? formatVariableValue(result.value, variable)
+                : '—'}
+            </span>
+            {unit && <span className="text-[10px] text-black font-bold font-sans ml-1">{unit}</span>}
           </div>
         )}
       </div>
-
-      {unit && unit !== '-' && (
-        <span className="shrink-0 font-mono text-[10px] font-medium text-slate-500">
-          {unit}
-        </span>
-      )}
     </div>
   );
 };

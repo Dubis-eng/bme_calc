@@ -44,10 +44,10 @@ export const ValueCell = memo<ValueCellProps>(({ variable, result, isLocked }) =
           id={`input-val-${id}`}
           variable={v}
           isLocked={isLocked}
-          className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md border text-right focus:outline-none transition-all duration-150 disabled:opacity-50 ${fieldClass}`}
+          className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-bold text-black bg-white border border-slate-300 rounded-lg text-right focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-200 transition-all duration-150 disabled:opacity-60 shadow-sm ${fieldClass}`}
         />
         {v.tipo_exibicao === 'PERCENTAGE' && (
-          <span className="text-[10px] font-bold text-slate-500 w-4 shrink-0 select-none text-left">%</span>
+          <span className="text-xs font-bold text-black w-4 shrink-0 select-none text-left">%</span>
         )}
       </div>
     );
@@ -56,7 +56,7 @@ export const ValueCell = memo<ValueCellProps>(({ variable, result, isLocked }) =
   if (result !== undefined && result.status !== 'OK') {
     return (
       <div className="flex justify-end items-center">
-        <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${ERROR_BADGE[result.status] ?? 'bg-slate-700/40 text-slate-400 border-slate-700/60'}`} title={result.error_message || result.status}>⚠ {result.status}</span>
+        <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold ${ERROR_BADGE[result.status] ?? 'bg-slate-100 text-slate-700 border-slate-300'}`} title={result.error_message || result.status}>⚠ {result.status}</span>
       </div>
     );
   }
@@ -69,10 +69,10 @@ export const ValueCell = memo<ValueCellProps>(({ variable, result, isLocked }) =
         type="text"
         readOnly
         value={getReadOnlyValue()}
-        className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-semibold rounded-md border text-right focus:outline-none transition-all duration-150 ${fieldClass}`}
+        className={`${v.tipo_exibicao === 'PERCENTAGE' ? 'w-24' : 'w-28'} px-2.5 py-1 text-xs font-mono font-bold text-black bg-slate-50 border border-slate-200 rounded-lg text-right focus:outline-none transition-all duration-150 ${fieldClass}`}
       />
       {v.tipo_exibicao === 'PERCENTAGE' && (
-        <span className="text-[10px] font-bold text-slate-500 w-4 shrink-0 select-none text-left">%</span>
+        <span className="text-xs font-bold text-black w-4 shrink-0 select-none text-left">%</span>
       )}
     </div>
   );
