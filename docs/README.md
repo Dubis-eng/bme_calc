@@ -28,7 +28,8 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 * **[DONE] Épico 19: Unificação de Configurações e Sincronização de Ciclo** — Unificação de endpoints de configurações no backend, transação/idempotência de reordenamento de meses, e aviso visual com botão de recálculo manual para cenários com ciclo desatualizado.
 * **[DONE] Épico 20: Correção de Digitação de Percentuais e Decimais** — Componente `FormattedVariableInput` para digitação fluida de decimais (ponto/vírgula) e normalização entre frontend e backend para todas as variáveis percentuais e numéricas.
 * **[DONE] [feat-021-harvest-plan-sorting.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-021-harvest-plan-sorting.md)** — Ordenação Personalizada e Divisores no Plano de Safra.
-* **[DONE] [feat-022-architecture-modernization.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-022-architecture-modernization.md)** — Modernização Arquitetural, Reestruturação de Diretórios e Design System Studio Dark.
+* **[DONE] [feat-022-architecture-modernization.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/features/feat-022-architecture-modernization.md)** — Modernização Arquitetural, Reestruturação de Diretórios e Design System.
+* **[DONE] Épico 30: Design System Pure White & High Contrast Black** — Padronização institucional de todas as telas, modais, submodais, tooltips e cartões de setores com fundo branco puro (`#FFFFFF`) e tipografia em preto nítido em negrito (`font-bold text-black`).
 * **[DONE] [architecture/README.md](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/architecture/README.md)** — Registro e catalogação das Decisões de Arquitetura (ADRs) usando o framework global.
 
 ---
