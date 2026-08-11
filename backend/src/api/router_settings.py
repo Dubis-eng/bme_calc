@@ -17,12 +17,38 @@ class MonthReorderItem(BaseModel):
 class MonthReorderRequest(BaseModel):
     reorderings: List[MonthReorderItem]
 
+ALL_MONTHS_DEFAULT = [
+    'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro', 'Janeiro', 'Fevereiro', 'Março', 'Abril'
+]
+
+def _ensure_default_years(db):
+    from sqlmodel import select
+    existing = db.exec(select(HarvestYear)).all()
+    if not existing:
+        scenario_years = db.exec(select(Scenario.year_harvest)).all()
+        years_to_add = set(scenario_years) if scenario_years else {2026, 2027}
+        years_to_add.discard(None)
+        if not years_to_add:
+            years_to_add = {2026, 2027}
+        for y in sorted(years_to_add):
+            db.add(HarvestYear(id=int(y), active=True))
+        db.commit()
+
+def _ensure_default_months(db):
+    from sqlmodel import select
+    existing = db.exec(select(HarvestMonth)).all()
+    if not existing:
+        for idx, m_name in enumerate(ALL_MONTHS_DEFAULT):
+            db.add(HarvestMonth(id=idx+1, name=m_name, order_index=idx, enabled=True))
+        db.commit()
+
 # ── HARVEST YEARS ───────────────────────────────────────────────────────────
 
 @router.get("/settings/years", response_model=List[HarvestYearRead])
 def list_harvest_years_endpoint(db=Depends(get_session)):
     try:
         from sqlmodel import select
+        _ensure_default_years(db)
         stmt = select(HarvestYear).order_by(HarvestYear.id.desc())
         return db.exec(stmt).all()
     except Exception as e:
@@ -74,6 +100,7 @@ def delete_harvest_year_endpoint(year_start: int, db=Depends(get_session)):
 def list_harvest_months_endpoint(enabled_only: Optional[bool] = None, db=Depends(get_session)):
     try:
         from sqlmodel import select
+        _ensure_default_months(db)
         stmt = select(HarvestMonth)
         if enabled_only:
             stmt = stmt.where(HarvestMonth.enabled == True)

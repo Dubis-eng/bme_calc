@@ -160,8 +160,8 @@ def update_existing_scenario(scenario_id: uuid.UUID, req, db: Session) -> Scenar
     db_scenario = db.get(Scenario, scenario_id)
     if not db_scenario:
         raise ValueError("Cenário não encontrado")
-    if db_scenario.status in {ScenarioStatus.APROVADO, ScenarioStatus.FINAL}:
-        raise ValueError("Cenário bloqueado para edições")
+    if hasattr(req, "status") and req.status is not None:
+        db_scenario.status = req.status
     db_scenario.updated_at = datetime.datetime.utcnow()
     
     from src.services.services_harvest_plan import get_harvest_plan_settings

@@ -53,8 +53,7 @@ export function useHarvestPlanState() {
 
   const fetchSelections = useCallback(() => {
     if (!selectedYear) return;
-    const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    apiClient.get(`/api/harvest-plan/selections?year_harvest=${yearNum}`)
+    apiClient.get(`/api/harvest-plan/selections?year_harvest=${encodeURIComponent(selectedYear)}`)
       .then(res => {
         setSelections(res.data.selections || []);
         setAvailableScenarios(res.data.available_scenarios || {});
@@ -64,8 +63,7 @@ export function useHarvestPlanState() {
   const handleSelectScenario = (month: string, scenarioId: string | null, exclude: boolean) => {
     if (!selectedYear) return;
     setLoading(true);
-    const yearNum = parseInt(selectedYear.split('/')[0], 10);
-    apiClient.post(`/api/harvest-plan/selections?year_harvest=${yearNum}`, { month, scenario_id: scenarioId, exclude })
+    apiClient.post(`/api/harvest-plan/selections?year_harvest=${encodeURIComponent(selectedYear)}`, { month, scenario_id: scenarioId, exclude })
       .then(async () => {
         await fetchConsolidation();
         fetchSelections();

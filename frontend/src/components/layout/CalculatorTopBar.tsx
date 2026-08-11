@@ -29,7 +29,7 @@ interface CalculatorTopBarProps {
   onGoalSeekOpen: () => void;
   years: { id: number; active: boolean }[];
   months: { id: number; name: string; order_index: number; enabled: boolean }[];
-  onStatusChange: (status: 'Em Edição' | 'Aprovado' | 'Final') => void;
+  onStatusChange?: (status: 'Em Edição' | 'Aprovado' | 'Final') => void;
 }
 
 const DEFAULT_MONTHS_LIST = [
@@ -92,7 +92,7 @@ export const CalculatorTopBar: React.FC<CalculatorTopBarProps> = ({
             <select
               value={anoSafra}
               onChange={(e) => setAnoSafra(Number(e.target.value))}
-              disabled={isLocked || isOffline}
+              disabled={isOffline}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-black focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 outline-none disabled:opacity-60 disabled:bg-slate-100"
             >
               {safeYears.map((y) => (
@@ -105,7 +105,7 @@ export const CalculatorTopBar: React.FC<CalculatorTopBarProps> = ({
             <select
               value={mesReferencia}
               onChange={(e) => setMesReferencia(e.target.value)}
-              disabled={isLocked || isOffline}
+              disabled={isOffline}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-black focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 outline-none disabled:opacity-60 disabled:bg-slate-100"
             >
               {safeMonths.map((m) => (
@@ -125,7 +125,7 @@ export const CalculatorTopBar: React.FC<CalculatorTopBarProps> = ({
                   key={st}
                   type="button"
                   disabled={isOffline}
-                  onClick={() => onStatusChange(st)}
+                  onClick={() => onStatusChange && onStatusChange(st)}
                   className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                     currentScenario.status === st
                       ? 'bg-bme-teal text-white shadow-sm'

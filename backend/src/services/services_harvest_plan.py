@@ -22,10 +22,15 @@ def get_ordered_months(start_month: str, db: Session) -> List[str]:
     return enabled_names[idx:] + enabled_names[:idx]
 
 def get_harvest_years(db: Session) -> List[int]:
-    from src.db.database import HarvestYear
-    stmt = select(HarvestYear.id).where(HarvestYear.active == True)
-    years = db.exec(stmt).all()
-    return sorted(list(set(years)), reverse=True)
+    from src.db.database import HarvestYear, Scenario
+    stmt1 = select(HarvestYear.id).where(HarvestYear.active == True)
+    years1 = db.exec(stmt1).all()
+    stmt2 = select(Scenario.year_harvest)
+    years2 = db.exec(stmt2).all()
+    all_years = list(set([y for y in (years1 + years2) if y is not None]))
+    if not all_years:
+        all_years = [2026]
+    return sorted(all_years, reverse=True)
 
 def get_harvest_plan_settings(db: Session) -> HarvestPlanSetting:
     setting = db.get(HarvestPlanSetting, "default")
@@ -121,7 +126,7 @@ def update_variables_harvest_config(configs: List[Dict[str, Any]], db: Session):
     db.commit()
 
 def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any]:
-    from src.db.database import HarvestPlanSelection, Scenario, ScenarioStatus
+    from src.db.database import HarvestPlanSelection, Scenario
     
     selections = db.exec(select(HarvestPlanSelection).where(HarvestPlanSelection.year_harvest == year_harvest)).all()
     selections_list = []
@@ -133,18 +138,19 @@ def get_harvest_plan_selections(year_harvest: int, db: Session) -> Dict[str, Any
         })
         
     stmt = select(Scenario).where(
-        Scenario.year_harvest == year_harvest,
-        Scenario.status.in_([ScenarioStatus.APROVADO, ScenarioStatus.FINAL])
+        Scenario.year_harvest == year_harvest
     ).order_by(Scenario.reference_month, Scenario.version.desc())
     scenarios = db.exec(stmt).all()
     
     available = {}
     for sc in scenarios:
+        st_str = sc.status.value if hasattr(sc.status, "value") else str(sc.status)
+        sc_name = f"{sc.nome} (v{sc.version} - {st_str})" if sc.version else f"{sc.nome} ({st_str})"
         available.setdefault(sc.reference_month, []).append({
             "id": str(sc.id),
-            "nome": sc.nome,
+            "nome": sc_name,
             "version": sc.version,
-            "status": sc.status.value if hasattr(sc.status, "value") else str(sc.status)
+            "status": st_str
         })
         
     return {
@@ -184,6 +190,9 @@ def get_harvest_plan_structure(db: Session) -> List[Dict[str, Any]]:
         Variable.status != VariableStatus.INATIVA
     )
     active_vars = db.exec(active_vars_stmt).all()
+    if not active_vars:
+        active_vars_stmt = select(Variable).where(Variable.status != VariableStatus.INATIVA)
+        active_vars = db.exec(active_vars_stmt).all()
     active_var_ids = {v.id for v in active_vars}
     vars_map = {v.id: v for v in active_vars}
     

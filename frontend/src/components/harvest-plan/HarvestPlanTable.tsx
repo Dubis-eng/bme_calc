@@ -126,7 +126,7 @@ export const HarvestPlanTable: React.FC<HarvestPlanTableProps> = ({
                       >
                         <option value="auto">⚙️ Padrão</option>
                         {availScs.map(sc => (
-                          <option key={sc.id} value={sc.id}>v{sc.version} ({sc.status})</option>
+                          <option key={sc.id} value={sc.id}>{sc.nome || `v${sc.version} (${sc.status})`}</option>
                         ))}
                         <option value="exclude">❌ Ocultar</option>
                       </select>

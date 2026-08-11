@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { Variable, Sector } from '../types';
 
 export function useScenarioIO() {
@@ -9,11 +9,11 @@ export function useScenarioIO() {
   const fetchYearsAndMonths = useCallback(async () => {
     try {
       const [yRes, mRes] = await Promise.all([
-        axios.get('http://localhost:8000/api/settings/years'),
-        axios.get('http://localhost:8000/api/settings/months')
+        apiClient.get('/api/settings/years').catch(() => ({ data: [] })),
+        apiClient.get('/api/settings/months').catch(() => ({ data: [] }))
       ]);
-      setYears(yRes.data);
-      setMonths(mRes.data);
+      if (yRes.data && yRes.data.length > 0) setYears(yRes.data);
+      if (mRes.data && mRes.data.length > 0) setMonths(mRes.data);
     } catch (err) {
       console.error("Erro ao buscar anos e meses das configurações:", err);
     }
@@ -24,7 +24,7 @@ export function useScenarioIO() {
     if (!sectors.some(s => s.id === sectorId)) {
       try {
         const maxO = sectors.reduce((m, s) => s.ordem > m ? s.ordem : m, 0);
-        await axios.post('http://localhost:8000/api/sectors', {
+        await apiClient.post('/api/sectors', {
           id: sectorId,
           nome: sectorId.charAt(0).toUpperCase() + sectorId.slice(1).toLowerCase(),
           descricao: 'Criado via variável',

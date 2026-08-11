@@ -4,29 +4,34 @@ import { getFriendlySectorName } from '../../utils/helpers';
 import { BmeIcon } from '../../styles/design-system';
 
 interface SidebarProps {
-  isSidebarExpanded: boolean;
-  setIsSidebarExpanded: (val: boolean | ((prev: boolean) => boolean)) => void;
-  uniqueSectors: string[];
-  activeSector: string;
-  setActiveSector: (val: string) => void;
-  variables: Variable[];
-  sectors: Sector[];
-  results: Record<string, { value: number | null; status: string }>;
-  onSubgroupClick: (sectorId: string, subgroupName: string) => void;
-  onVariableClick: (varId: string) => void;
-  onSettingsClick: () => void;
+  isSidebarExpanded?: boolean;
+  setIsSidebarExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
+  uniqueSectors?: string[];
+  activeSector?: string;
+  setActiveSector?: (val: string) => void;
+  onSelectSector?: (val: string) => void;
+  variables?: Variable[];
+  sectors?: Sector[];
+  results?: Record<string, { value: number | null; status: string }>;
+  onSubgroupClick?: (sectorId: string, subgroupName: string) => void;
+  onSelectSubgroup?: (sectorId: string, subgroupName: string) => void;
+  onVariableClick?: (varId: string) => void;
+  onSettingsClick?: () => void;
+  onShowAll?: () => void;
 }
 
 type SectorStatus = 'ok' | 'error' | 'idle';
 
 function getSectorStatus(
   sectorId: string,
-  variables: Variable[],
-  results: Record<string, { value: number | null; status: string }>
+  variables: Variable[] = [],
+  results: Record<string, { value: number | null; status: string }> = {}
 ): SectorStatus {
-  const sectorVarIds = variables.filter(v => v.SETOR === sectorId).map(v => v['ID - REF']);
+  const sectorVarIds = (variables || []).filter(v => v && v.SETOR === sectorId).map(v => v['ID - REF']);
   if (sectorVarIds.length === 0) return 'idle';
-  const hasError = sectorVarIds.some(id => results[id]?.status && results[id].status !== 'OK');
+  const hasError = sectorVarIds.some(id => results && results[id]?.status && results[id].status !== 'OK');
   return hasError ? 'error' : 'ok';
 }
 
@@ -37,24 +42,52 @@ const STATUS_DOT: Record<SectorStatus, string> = {
 };
 
 export function Sidebar({
-  isSidebarExpanded,
-  setIsSidebarExpanded,
-  uniqueSectors,
-  activeSector,
-  setActiveSector,
-  variables,
-  sectors,
-  results,
+  isSidebarExpanded: propIsSidebarExpanded,
+  setIsSidebarExpanded: propSetIsSidebarExpanded,
+  isExpanded,
+  onToggleExpand,
+  uniqueSectors: propUniqueSectors,
+  activeSector = '',
+  setActiveSector: propSetActiveSector,
+  onSelectSector,
+  variables = [],
+  sectors = [],
+  results = {},
   onSubgroupClick,
+  onSelectSubgroup,
   onVariableClick,
   onSettingsClick,
+  onShowAll,
 }: SidebarProps) {
+  const [internalExpanded, setInternalExpanded] = useState(true);
   const [expandedSectors, setExpandedSectors] = useState<Record<string, boolean>>({});
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({});
   const [expandedCps, setExpandedCps] = useState<Record<string, boolean>>({});
 
+  const isExpandedActive = isExpanded ?? propIsSidebarExpanded ?? internalExpanded;
+
+  const toggleExpand = () => {
+    if (onToggleExpand) {
+      onToggleExpand();
+    } else if (propSetIsSidebarExpanded) {
+      propSetIsSidebarExpanded(prev => !prev);
+    } else {
+      setInternalExpanded(prev => !prev);
+    }
+  };
+
+  const handleSelectSector = (id: string) => {
+    if (onSelectSector) onSelectSector(id);
+    if (propSetActiveSector) propSetActiveSector(id);
+  };
+
+  const handleSubgroupSelect = (sectorId: string, subgroupName: string) => {
+    if (onSelectSubgroup) onSelectSubgroup(sectorId, subgroupName);
+    if (onSubgroupClick) onSubgroupClick(sectorId, subgroupName);
+  };
+
   const toggleSector = (id: string) => {
-    setActiveSector(id);
+    handleSelectSector(id);
     setExpandedSectors(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -68,35 +101,43 @@ export function Sidebar({
     setExpandedCps(prev => ({ ...prev, [`${sectorId}:${stage}:${cp}`]: !prev[`${sectorId}:${stage}:${cp}`] }));
   };
 
+  const uniqueSectorsList = propUniqueSectors ?? Array.from(new Set([
+    ...(sectors || []).map(s => s.id),
+    ...(variables || []).map(v => v.SETOR)
+  ])).filter(Boolean);
+
   return (
     <aside
       className={`flex flex-col bg-slate-800 text-white border-r border-slate-700/80 transition-all duration-300 shrink-0 z-20 select-none ${
-        isSidebarExpanded ? 'w-60' : 'w-10'
+        isExpandedActive ? 'w-60' : 'w-10'
       }`}
     >
       {/* ── Top Header ── */}
       <div className="flex items-center justify-between px-3 py-3 border-b border-slate-700/70 h-[56px]">
-        {isSidebarExpanded ? (
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-            Setores ({uniqueSectors.length})
-          </span>
+        {isExpandedActive ? (
+          <button
+            onClick={onShowAll}
+            className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+          >
+            Setores ({uniqueSectorsList.length})
+          </button>
         ) : (
           <span className="sr-only">Setores</span>
         )}
         <button
-          onClick={() => setIsSidebarExpanded(prev => !prev)}
+          onClick={toggleExpand}
           className="p-1.5 ml-auto text-slate-400 hover:text-white hover:bg-slate-700/60 rounded-lg flex items-center justify-center transition-colors"
-          aria-label={isSidebarExpanded ? 'Recolher setores' : 'Expandir setores'}
-          title={isSidebarExpanded ? 'Recolher setores' : 'Expandir setores'}
+          aria-label={isExpandedActive ? 'Recolher setores' : 'Expandir setores'}
+          title={isExpandedActive ? 'Recolher setores' : 'Expandir setores'}
         >
-          <BmeIcon name={isSidebarExpanded ? 'chevron-left' : 'chevron-right'} size={14} />
+          <BmeIcon name={isExpandedActive ? 'chevron-left' : 'chevron-right'} size={14} />
         </button>
       </div>
 
       {/* ── Nav ── */}
-      {isSidebarExpanded ? (
+      {isExpandedActive ? (
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
-          {uniqueSectors.map(sectorId => {
+          {uniqueSectorsList.map(sectorId => {
             const dbSector   = sectors.find(s => s.id === sectorId);
             const friendly   = dbSector ? dbSector.nome : getFriendlySectorName(sectorId);
             const sectorVars = variables.filter(v => v.SETOR === sectorId);
@@ -117,7 +158,6 @@ export function Sidebar({
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/50 font-medium'
                   }`}
                 >
-                  {/* Icon */}
                   <span className={`shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
                     isActive ? 'bg-white/20 text-white' : 'bg-slate-700/80 text-slate-300'
                   }`}>
@@ -166,7 +206,7 @@ export function Sidebar({
                             return (
                               <div key={cp} className="ml-3 border-l border-slate-700/40 pl-2">
                                 <div
-                                  onClick={() => onSubgroupClick(sectorId, cp)}
+                                  onClick={() => handleSubgroupSelect(sectorId, cp)}
                                   className="flex items-center gap-1.5 py-1 px-1.5 rounded text-[10px] text-slate-300 hover:text-teal-300 hover:bg-slate-700/40 cursor-pointer transition-colors"
                                 >
                                   <button
@@ -186,7 +226,7 @@ export function Sidebar({
                                 {isCpExp && cpVars.map(v => (
                                   <button
                                     key={v['ID - REF']}
-                                    onClick={() => onVariableClick(v['ID - REF'])}
+                                    onClick={() => onVariableClick && onVariableClick(v['ID - REF'])}
                                     title={`${v['ID - REF']}: ${v['DESCRIÇÃO']}`}
                                     className="w-full text-left flex items-center gap-1.5 py-0.5 px-2 ml-2 text-[9px] text-slate-400 hover:text-white hover:bg-slate-700/40 rounded transition-colors"
                                   >
@@ -208,9 +248,9 @@ export function Sidebar({
           })}
         </nav>
       ) : (
-        /* Quando recolhido: mostra lista vertical com ícones compactos */
+        /* Recolhido: lista vertical com ícones compactos */
         <div className="flex-1 overflow-y-auto py-3 flex flex-col items-center gap-2">
-          {uniqueSectors.map(sectorId => {
+          {uniqueSectorsList.map(sectorId => {
             const dbSector = sectors.find(s => s.id === sectorId);
             const friendly = dbSector ? dbSector.nome : getFriendlySectorName(sectorId);
             const isActive = activeSector === sectorId;
@@ -218,8 +258,8 @@ export function Sidebar({
               <button
                 key={sectorId}
                 onClick={() => {
-                  setActiveSector(sectorId);
-                  setIsSidebarExpanded(true);
+                  handleSelectSector(sectorId);
+                  toggleExpand();
                 }}
                 title={friendly}
                 className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all relative group ${

@@ -24,12 +24,16 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
     db_vars = db.exec(stmt_vars).all()
     vars_map = {v.id: v for v in db_vars}
     
-    # 3. Get all approved/final scenarios for the harvest year
+    # 3. Get all approved/final scenarios for the harvest year (fallback to all scenarios if status string varies)
     stmt_scenarios = select(Scenario).where(
-        Scenario.year_harvest == year_harvest_int,
-        Scenario.status.in_([ScenarioStatus.APROVADO, ScenarioStatus.FINAL])
+        Scenario.year_harvest == year_harvest_int
     )
-    scenarios = db.exec(stmt_scenarios).all()
+    all_scenarios = db.exec(stmt_scenarios).all()
+    approved_scs = [
+        s for s in all_scenarios 
+        if str(getattr(s.status, "value", s.status)).lower() in ["aprovado", "final", "scenariostatus.aprovado", "scenariostatus.final"]
+    ]
+    scenarios = approved_scs if approved_scs else all_scenarios
     
     # Group all available scenarios by month
     scenarios_by_month_all = {}
@@ -123,8 +127,9 @@ def calculate_harvest_plan_consolidation(year_harvest: Any, db: Session) -> Dict
     
     # Build dictionary of consolidated variables
     consolidated_dict = {}
+    has_any_in_plan = any(v.in_harvest_plan for v in vars_map.values())
     for var_id, var in vars_map.items():
-        if var.in_harvest_plan:
+        if var.in_harvest_plan or not has_any_in_plan:
             month_vals_dict = {m: monthly_results[m].get(var_id) for m in active_months}
             month_statuses_dict = {m: monthly_statuses[m].get(var_id, "PENDING") for m in active_months}
             accum_res = accumulated_results.get(var_id, {"value": None, "status": "PENDING", "error_message": ""})

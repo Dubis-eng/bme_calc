@@ -1,14 +1,21 @@
 import React from 'react';
-import { Sector } from '../../types';
+import { Sector, Variable } from '../../types';
 import { BmeIcon } from '../../styles/design-system';
 import { HarvestPlanTable } from './HarvestPlanTable';
 import { useHarvestPlanState } from '../../hooks/useHarvestPlanState';
 import apiClient from '../../api/client';
 
-interface HarvestPlanProps { sectors: Sector[]; }
+interface HarvestPlanProps {
+  sectors?: Sector[];
+  variables?: Variable[];
+  results?: Record<string, any>;
+  anoSafra?: number;
+  mesReferencia?: string;
+  isLocked?: boolean;
+}
 const ALL_MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-export function HarvestPlan({ sectors }: HarvestPlanProps) {
+export function HarvestPlan({ sectors = [] }: HarvestPlanProps) {
   const {
     years, selectedYear, setSelectedYear,
     startMonth, months,
@@ -139,7 +146,7 @@ export function HarvestPlan({ sectors }: HarvestPlanProps) {
 
           <select value={selectedSector} onChange={(e) => setSelectedSector(e.target.value)} className="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-black focus:outline-none focus:border-teal-600 shadow-sm">
             <option value="TODOS">Todos os Setores</option>
-            {sectors.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
+            {(sectors || []).map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
           </select>
         </div>
       </div>

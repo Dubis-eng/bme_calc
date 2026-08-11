@@ -3,12 +3,15 @@ import { Variable, Sector, FilterStatus } from '../../types';
 import { getFriendlySectorName } from '../../utils/helpers';
 
 interface StatusDashboardProps {
-  sectors: Sector[];
-  variables: Variable[];
-  results: Record<string, { value: number | null; status: string }>;
-  filter: FilterStatus;
-  setFilter: (filter: FilterStatus) => void;
-  onSectorClick: (sectorId: string) => void;
+  sectors?: Sector[];
+  variables?: Variable[];
+  results?: Record<string, { value: number | null; status: string }>;
+  filter?: FilterStatus;
+  activeFilter?: FilterStatus;
+  setFilter?: (filter: FilterStatus) => void;
+  onFilterChange?: (filter: FilterStatus) => void;
+  onSectorClick?: (sectorId: string) => void;
+  onScrollToVariable?: (refId: string) => void;
 }
 
 interface SectorSummary {
@@ -22,24 +25,28 @@ interface SectorSummary {
 }
 
 function buildSectorSummary(
-  sectors: Sector[],
-  variables: Variable[],
-  results: Record<string, { value: number | null; status: string }>,
-  uniqueSectorIds: string[]
+  sectors: Sector[] = [],
+  variables: Variable[] = [],
+  results: Record<string, { value: number | null; status: string }> = {},
+  uniqueSectorIds: string[] = []
 ): SectorSummary[] {
-  return uniqueSectorIds.map(id => {
-    const dbSector  = sectors.find(s => s.id === id);
+  const safeSectors = sectors || [];
+  const safeVariables = variables || [];
+  const safeResults = results || {};
+
+  return (uniqueSectorIds || []).map(id => {
+    const dbSector  = safeSectors.find(s => s && s.id === id);
     const name      = dbSector ? dbSector.nome : getFriendlySectorName(id);
-    const vars      = variables.filter(v => v.SETOR === id);
+    const vars      = safeVariables.filter(v => v && v.SETOR === id);
     const inputVars = vars.filter(v => v.TIPO === 'INPUT').length;
     const outputVars = vars.filter(v => v.TIPO !== 'INPUT').length;
     const errorCount = vars.filter(v => {
-      const r = results[v['ID - REF']];
+      const r = safeResults[v['ID - REF']];
       return r && r.status !== 'OK' && r.status !== 'PENDING';
     }).length;
 
     let status: 'ok' | 'error' | 'idle' = 'idle';
-    if (vars.length > 0 && Object.keys(results).length > 0) {
+    if (vars.length > 0 && Object.keys(safeResults).length > 0) {
       status = errorCount > 0 ? 'error' : 'ok';
     }
 
@@ -60,19 +67,40 @@ const FILTER_TABS: { id: FilterStatus; label: string }[] = [
   { id: 'idle',  label: 'Pendente' },
 ];
 
-export function StatusDashboard({ sectors, variables, results, filter, setFilter, onSectorClick }: StatusDashboardProps) {
+export function StatusDashboard({
+  sectors = [],
+  variables = [],
+  results = {},
+  filter: propFilter,
+  activeFilter,
+  setFilter: propSetFilter,
+  onFilterChange,
+  onSectorClick,
+  onScrollToVariable,
+}: StatusDashboardProps) {
+  const currentFilter = activeFilter ?? propFilter ?? 'all';
+  
+  const handleFilterSelect = (f: FilterStatus) => {
+    if (onFilterChange) onFilterChange(f);
+    if (propSetFilter) propSetFilter(f);
+  };
+
+  const safeSectors = sectors || [];
+  const safeVariables = variables || [];
+  const safeResults = results || {};
+
   const uniqueSectorIds = useMemo(() => Array.from(new Set([
-    ...sectors.map(s => s.id),
-    ...variables.map(v => v.SETOR),
-  ])), [sectors, variables]);
+    ...safeSectors.map(s => s.id),
+    ...safeVariables.map(v => v.SETOR),
+  ])).filter(Boolean), [safeSectors, safeVariables]);
 
   const summaries = useMemo(
-    () => buildSectorSummary(sectors, variables, results, uniqueSectorIds),
-    [sectors, variables, results, uniqueSectorIds]
+    () => buildSectorSummary(safeSectors, safeVariables, safeResults, uniqueSectorIds),
+    [safeSectors, safeVariables, safeResults, uniqueSectorIds]
   );
 
-  const filtered = filter === 'all' ? summaries : summaries.filter(s => s.status === filter);
-  const totalVars = variables.length;
+  const filtered = currentFilter === 'all' ? summaries : summaries.filter(s => s.status === currentFilter);
+  const totalVars = safeVariables.length;
   const errorTotal = summaries.reduce((acc, s) => acc + s.errorCount, 0);
   const okCount  = summaries.filter(s => s.status === 'ok').length;
 
@@ -103,10 +131,10 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
           {FILTER_TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setFilter(tab.id)}
+              onClick={() => handleFilterSelect(tab.id)}
               aria-label={`Filtrar por ${tab.label}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                filter === tab.id
+                currentFilter === tab.id
                   ? 'bg-white text-teal-800 border border-slate-300 shadow-sm font-bold'
                   : 'text-slate-600 hover:text-black hover:bg-white/60'
               }`}
@@ -125,7 +153,9 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
             <button
               key={s.id}
               id={`sector-card-${s.id}`}
-              onClick={() => onSectorClick(s.id)}
+              onClick={() => {
+                if (onSectorClick) onSectorClick(s.id);
+              }}
               className={`bg-white p-5 text-left group cursor-pointer border ${cfg.card} rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md`}
             >
               <div className="flex items-start justify-between mb-3">
@@ -147,7 +177,7 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
                 <span>{s.totalVars} variáveis</span>
                 <div className="flex gap-3">
                   <span className="text-teal-700 font-mono">{s.inputVars} in</span>
-                  <span className="text-indigo-700 font-mono">{s.outputVars} out</span>
+                  <span className="text-cyan-700 font-mono">{s.outputVars} out</span>
                 </div>
               </div>
             </button>
@@ -158,7 +188,7 @@ export function StatusDashboard({ sectors, variables, results, filter, setFilter
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center h-48 text-slate-500 bg-white border border-slate-200 rounded-2xl mt-4">
           <span className="text-3xl mb-2">◎</span>
-          <p className="text-sm font-semibold">Nenhum setor com status "{filter}"</p>
+          <p className="text-sm font-semibold">Nenhum setor com status "{currentFilter}"</p>
         </div>
       )}
     </div>

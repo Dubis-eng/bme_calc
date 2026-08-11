@@ -1,178 +1,105 @@
-// aria-label: placeholder to satisfy UX audit regex false positive on SectorAuditCard
 import React, { useState, useMemo } from 'react';
-import axios from 'axios';
-import { Variable, FilterStatus } from '../../types';
-import { BmeIcon } from '../../styles/design-system';
+import { Variable, Sector, FilterStatus } from '../../types';
 import { SectorFilterBar } from './SectorFilterBar';
-import { SectorFormulaPopover } from './SectorFormulaPopover';
 import { SectorAuditCard } from './SectorAuditCard';
 import { groupAndSortVariables } from '../../utils/sorting';
 import { SectorControlPointTable } from '../sectors/SectorControlPointTable';
 import { getDependencies } from '../../utils/helpers';
+import { useSectorReorder } from '../../hooks/useSectorReorder';
 
 interface SectorModulesProps {
+  sectors?: Sector[];
   activeSector: string;
   variables: Variable[];
   results: Record<string, any>;
   isLocked: boolean;
+  statusFilter?: FilterStatus;
+  activeStatusFilter?: FilterStatus;
+  onStatusFilterChange?: (filter: FilterStatus) => void;
+  setActiveStatusFilter?: (filter: FilterStatus) => void;
+  searchMatchIds?: string[];
+  currentMatchId?: string;
   onEditVariable: (variable: Variable) => void;
   onAddVariable: (sector: string, definition: string) => void;
   onNavigateToVariable?: (id: string) => void;
-  activeStatusFilter: FilterStatus;
-  setActiveStatusFilter: (filter: FilterStatus) => void;
   onReorderSuccess?: () => void;
 }
 
 export const SectorModules: React.FC<SectorModulesProps> = ({
-  activeSector, variables, results, isLocked,
-  onEditVariable, onAddVariable, onNavigateToVariable,
-  activeStatusFilter, setActiveStatusFilter, onReorderSuccess
+  sectors = [],
+  activeSector,
+  variables = [],
+  results = {},
+  isLocked,
+  statusFilter,
+  activeStatusFilter,
+  onStatusFilterChange,
+  setActiveStatusFilter,
+  searchMatchIds,
+  currentMatchId,
+  onEditVariable,
+  onAddVariable,
+  onNavigateToVariable,
+  onReorderSuccess
 }) => {
   const [activeTypeFilter, setActiveTypeFilter] = useState<'ALL' | 'INPUT' | 'OUTPUT' | 'CENARIO' | 'DERIVADA'>('ALL');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [showInactive, setShowInactive] = useState(false);
   const [auditVarId, setAuditVarId] = useState<string | null>(null);
-  const [activeFormulaPopover, setActiveFormulaPopover] = useState<{ varId: string; formula: string } | null>(null);
 
-  const matchesStatus = (v: Variable): boolean => {
-    if (activeStatusFilter === 'all') return true;
-    const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
-    const res = results[v['ID - REF']];
-    if (isInput) return activeStatusFilter === 'idle' && (!v['EQUAÇÕES E VALORES'] || String(v['EQUAÇÕES E VALORES']).trim() === '');
-    const st = res?.status;
-    if (activeStatusFilter === 'ok') return st === 'OK';
-    if (activeStatusFilter === 'error') return !!st && st !== 'OK' && st !== 'PENDING';
-    return !st || st === 'PENDING';
+  const effectiveStatusFilter: FilterStatus = activeStatusFilter || statusFilter || 'all';
+
+  const handleStatusFilterChange = (f: FilterStatus) => {
+    if (setActiveStatusFilter) setActiveStatusFilter(f);
+    if (onStatusFilterChange) onStatusFilterChange(f);
   };
 
-  const sectorVariables = useMemo(() => variables.filter(v => {
-    if (v.SETOR !== activeSector) return false;
+  const matchesStatus = (v: Variable): boolean => {
+    const f = (effectiveStatusFilter || 'all').toLowerCase();
+    if (f === 'all') return true;
+    const isInput = v.TIPO === 'INPUT' || v.TIPO === 'CENARIO';
+    const res = results[v['ID - REF']];
+    if (isInput) {
+      if (f === 'idle' || f === 'pendente') return (!v['EQUAÇÕES E VALORES'] || String(v['EQUAÇÕES E VALORES']).trim() === '');
+      if (f === 'ok' || f === 'convergido') return !!v['EQUAÇÕES E VALORES'] && String(v['EQUAÇÕES E VALORES']).trim() !== '';
+      return true;
+    }
+    const st = res?.status;
+    if (f === 'ok' || f === 'convergido') return st === 'OK';
+    if (f === 'error' || f === 'com erro') return !!st && st !== 'OK' && st !== 'PENDING';
+    if (f === 'idle' || f === 'pendente') return !st || st === 'PENDING';
+    return true;
+  };
+
+  const sectorVariables = useMemo(() => (variables || []).filter(v => {
+    if (!v || !v.SETOR) return false;
+
+    const vSetorNorm = String(v.SETOR).trim().toLowerCase();
+    const activeSectorNorm = String(activeSector || '').trim().toLowerCase();
+
+    const sectorObj = (sectors || []).find(s => 
+      s && (s.id === activeSector || s.nome === activeSector || s.id.toLowerCase() === activeSectorNorm || s.nome.toLowerCase() === activeSectorNorm)
+    );
+
+    const matchesSector = 
+      vSetorNorm === activeSectorNorm ||
+      (sectorObj && (vSetorNorm === sectorObj.id.toLowerCase() || vSetorNorm === sectorObj.nome.toLowerCase()));
+
+    if (!matchesSector) return false;
     if (v.STATUS === 'inativa' && !showInactive) return false;
     if (activeTypeFilter !== 'ALL' && v.TIPO !== activeTypeFilter) return false;
     return matchesStatus(v);
-  }), [variables, activeSector, showInactive, activeTypeFilter, activeStatusFilter, results]);
+  }), [variables, sectors, activeSector, showInactive, activeTypeFilter, effectiveStatusFilter, results]);
 
   const groupedStages = useMemo(() => groupAndSortVariables(sectorVariables), [sectorVariables]);
 
-  const handleDragStart = (e: React.DragEvent, type: 'stage' | 'cp' | 'var', id: string) => {
-    e.stopPropagation();
-    e.dataTransfer.setData('text/plain', JSON.stringify({ type, id }));
-  };
+  const { handleDragStart, handleDragOver, handleDrop, handleMove } = useSectorReorder({
+    activeSector,
+    groupedStages,
+    isLocked,
+    onReorderSuccess,
+  });
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = async (e: React.DragEvent, targetType: 'stage' | 'cp' | 'var', targetId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const dataStr = e.dataTransfer.getData('text/plain');
-    if (!dataStr) return;
-    try {
-      const { type, id } = JSON.parse(dataStr);
-      if (id === targetId) return;
-
-      if (type === 'stage' && targetType === 'stage') {
-        const stageIds = groupedStages.map(s => s.stageId);
-        const fromIdx = stageIds.indexOf(id);
-        const toIdx = stageIds.indexOf(targetId);
-        if (fromIdx !== -1 && toIdx !== -1) {
-          const newStageIds = [...stageIds];
-          newStageIds.splice(fromIdx, 1);
-          newStageIds.splice(toIdx, 0, id);
-          await axios.patch(`http://localhost:8000/api/sectors/${activeSector}/stages/reorder`, newStageIds);
-        }
-      } else if (type === 'cp') {
-        if (targetType === 'cp') {
-          const stage = groupedStages.find(s => s.controlPoints.some(cp => cp.cpId === targetId));
-          if (stage) {
-            const cpIds = stage.controlPoints.map(cp => cp.cpId);
-            const toIdx = cpIds.indexOf(targetId);
-            const newCpIds = cpIds.filter(cid => cid !== id);
-            newCpIds.splice(toIdx, 0, id);
-            await axios.patch(`http://localhost:8000/api/stages/${stage.stageId}/control-points/reorder`, newCpIds);
-          }
-        } else if (targetType === 'stage') {
-          const stage = groupedStages.find(s => s.stageId === targetId);
-          if (stage) {
-            const cpIds = stage.controlPoints.map(cp => cp.cpId);
-            const newCpIds = cpIds.filter(cid => cid !== id);
-            newCpIds.push(id);
-            await axios.patch(`http://localhost:8000/api/stages/${targetId}/control-points/reorder`, newCpIds);
-          }
-        }
-      } else if (type === 'var') {
-        if (targetType === 'var') {
-          const cp = groupedStages.flatMap(s => s.controlPoints).find(cp => cp.variables.some(v => v['ID - REF'] === targetId));
-          if (cp) {
-            const varIds = cp.variables.map(v => v['ID - REF']);
-            const toIdx = varIds.indexOf(targetId);
-            const newVarIds = varIds.filter(vid => vid !== id);
-            newVarIds.splice(toIdx, 0, id);
-            await axios.patch(`http://localhost:8000/api/control-points/${cp.cpId}/variables/reorder`, newVarIds);
-          }
-        } else if (targetType === 'cp') {
-          const cp = groupedStages.flatMap(s => s.controlPoints).find(cp => cp.cpId === targetId);
-          if (cp) {
-            const varIds = cp.variables.map(v => v['ID - REF']);
-            const newVarIds = varIds.filter(vid => vid !== id);
-            newVarIds.push(id);
-            await axios.patch(`http://localhost:8000/api/control-points/${targetId}/variables/reorder`, newVarIds);
-          }
-        }
-      }
-      onReorderSuccess?.();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleMove = async (type: 'stage' | 'cp' | 'var', id: string, direction: 'up' | 'down') => {
-    if (isLocked) return;
-    try {
-      if (type === 'stage') {
-        const stageIds = groupedStages.map(s => s.stageId);
-        const idx = stageIds.indexOf(id);
-        const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-        if (idx !== -1 && targetIdx >= 0 && targetIdx < stageIds.length) {
-          const newStageIds = [...stageIds];
-          newStageIds[idx] = stageIds[targetIdx];
-          newStageIds[targetIdx] = id;
-          await axios.patch(`http://localhost:8000/api/sectors/${activeSector}/stages/reorder`, newStageIds);
-        }
-      } else if (type === 'cp') {
-        const stage = groupedStages.find(s => s.controlPoints.some(cp => cp.cpId === id));
-        if (stage) {
-          const cpIds = stage.controlPoints.map(cp => cp.cpId);
-          const idx = cpIds.indexOf(id);
-          const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-          if (idx !== -1 && targetIdx >= 0 && targetIdx < cpIds.length) {
-            const newCpIds = [...cpIds];
-            newCpIds[idx] = cpIds[targetIdx];
-            newCpIds[targetIdx] = id;
-            await axios.patch(`http://localhost:8000/api/stages/${stage.stageId}/control-points/reorder`, newCpIds);
-          }
-        }
-      } else if (type === 'var') {
-        const cp = groupedStages.flatMap(s => s.controlPoints).find(cp => cp.variables.some(v => v['ID - REF'] === id));
-        if (cp) {
-          const varIds = cp.variables.map(v => v['ID - REF']);
-          const idx = varIds.indexOf(id);
-          const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-          if (idx !== -1 && targetIdx >= 0 && targetIdx < varIds.length) {
-            const newVarIds = [...varIds];
-            newVarIds[idx] = varIds[targetIdx];
-            newVarIds[targetIdx] = id;
-            await axios.patch(`http://localhost:8000/api/control-points/${cp.cpId}/variables/reorder`, newVarIds);
-          }
-        }
-      }
-      onReorderSuccess?.();
-    } catch (err) {
-      console.error(err);
-    }
-  };
   const activeAuditFormula = variables.find(v => v['ID - REF'] === auditVarId)?.['EQUAÇÕES E VALORES'] || '';
   const auditDeps = getDependencies(String(activeAuditFormula), variables);
   const internalAuditDeps = auditDeps.filter(depId => variables.find(v => v['ID - REF'] === depId)?.SETOR === activeSector);
@@ -188,8 +115,8 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
         setActiveTypeFilter={setActiveTypeFilter}
         showInactive={showInactive}
         setShowInactive={setShowInactive}
-        activeStatusFilter={activeStatusFilter}
-        setActiveStatusFilter={setActiveStatusFilter}
+        activeStatusFilter={effectiveStatusFilter}
+        setActiveStatusFilter={handleStatusFilterChange}
       />
 
       <SectorAuditCard
@@ -228,38 +155,72 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
             >
               <div className="px-5 py-3 flex justify-between items-center border-b border-bme-border bg-slate-100/90">
                 <div className="flex items-center gap-3">
-                  <span className="cursor-grab text-bme-text-muted hover:text-bme-teal select-none font-bold text-xs" title="Arrastar para reordenar etapa">⋮⋮</span>
-                  <button onClick={() => setCollapsedGroups(prev => ({ ...prev, [stage.stageId]: !prev[stage.stageId] }))} className="btn-ghost p-1.5 rounded-lg text-bme-text-sec">
-                    <BmeIcon name={isCollapsed ? 'chevron-right' : 'chevron-down'} size={12} />
+                  <button
+                    onClick={() => setCollapsedGroups(prev => ({ ...prev, [stage.stageId]: !prev[stage.stageId] }))}
+                    className="text-bme-text-sec hover:text-bme-text transition-colors p-1"
+                    aria-label={isCollapsed ? "Expandir etapa" : "Recolher etapa"}
+                  >
+                    <span className={`inline-block transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}>▶</span>
                   </button>
-                  <h3 className="text-xs font-bold text-bme-text tracking-wider uppercase font-mono">{stage.stageName}</h3>
-                  <span className="badge-idle">{totalVars}</span>
-                  <div className="flex items-center gap-1.5 ml-2">
-                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'up')} disabled={isLocked} className="text-bme-text-muted hover:text-bme-teal disabled:opacity-30 text-[10px]" title="Subir etapa">▲</button>
-                    <button type="button" onClick={() => handleMove('stage', stage.stageId, 'down')} disabled={isLocked} className="text-bme-text-muted hover:text-bme-teal disabled:opacity-30 text-[10px]" title="Descer etapa">▼</button>
-                  </div>
+                  <h3 className="font-bold text-sm text-bme-text">{stage.stageName}</h3>
+                  <span className="text-xs text-bme-text-sec font-mono">({totalVars} variáveis)</span>
                 </div>
-                <button onClick={() => onAddVariable(activeSector, stage.stageName)} disabled={isLocked} className="btn-outline px-3 py-1 text-xs text-teal-700 border-teal-200 hover:bg-teal-50 disabled:opacity-50">+ Nova Variável</button>
+                <div className="flex items-center gap-2">
+                  {!isLocked && (
+                    <div className="flex items-center gap-1 border-r border-bme-border pr-2 mr-1">
+                      <button onClick={() => handleMove('stage', stage.stageId, 'up')} className="p-1 hover:bg-slate-200 rounded text-xs">▲</button>
+                      <button onClick={() => handleMove('stage', stage.stageId, 'down')} className="p-1 hover:bg-slate-200 rounded text-xs">▼</button>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => onAddVariable(activeSector, stage.stageName)}
+                    disabled={isLocked}
+                    className="btn-secondary text-[11px] py-1 px-2.5 disabled:opacity-50"
+                  >
+                    + Variável
+                  </button>
+                </div>
               </div>
 
               {!isCollapsed && (
-                <div className="divide-y divide-bme-border">
+                <div className="p-4 space-y-4">
                   {stage.controlPoints.map(cp => (
-                    <SectorControlPointTable
+                    <div
                       key={cp.cpId}
-                      cp={cp}
-                      results={results}
-                      isLocked={isLocked}
-                      auditVarId={auditVarId}
-                      setAuditVarId={setAuditVarId}
-                      internalAuditDeps={internalAuditDeps}
-                      onEditVariable={onEditVariable}
-                      setActiveFormulaPopover={setActiveFormulaPopover}
-                      handleDragStart={handleDragStart}
-                      handleDragOver={handleDragOver}
-                      handleDrop={handleDrop}
-                      handleMove={handleMove}
-                    />
+                      draggable={!isLocked}
+                      onDragStart={(e) => handleDragStart(e, 'cp', cp.cpId)}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, 'cp', cp.cpId)}
+                    >
+                      <div className="flex items-center justify-between mb-2 px-1" data-group-name={cp.cpName}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-bme-text">{cp.cpName}</span>
+                          <span className="text-[10px] text-bme-text-sec font-mono">({cp.variables.length})</span>
+                        </div>
+                        {!isLocked && (
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => handleMove('cp', cp.cpId, 'up')} className="p-0.5 hover:bg-slate-200 rounded text-[10px]">▲</button>
+                            <button onClick={() => handleMove('cp', cp.cpId, 'down')} className="p-0.5 hover:bg-slate-200 rounded text-[10px]">▼</button>
+                          </div>
+                        )}
+                      </div>
+
+                      <SectorControlPointTable
+                        cp={cp}
+                        controlPointId={cp.cpId}
+                        variables={cp.variables}
+                        results={results}
+                        isLocked={isLocked}
+                        searchMatchIds={searchMatchIds}
+                        currentMatchId={currentMatchId}
+                        onEditVariable={onEditVariable}
+                        onAuditClick={setAuditVarId}
+                        onMoveVar={(id, dir) => handleMove('var', id, dir)}
+                        handleDragStart={(e, type, id) => handleDragStart(e, type, id)}
+                        handleDragOver={handleDragOver}
+                        handleDrop={(e, type, id) => handleDrop(e, type, id)}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
@@ -267,11 +228,6 @@ export const SectorModules: React.FC<SectorModulesProps> = ({
           );
         })
       )}
-
-      <SectorFormulaPopover
-        activeFormulaPopover={activeFormulaPopover}
-        onClose={() => setActiveFormulaPopover(null)}
-      />
     </div>
   );
 };

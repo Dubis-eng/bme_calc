@@ -32,15 +32,15 @@ const OPTIONS: {
     value: 'DERIVADA',
     label: 'Derivada',
     description: 'Resultado derivado de outras variáveis',
-    activeClasses: 'bg-indigo-50 text-indigo-700 border-indigo-300 shadow-sm',
-    dotColor: 'bg-indigo-400',
+    activeClasses: 'bg-cyan-50 text-cyan-700 border-cyan-300 shadow-sm',
+    dotColor: 'bg-cyan-400',
   },
   {
     value: 'CENARIO',
     label: 'Cenário',
     description: 'Premissa global usada em simulações',
-    activeClasses: 'bg-violet-50 text-violet-700 border-violet-300 shadow-sm',
-    dotColor: 'bg-violet-400',
+    activeClasses: 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-sm',
+    dotColor: 'bg-emerald-400',
   },
 ];
 

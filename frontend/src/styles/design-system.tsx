@@ -3,8 +3,8 @@ import React from 'react';
 // ── Variable Type Badges ─────────────────────────────────────
 export const TYPE_BADGE: Record<string, string> = {
   INPUT:    'bg-amber-50 text-amber-700 border-amber-200 font-semibold',
-  CENARIO:  'bg-violet-50 text-violet-700 border-violet-200 font-semibold',
-  DERIVADA: 'bg-indigo-50 text-indigo-700 border-indigo-200 font-semibold',
+  CENARIO:  'bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold',
+  DERIVADA: 'bg-cyan-50 text-cyan-700 border-cyan-200 font-semibold',
   OUTPUT:   'bg-teal-50 text-teal-700 border-teal-200 font-semibold',
 };
 

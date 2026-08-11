@@ -71,16 +71,20 @@ def save_harvest_plan_structure_endpoint(req: HarvestPlanStructureUpdate, db=Dep
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/api/harvest-plan/selections", response_model=HarvestPlanSelectionsResponse)
-def get_harvest_plan_selections_endpoint(year_harvest: int, db=Depends(get_session)):
+def get_harvest_plan_selections_endpoint(year_harvest: str, db=Depends(get_session)):
     try:
-        return services.get_harvest_plan_selections(year_harvest, db)
+        from src.db.database import parse_year
+        year_num = parse_year(year_harvest)
+        return services.get_harvest_plan_selections(year_num, db)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/api/harvest-plan/selections")
-def update_harvest_plan_selection_endpoint(req: HarvestPlanSelectionUpdate, year_harvest: int, db=Depends(get_session)):
+def update_harvest_plan_selection_endpoint(req: HarvestPlanSelectionUpdate, year_harvest: str, db=Depends(get_session)):
     try:
-        return services.update_harvest_plan_selection(year_harvest, req.month, req.scenario_id, req.exclude, db)
+        from src.db.database import parse_year
+        year_num = parse_year(year_harvest)
+        return services.update_harvest_plan_selection(year_num, req.month, req.scenario_id, req.exclude, db)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
