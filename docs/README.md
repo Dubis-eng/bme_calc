@@ -34,7 +34,8 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 
 ---
 
-## 📊 Diagramas de Arquitetura Interativos (Archify)
+## 📊 Diagramas de Arquitetura & Relatórios
+- [Relatório de Auditoria Recente](file:///c:/Users/dbzin/Documents/GitHub/bme_calc/docs/AUDIT_REPORT.md) — Diagnóstico automatizado de documentação, densidade de código, testes e segurança (`/reverse-engineer`).
 - [Arquitetura Geral](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_architecture.html) — Mapeamento de componentes frontend/backend, motor AST NetworkX e serviços de relatórios.
 - [Sequência de Cálculo](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_sequence.html) — Fluxo passo a passo de cálculo da rota `/api/calculate` e consultas termodinâmicas IAPWS97.
 - [Ciclo de Vida de Cenários](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/bme_calc_lifecycle.html) — Transição de estados dos cenários (`Rascunho`, `Em Simulação`, `Em Revisão`, `Aprovado`, `Arquivado`).

@@ -70,7 +70,7 @@
       --backend-fill:     rgba(6, 78, 59, 0.4);
       --backend-stroke:   #34d399;
       --database-fill:    rgba(76, 29, 149, 0.4);
-      --database-stroke:  #a78bfa;
+      --database-stroke:  #0d9488;
       --cloud-fill:       rgba(120, 53, 15, 0.3);
       --cloud-stroke:     #fbbf24;
       --security-fill:    rgba(136, 19, 55, 0.4);
@@ -109,8 +109,8 @@
       --frontend-stroke:  #0891b2;
       --backend-fill:     rgba(52, 211, 153, 0.18);
       --backend-stroke:   #059669;
-      --database-fill:    rgba(167, 139, 250, 0.2);
-      --database-stroke:  #7c3aed;
+      --database-fill:    rgba(20, 184, 166, 0.18);
+      --database-stroke:  #0d9488;
       --cloud-fill:       rgba(251, 191, 36, 0.18);
       --cloud-stroke:     #d97706;
       --security-fill:    rgba(251, 113, 133, 0.15);
@@ -148,8 +148,8 @@
       --frontend-stroke: #67e8f9;
       --backend-fill: rgba(16, 185, 129, 0.14);
       --backend-stroke: #5eead4;
-      --database-fill: rgba(139, 92, 246, 0.16);
-      --database-stroke: #c4b5fd;
+      --database-fill: rgba(20, 184, 166, 0.16);
+      --database-stroke: #2dd4bf;
       --cloud-fill: rgba(245, 158, 11, 0.13);
       --cloud-stroke: #fcd34d;
       --security-fill: rgba(244, 63, 94, 0.13);
@@ -362,13 +362,13 @@
     html[data-preset="signal-flow"] body {
       background-image:
         radial-gradient(circle at 18% -8%, rgba(34, 211, 238, 0.14), transparent 34rem),
-        radial-gradient(circle at 92% 18%, rgba(139, 92, 246, 0.12), transparent 30rem);
+        radial-gradient(circle at 92% 18%, rgba(20, 184, 166, 0.12), transparent 30rem);
       background-attachment: fixed;
     }
     html[data-preset="signal-flow"][data-theme="light"] body {
       background-image:
         radial-gradient(circle at 18% -8%, rgba(6, 182, 212, 0.12), transparent 34rem),
-        radial-gradient(circle at 92% 18%, rgba(139, 92, 246, 0.08), transparent 30rem);
+        radial-gradient(circle at 92% 18%, rgba(20, 184, 166, 0.08), transparent 30rem);
     }
     html[data-preset="blueprint"] body {
       background-image:
@@ -2743,7 +2743,7 @@
 
     .card-dot.cyan     { background: var(--frontend-stroke); }
     .card-dot.emerald  { background: var(--backend-stroke); }
-    .card-dot.violet   { background: var(--database-stroke); }
+    .card-dot.database { background: var(--database-stroke); }
     .card-dot.amber    { background: var(--cloud-stroke); }
     .card-dot.rose     { background: var(--security-stroke); }
     .card-dot.orange   { background: var(--messagebus-stroke); }
@@ -2810,7 +2810,7 @@
         --backend-fill:     rgba(52, 211, 153, 0.18);
         --backend-stroke:   #059669;
         --database-fill:    rgba(167, 139, 250, 0.2);
-        --database-stroke:  #7c3aed;
+        --database-stroke:  #0d9488;
         --cloud-fill:       rgba(251, 191, 36, 0.18);
         --cloud-stroke:     #d97706;
         --security-fill:    rgba(251, 113, 133, 0.15);
@@ -3009,7 +3009,7 @@
       right: 0.2rem;
       left: 0.2rem;
       height: 1px;
-      background: linear-gradient(90deg, #67e8f9, #c4b5fd);
+      background: linear-gradient(90deg, #67e8f9, #2dd4bf);
       box-shadow: 0 0 8px #67e8f9;
     }
     .preset-option-swatch.signal-flow::after {

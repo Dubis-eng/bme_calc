@@ -1,0 +1,26 @@
+{
+  "$schema": "antigravity_sdd_v2",
+  "project_status": {
+    "current_phase": "1_DISCOVERY",
+    "execution_locked": true
+  },
+  "phase_gates": {
+    "discovery_completed": false,
+    "socratic_questions_answered": 0,
+    "human_review_token": null,
+    "architecture_approved": false
+  },
+  "enforcement_metrics": {
+    "max_file_lines": 300,
+    "max_nesting_level": 3,
+    "strict_typing_enforced": true
+  },
+  "atomic_tasks": [
+    {
+      "id": "TASK-000",
+      "description": "Aguardando mapeamento de requisitos na fase de discovery",
+      "scope": "N/A",
+      "status": "BLOCKED"
+    }
+  ]
+}

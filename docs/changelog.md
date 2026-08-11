@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.0] - 2026-08-11
+
+### Fixed & Enhanced
+- **Persistência Imediata do Status de Cenários**:
+  - **Execução Instantânea do PATCH (`App.tsx`)**: Atualização do manipulador `handleStatusChange` para disparar imediatamente a requisição `PATCH /api/scenarios/:id/status` no backend assim que o usuário seleciona "Aprovado" ou "Final".
+  - **Manutenção de Status em Atualizações (`services_scenarios.py`)**: Atualizado o serviço `update_existing_scenario` no backend para aceitar e gravar a propriedade `status` recebida da requisição em vez de bloquear o salvamento.
+- **Liberação dos Seletores de Safra e Mês de Referência (`CalculatorTopBar.tsx`)**:
+  - Remoção da trava `disabled={isLocked}` dos menus dropdown de Safra e Mês na barra superior, permitindo que o usuário altere a safra e o mês de referência mesmo visualizando um cenário aprovado/final para criar novas versões.
+- **Correção e Formatação de Seleção de Versões no Plano de Safra (`services_harvest_plan.py` & `router_harvest_plan.py`)**:
+  - **Suporte a Safras String (`year_harvest`)**: Alterado o parâmetro dos endpoints `/api/harvest-plan/selections` de `int` para `str` com parser seguro `parse_year()`, corrigindo o erro 422 ao consultar safras formatadas como `"2026/2027"`.
+  - **Exibição de Versões e Status (`HarvestPlanTable.tsx`)**: Atualizado o retorno de `available_scenarios` para incluir todas as versões e formatar seus rótulos no dropdown (ex: `Cenário 2026 v1 (v1 - Aprovado)`).
+- **Resiliência e Fallbacks no Carregamento do Plano de Safra (`services_harvest_plan_calc.py`)**:
+  - Adicionado fallback automático para incluir todas as variáveis ativas do sistema na consolidação caso nenhuma esteja com a marcação `in_harvest_plan = True`.
+  - Adicionado fallback automático na busca de safras em `get_harvest_years` para consultar a tabela `Scenario.year_harvest` e retornar o padrão `[2026]` caso a tabela de safras esteja vazia.
+- **Padronização do Cliente HTTP e Resiliência de Conexão (`useScenarioIO.ts` & `client.ts`)**:
+  - Substituição de chamadas de `axios` com URLs fixas por `apiClient` e tratamento `.catch(() => ({ data: [] }))` gracioso em `useScenarioIO.ts`.
+  - Aumento do timeout padrão do `apiClient` de 10s para 30s para evitar erros prematuros durante recálculos e reinicializações de contêineres Docker.
+- **Nova Agent Skill (`.agent/skills/bme-calc-operations/SKILL.md`)**:
+  - Registro da skill de operações e padrões arquiteturais do BME Calc com base nas regras do Self-Learning.
+
 ## [2.25.0] - 2026-08-10
 
 ### Added & Refactored (Épico 30)
