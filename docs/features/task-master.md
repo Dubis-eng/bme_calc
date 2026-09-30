@@ -5,7 +5,8 @@
 | ID | Descrição | Arquivos / Escopo | Status | Dependências |
 |---|---|---|---|---|
 | TASK-3101 | Frontend: Modularizar `VariableModal.tsx` extraindo `VariableModalIdentitySection.tsx` e `VariableModalHarvestPlanSection.tsx` para cumprir o limite constitucional de 300 linhas físicas e eliminar tipos `any`. | `frontend/src/components/variables/VariableModal.tsx`, `VariableModalIdentitySection.tsx`, `VariableModalHarvestPlanSection.tsx` | `done` | Nenhum |
-| TASK-3102 | Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade (`python .agent/scripts/checklist.py .`). | Todo o repositório | `blocked` | TASK-3101 |
+| TASK-3103 | Backend: Modularizar `backend/src/services/services_variables.py` (377 linhas) extraindo `backend/src/services/services_variables_helpers.py` (<150 linhas) para cumprir o limite constitucional de 300 linhas físicas de `GEMINI.md`. | `backend/src/services/services_variables.py`, `services_variables_helpers.py` | `done` | TASK-3101 |
+| TASK-3102 | Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade (`python .agent/scripts/checklist.py .`). | Todo o repositório | `ready` | TASK-3103 |
 
 ---
 

@@ -1,57 +1,49 @@
-import datetime
 from typing import List, Dict, Any, Optional
 from sqlmodel import select, Session
-from sqlalchemy import func
 from src.db.database import (
-    Variable, Equation, Dependency, Sector,
+    Variable, Equation, Sector,
     VariableType, VariableStatus, Stage, ControlPoint, HarvestPlanOrderedItem
 )
-from src.core import engine
+from src.services.services_variables_helpers import (
+    _update_variable_equation,
+    _resolve_control_point,
+    _sync_variable_harvest_grouping
+)
 
-def _update_variable_equation(var_id: str, new_eq_val: str, db_var: Variable, db: Session):
-    stmt = select(Equation).where(Equation.variable_id == var_id, Equation.status == "ativa")
-    active_eqs = db.exec(stmt).all()
-    
-    if not (isinstance(new_eq_val, str) and new_eq_val.startswith("=")):
-        for eq in active_eqs:
-            eq.status = "desativada"
-            eq.updated_at = datetime.datetime.utcnow()
-            db.add(eq)
-        db.flush()
-        return
 
-    for eq in active_eqs:
-        if eq.expression_original == new_eq_val:
-            return
+def _format_variable_response(
+    db_var: Variable,
+    db_cp: ControlPoint,
+    etapa_str: str,
+    pc_str: str,
+    eq_val: str,
+    grouping: Optional[str]
+) -> Dict[str, Any]:
+    tipo_val = db_var.tipo.value if hasattr(db_var.tipo, 'value') else str(db_var.tipo)
+    status_val = db_var.status.value if hasattr(db_var.status, 'value') else str(db_var.status)
+    return {
+        "id": db_var.id,
+        "nome": db_var.nome,
+        "descricao": db_var.descricao,
+        "setor_id": db_var.setor_id,
+        "tipo": tipo_val,
+        "unidade": db_var.unidade,
+        "status": status_val,
+        "etapa": etapa_str or "GERAL",
+        "ponto_controle": pc_str or "GERAL",
+        "control_point_id": db_var.control_point_id,
+        "stage_id": db_cp.stage_id,
+        "ordem": db_var.ordem,
+        "equation_value": eq_val,
+        "casas_decimais": db_var.casas_decimais,
+        "tipo_exibicao": db_var.tipo_exibicao,
+        "percent_base": db_var.percent_base,
+        "in_harvest_plan": db_var.in_harvest_plan,
+        "harvest_plan_op": db_var.harvest_plan_op,
+        "harvest_plan_weight_var_id": db_var.harvest_plan_weight_var_id,
+        "agrupamento": grouping
+    }
 
-    for eq in active_eqs:
-        eq.status = "desativada"
-        eq.updated_at = datetime.datetime.utcnow()
-        db.add(eq)
-    db.flush()
-
-    db_eq = Equation(
-        variable_id=var_id,
-        expression_original=new_eq_val,
-        expression_normalized=engine.normalize_formula(new_eq_val),
-        version=len(active_eqs) + 1,
-        status="ativa"
-    )
-    db.add(db_eq)
-    db.flush()
-    
-    deps = engine.extract_dependencies(engine.normalize_formula(new_eq_val))
-    for idx, dep_id in enumerate(sorted(deps)):
-        dep_var = db.get(Variable, dep_id)
-        if not dep_var:
-            dep_var = Variable(
-                id=dep_id, nome=dep_id, descricao="Auto-criado por dependência",
-                setor_id=db_var.setor_id, tipo=VariableType.INPUT, status=VariableStatus.PENDENTE
-            )
-            db.add(dep_var)
-            db.flush()
-        db_dep = Dependency(equation_id=db_eq.id, dependency_var_id=dep_id, evaluation_order=idx)
-        db.add(db_dep)
 
 def list_variables(db: Session) -> List[Dict[str, Any]]:
     stmt = (
@@ -84,7 +76,6 @@ def list_variables(db: Session) -> List[Dict[str, Any]]:
     vars_list = []
     for var in db_vars:
         eq_val = eq_map.get(var.id, "")
-        
         etapa_name = ""
         cp_name = ""
         stage_id = None
@@ -125,73 +116,6 @@ def list_variables(db: Session) -> List[Dict[str, Any]]:
         })
     return vars_list
 
-def _resolve_control_point(sector_id: str, etapa_str: str, pc_str: str, db: Session) -> ControlPoint:
-    stage_name = etapa_str.strip() if etapa_str else "GERAL"
-    stmt = select(Stage).where(
-        Stage.sector_id == sector_id,
-        func.lower(func.trim(Stage.nome)) == stage_name.lower()
-    )
-    db_stage = db.exec(stmt).first()
-    if not db_stage:
-        all_orders = db.exec(select(Stage.ordem).where(Stage.sector_id == sector_id)).all()
-        next_ordem = max(all_orders) + 10 if all_orders else 10
-        db_stage = Stage(nome=stage_name, sector_id=sector_id, ordem=next_ordem)
-        db.add(db_stage)
-        db.flush()
-        
-    cp_name = pc_str.strip() if pc_str else "GERAL"
-    stmt = select(ControlPoint).where(
-        ControlPoint.stage_id == db_stage.id,
-        func.lower(func.trim(ControlPoint.nome)) == cp_name.lower()
-    )
-    db_cp = db.exec(stmt).first()
-    if not db_cp:
-        all_orders = db.exec(select(ControlPoint.ordem).where(ControlPoint.stage_id == db_stage.id)).all()
-        next_ordem = max(all_orders) + 10 if all_orders else 10
-        db_cp = ControlPoint(nome=cp_name, stage_id=db_stage.id, ordem=next_ordem)
-        db.add(db_cp)
-        db.flush()
-        
-    return db_cp
-
-def _sync_variable_harvest_grouping(var_id: str, in_harvest_plan: bool, agrupamento: Optional[str], db: Session):
-    var_items = db.exec(select(HarvestPlanOrderedItem).where(HarvestPlanOrderedItem.variable_id == var_id)).all()
-    if not in_harvest_plan:
-        for item in var_items:
-            db.delete(item)
-        db.flush()
-        return
-
-    group_label = agrupamento.strip() if (agrupamento and isinstance(agrupamento, str) and agrupamento.strip()) else "Itens sem Agrupamento"
-
-    divider = db.exec(select(HarvestPlanOrderedItem).where(
-        HarvestPlanOrderedItem.tipo == "divider",
-        HarvestPlanOrderedItem.label == group_label
-    )).first()
-
-    all_items = db.exec(select(HarvestPlanOrderedItem).order_by(HarvestPlanOrderedItem.ordem.asc())).all()
-
-    if not divider:
-        max_ord = max([it.ordem for it in all_items], default=-1)
-        divider = HarvestPlanOrderedItem(tipo="divider", label=group_label, ordem=max_ord + 1)
-        db.add(divider)
-        db.flush()
-        all_items.append(divider)
-
-    for item in var_items:
-        db.delete(item)
-    db.flush()
-
-    all_items = db.exec(select(HarvestPlanOrderedItem).order_by(HarvestPlanOrderedItem.ordem.asc())).all()
-    div_index = next((i for i, it in enumerate(all_items) if it.id == divider.id), len(all_items) - 1)
-    
-    new_var_item = HarvestPlanOrderedItem(tipo="variable", variable_id=var_id, ordem=0)
-    all_items.insert(div_index + 1, new_var_item)
-
-    for idx, item in enumerate(all_items):
-        item.ordem = idx
-        db.add(item)
-    db.flush()
 
 def create_variable(req, db: Session) -> Dict[str, Any]:
     req_id = (req.id or "").strip()
@@ -216,7 +140,6 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
     pc_str = (req.ponto_controle or "").strip()
     db_cp = _resolve_control_point(sector_id, etapa_str, pc_str, db)
     
-    # Calculate variable ordem if not provided or 0
     v_ordem = getattr(req, 'ordem', 0) or 0
     if v_ordem <= 0:
         all_var_orders = db.exec(select(Variable.ordem).where(Variable.control_point_id == db_cp.id)).all()
@@ -235,8 +158,8 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
         tipo=tipo,
         unidade=(req.unidade or "").strip(),
         status=VariableStatus((req.status or "ativa").strip().lower()),
-        etapa=db_cp.stage_id.hex, # dummy legacy value
-        ponto_controle=db_cp.id.hex, # dummy legacy value
+        etapa=db_cp.stage_id.hex,
+        ponto_controle=db_cp.id.hex,
         control_point_id=db_cp.id,
         ordem=v_ordem,
         casas_decimais=req.casas_decimais,
@@ -257,29 +180,8 @@ def create_variable(req, db: Session) -> Dict[str, Any]:
     
     db_eq = db.exec(select(Equation).where(Equation.variable_id == db_var.id, Equation.status == "ativa")).first()
     eq_val = db_eq.expression_original if db_eq else ""
-    
-    return {
-        "id": db_var.id,
-        "nome": db_var.nome,
-        "descricao": db_var.descricao,
-        "setor_id": db_var.setor_id,
-        "tipo": db_var.tipo.value,
-        "unidade": db_var.unidade,
-        "status": db_var.status.value,
-        "etapa": etapa_str or "GERAL",
-        "ponto_controle": pc_str or "GERAL",
-        "control_point_id": db_var.control_point_id,
-        "stage_id": db_cp.stage_id,
-        "ordem": db_var.ordem,
-        "equation_value": eq_val,
-        "casas_decimais": db_var.casas_decimais,
-        "tipo_exibicao": db_var.tipo_exibicao,
-        "percent_base": db_var.percent_base,
-        "in_harvest_plan": db_var.in_harvest_plan,
-        "harvest_plan_op": db_var.harvest_plan_op,
-        "harvest_plan_weight_var_id": db_var.harvest_plan_weight_var_id,
-        "agrupamento": grouping
-    }
+    return _format_variable_response(db_var, db_cp, etapa_str, pc_str, eq_val, grouping)
+
 
 def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
     db_var = db.get(Variable, var_id)
@@ -301,7 +203,6 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
     pc_str = (req.ponto_controle or "").strip()
     db_cp = _resolve_control_point(sector_id, etapa_str, pc_str, db)
     
-    # Calculate variable ordem if not provided or 0
     v_ordem = getattr(req, 'ordem', 0) or 0
     if v_ordem <= 0:
         if db_var.control_point_id != db_cp.id:
@@ -349,28 +250,4 @@ def update_variable(var_id: str, req, db: Session) -> Dict[str, Any]:
     
     db_eq = db.exec(select(Equation).where(Equation.variable_id == db_var.id, Equation.status == "ativa")).first()
     eq_val = db_eq.expression_original if db_eq else ""
-    
-    return {
-        "id": db_var.id,
-        "nome": db_var.nome,
-        "descricao": db_var.descricao,
-        "setor_id": db_var.setor_id,
-        "tipo": db_var.tipo.value,
-        "unidade": db_var.unidade,
-        "status": db_var.status.value,
-        "etapa": etapa_str or "GERAL",
-        "ponto_controle": pc_str or "GERAL",
-        "control_point_id": db_var.control_point_id,
-        "stage_id": db_cp.stage_id,
-        "ordem": db_var.ordem,
-        "equation_value": eq_val,
-        "casas_decimais": db_var.casas_decimais,
-        "tipo_exibicao": db_var.tipo_exibicao,
-        "percent_base": db_var.percent_base,
-        "in_harvest_plan": db_var.in_harvest_plan,
-        "harvest_plan_op": db_var.harvest_plan_op,
-        "harvest_plan_weight_var_id": db_var.harvest_plan_weight_var_id,
-        "agrupamento": grouping
-    }
-
-
+    return _format_variable_response(db_var, db_cp, etapa_str, pc_str, eq_val, grouping)

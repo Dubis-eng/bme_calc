@@ -23,10 +23,16 @@
       "status": "COMPLETED"
     },
     {
+      "id": "TASK-3103",
+      "description": "Backend: Modularizar backend/src/services/services_variables.py (377 linhas) extraindo backend/src/services/services_variables_helpers.py (<150 linhas) para cumprir o limite constitucional de 300 linhas físicas de GEMINI.md.",
+      "scope": "backend/src/services/services_variables.py, backend/src/services/services_variables_helpers.py",
+      "status": "COMPLETED"
+    },
+    {
       "id": "TASK-3102",
       "description": "Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade.",
       "scope": "Todo o repositório",
-      "status": "BLOCKED"
+      "status": "READY"
     }
   ]
 }

@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Criação do componente `VariableModalIdentitySection.tsx` isolando os campos de identificação cadastral e taxonomia industrial.
   - Criação do componente `VariableModalHarvestPlanSection.tsx` isolando as configurações do Plano de Safra, autocomplete de variáveis de peso e tipagem estrita sem `any`.
   - Redução de `VariableModal.tsx` de 414 linhas para 284 linhas físicas, atendendo integralmente ao limite de 300 linhas de `GEMINI.md`.
+- **Decomposição Modular de services_variables.py (TASK-3103)**:
+  - Criação do submódulo auxiliar `services_variables_helpers.py` (125 linhas) isolando a manipulação de equações AST, ciclo de vida de equações, auto-resolução de pontos de controle/etapas e agrupamentos do Plano de Safra.
+  - Refatoração de `services_variables.py` de 377 para 253 linhas físicas, unificando a formatação do payload de resposta e mantendo 100% de retrocompatibilidade com a reexportação de `_update_variable_equation`.
 
 ## [2.26.0] - 2026-08-11
 

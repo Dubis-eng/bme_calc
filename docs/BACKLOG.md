@@ -17,7 +17,7 @@ This file tracks automatic warnings and legacy failures to be resolved later.
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `.agents/skills/vulnerability-scanner/scripts/security_scan.py`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `.agents/ui-ux-pro-max/scripts/design_system.py`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/calculator/ProcessFlowCanvas.tsx`)
-- [ ] **Architecture Audit**: File exceeds 300 lines (File: `backend/src/services/services_variables.py`)
+- [x] **Architecture Audit**: File exceeds 300 lines (File: `backend/src/services/services_variables.py`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/App.tsx`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/sectors/SectorControlPointTable.tsx`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/settings/SystemSettingsModal.tsx`)
