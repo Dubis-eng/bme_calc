@@ -17,34 +17,16 @@
   },
   "atomic_tasks": [
     {
-      "id": "TASK-2701",
-      "description": "Frontend: Corrigir carregamento e retenção do layout salvo no banco em ProcessFlowCanvas.tsx impedindo reset ao trocar de abas.",
-      "scope": "frontend/src/components/calculator/ProcessFlowCanvas.tsx",
+      "id": "TASK-3101",
+      "description": "Frontend: Modularizar VariableModal.tsx extraindo VariableModalIdentitySection.tsx e VariableModalHarvestPlanSection.tsx para cumprir o limite constitucional de 300 linhas físicas e eliminar tipos any.",
+      "scope": "frontend/src/components/variables/VariableModal.tsx, VariableModalIdentitySection.tsx, VariableModalHarvestPlanSection.tsx",
       "status": "COMPLETED"
     },
     {
-      "id": "TASK-2702",
-      "description": "Frontend: Implementar dropdowns ativos e independentes de Ano Safra e Cenário/Versão na toolbar do fluxograma.",
-      "scope": "frontend/src/components/calculator/ProcessFlowToolbar.tsx, ProcessFlowCanvas.tsx",
-      "status": "COMPLETED"
-    },
-    {
-      "id": "TASK-2703",
-      "description": "Frontend: Reformular NodeVariableSelectorModal.tsx com edição/renomeação do título do bloco + seletores cascata (Setor → Etapa → Ponto de Controle).",
-      "scope": "frontend/src/components/calculator/NodeVariableSelectorModal.tsx, nodes/ProcessNode.tsx, nodes/IoNode.tsx",
-      "status": "COMPLETED"
-    },
-    {
-      "id": "TASK-2704",
-      "description": "Frontend: Implementar gerenciamento dinâmico de abas de setores (Adicionar novo setor customizado / Ocultar setor).",
-      "scope": "frontend/src/App.tsx, ProcessFlowCanvas.tsx",
-      "status": "COMPLETED"
-    },
-    {
-      "id": "TASK-2705",
-      "description": "Testes & Auditoria: Atualizar suítes de testes automatizados e validar sanidade via python .agent/scripts/checklist.py .",
-      "scope": "backend/tests/test_flowcharts.py, frontend/src/lib/generateDynamicSectorFlow.test.ts, todo o repositório",
-      "status": "COMPLETED"
+      "id": "TASK-3102",
+      "description": "Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade.",
+      "scope": "Todo o repositório",
+      "status": "BLOCKED"
     }
   ]
 }

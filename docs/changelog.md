@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.0] - 2026-09-30
+
+### Refactored & Enhanced
+- **Decomposição Modular do VariableModal (TASK-3101)**:
+  - Criação do componente `VariableModalIdentitySection.tsx` isolando os campos de identificação cadastral e taxonomia industrial.
+  - Criação do componente `VariableModalHarvestPlanSection.tsx` isolando as configurações do Plano de Safra, autocomplete de variáveis de peso e tipagem estrita sem `any`.
+  - Redução de `VariableModal.tsx` de 414 linhas para 284 linhas físicas, atendendo integralmente ao limite de 300 linhas de `GEMINI.md`.
+
 ## [2.26.0] - 2026-08-11
 
 ### Fixed & Enhanced
