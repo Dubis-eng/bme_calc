@@ -50,18 +50,18 @@ bme_calc/
 
 ## ⚙️ Componentes Principais & Fluxo de Dados
 
-### 1. Motor de Cálculo AST (`backend/engine.py`)
+### 1. Motor de Cálculo AST (`backend/src/core/engine.py` e `evaluator.py`)
 O motor traduz as fórmulas de strings do Excel para código Python interpretado via árvore de sintaxe abstrata (`ast`). O solucionador detecta dependências circulares e executa uma **ordenação topológica** (`networkx.DiGraph`). Se houver ciclos, resolve por iterações até convergência delta inferior a `0.0001` (máximo de 100 iterações).
 
-### 2. Otimizador Físico (`backend/goalseek.py`)
+### 2. Otimizador Físico (`backend/src/core/goalseek.py`)
 Utiliza `scipy.optimize.root_scalar` para encontrar o valor de um input que zera a diferença em relação ao valor da saída alvo:
 1. **Brentq**: Utilizado quando os sinais nos limites bracetam a raiz (`f(a) * f(b) < 0`).
 2. **Secante**: Fallback linear quando os limites não bracetam a raiz.
 3. **Nelder-Mead**: Fallback robótico multidimensional de minimização caso ocorra descontinuidade matemática (erros de domínio, divisão por zero ou IAPWS).
 
-### 3. Persistência e Governança (`backend/database.py`)
+### 3. Persistência e Governança (`backend/src/db/database.py`)
 Persiste os dados de maneira estruturada e relacional através do PostgreSQL normalizado em tabelas:
-* **Tabelas do Sistema**: `scenarios` (cenários de safra/mês), `variables` (propriedades de variáveis globais com status `ATIVA`, `PENDENTE`, `INVALIDA`, `INATIVA`), `equations` (fórmulas das variáveis), `dependencies` (grafo de dependências de cálculo), `results` (valores resultantes por cenário/versão), `sectors` (cadastro e ordenação de setores de processo) e `harvest_plan_settings` (configurações do plano de safra).
+* **Tabelas do Sistema**: `scenarios` (cenários de safra/mês), `variables` (propriedades de variáveis globais com status `ATIVA`, `PENDENTE`, `INVALIDA`, `INATIVA`), `equations` (fórmulas das variáveis), `dependencies` (grafo de dependências de cálculo), `results` (valores resultantes por cenário/versão), `sectors` (cadastro e ordenação de setores de processo), `harvest_plan_settings` (configurações do plano de safra) e `sector_flowcharts` (topologia do canvas).
 * **Versionamento Incremental**: O backend localiza automaticamente a versão máxima para aquele período e incrementa (`version + 1`).
 * **Bloqueio de Edição**: Caso o status do cenário no banco mude para `Aprovado` ou `Final`, o frontend desabilita todas as caixas de texto de entrada e o botão "Calcular", impedindo alterações acidentais.
 
@@ -69,7 +69,7 @@ Persiste os dados de maneira estruturada e relacional através do PostgreSQL nor
 * **Vapor**: Quando uma fórmula solicita `PROCV` com a tabela `Vapor` ou chama as funções `VAPOR_*` (ex: `VAPOR_H`, `VAPOR_S`), é resolvido via biblioteca `iapws` usando o padrão internacional **IAPWS-IF97** com suporte a pressões absolutas.
 * **Densidade (`J270`)**: Resolvido via polinômio físico de densidade OIML a 20°C para misturas hidroalcoólicas baseado na variável de entrada de INPM (`J269`).
 
-### 5. Consolidação do Plano de Safra (`backend/services.py` & `HarvestPlan.tsx`)
+### 5. Consolidação do Plano de Safra (`backend/src/services/services_harvest_plan.py` & `HarvestPlan.tsx`)
 * **Agregação Mensal e Anual**: Consolida dados operacionais e de balanço ao longo dos 12 meses do ano safra selecionado com base nos cenários homologados/aprovados.
 * **Operadores de Consolidação**:
   * `SUM`: Somatório dos valores mensais.
@@ -91,3 +91,7 @@ As migrações do banco de dados são gerenciadas através do Alembic:
   ```bash
   uv run alembic upgrade head
   ```
+
+### 7. Editor Topológico de Fluxogramas de Processo (`backend/src/api/router_flowcharts.py` & `ProcessFlowCanvas.tsx`)
+* **Modelagem Visual com XYFlow**: Renderização de nós de processo (`ProcessNode`), nós de entrada/saída (`IoNode`) e arestas direcionais refletindo a sequência de transformação do caldo e vapor.
+* **Persistência Dinâmica**: Layouts, coordenadas e campos de resumo selecionados são sincronizados na tabela `sector_flowcharts`, com suporte a modos de visualização detalhado (`full`) e executivo (`summary`).

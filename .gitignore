@@ -5,6 +5,8 @@
 # IDEs, Editores e Arquivos de Sistema
 .vscode/
 .idea/
+.claude/
+.grok/
 *.swp
 *.swo
 .DS_Store

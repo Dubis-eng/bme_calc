@@ -31,7 +31,7 @@ def parse_year(year_str: str) -> int:
     match = re.search(r'\d{4}', str(year_str))
     return int(match.group(0)) if match else 2026
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://uisa_user:uisa_password@localhost:5432/bme_calc")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///test.db")
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}

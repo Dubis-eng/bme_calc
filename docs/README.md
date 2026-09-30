@@ -4,6 +4,16 @@ Este arquivo serve como mapa de entrada e índice principal para toda a document
 
 ---
 
+## 📚 Documentação Canônica do Sistema
+* 📖 [Referência da API REST (docs/API.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/API.md) — Rotas, parâmetros e contratos da API FastAPI.
+* 🗄️ [Modelagem do Banco de Dados (docs/SCHEMA.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/SCHEMA.md) — Entidades SQLModel, enums e relacionamentos.
+* 🛠️ [Stack Tecnológica (docs/TECH_STACK.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/TECH_STACK.md) — Runtimes, bibliotecas, ferramentas de CI e infraestrutura.
+* 🏛️ [Decisões de Arquitetura - ADRs (docs/DECISIONS.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/DECISIONS.md) — Registro consolidado de ADR-001 a ADR-004.
+* 📊 [Relatório de Auditoria e Engenharia Reversa (docs/AUDIT_REPORT.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/AUDIT_REPORT.md) — Diagnóstico de densidade, segurança e cobertura.
+* 🎨 [Design System (docs/DESIGN.md)](file:///c:/Users/Dubis/Documents/GitHub/bme_calc/docs/DESIGN.md) — Padrão Pure White & High Contrast Black.
+
+---
+
 ## 🚀 Status das Funcionalidades Técnicas
 * **[DONE] Épico 1: Core de Cálculo** — Interpretador de fórmulas em árvore de sintaxe abstrata (AST) e ordenação por grafo topológico.
 * **[DONE] Épico 2: Núcleo de Processo** — Integração de fórmulas de Vapor IAPWS-IF97 para resolver tabelas externas.
