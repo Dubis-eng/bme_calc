@@ -41,6 +41,12 @@
       "status": "COMPLETED"
     },
     {
+      "id": "TASK-3106",
+      "description": "Frontend: Tipagem estrita de EquationAutocompleteState em VariableDrawerFormulaSection.tsx para sincronizar com useEquationAutocomplete e eliminar erro TS2322.",
+      "scope": "frontend/src/components/variables/VariableDrawerFormulaSection.tsx",
+      "status": "COMPLETED"
+    },
+    {
       "id": "TASK-3102",
       "description": "Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade.",
       "scope": "Todo o repositório",

@@ -4,18 +4,9 @@ import { FormulaEditor } from './FormulaEditor';
 import { EquationDropdown } from './EquationDropdown';
 import { ThermodynamicGuide } from './ThermodynamicGuide';
 import { Variable } from '../../types';
-import { AutocompleteResult, InjectionResult } from '../../hooks/useEquationAutocomplete';
+import { useEquationAutocomplete } from '../../hooks/useEquationAutocomplete';
 
-export interface EquationAutocompleteState {
-  isOpen: boolean;
-  results: AutocompleteResult[];
-  selectedIndex: number;
-  token: string;
-  handleInputChange: (val: string, cursor: number) => void;
-  handleKeyDown: (e: React.KeyboardEvent, formula: string, cursor: number) => InjectionResult | null;
-  selectResult: (varObj: Variable, formula: string, cursor: number) => InjectionResult;
-  dismiss: () => void;
-}
+export type EquationAutocompleteState = ReturnType<typeof useEquationAutocomplete>;
 
 interface FormulaSectionProps {
   type: 'INPUT' | 'OUTPUT' | 'DERIVADA' | 'CENARIO';

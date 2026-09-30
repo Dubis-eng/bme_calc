@@ -25,5 +25,5 @@ This file tracks automatic warnings and legacy failures to be resolved later.
 - [x] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/variables/VariableModal.tsx`)
 - [x] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/hooks/useFlowchartState.ts`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/variables/VariableDrawerMetadataSection.tsx`)
-- [ ] **Architecture Audit**: Tipo "any" banido — defina uma interface (File: `frontend/src/components/variables/VariableDrawerFormulaSection.tsx`)
+- [x] **Architecture Audit**: Tipo "any" banido — defina uma interface (File: `frontend/src/components/variables/VariableDrawerFormulaSection.tsx`)
 

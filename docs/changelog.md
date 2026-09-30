@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Criação de `flowchartTopology.ts` (48 linhas) centralizando geração de topologia de fluxo e normalização de arestas, eliminando ~75 linhas de código duplicado.
   - Criação do hook `useFlowchartScenarioSelector.ts` (36 linhas) isolando a seleção e carregamento de cenários e safras.
   - Redução de `useFlowchartState.ts` de 341 para 249 linhas físicas, mantendo compatibilidade total com `ProcessFlowCanvas.tsx`.
+- **Tipagem Estrita de Autocomplete de Equações (TASK-3106)**:
+  - Sincronização do tipo `EquationAutocompleteState` com `ReturnType<typeof useEquationAutocomplete>` em `VariableDrawerFormulaSection.tsx`.
+  - Resolução do erro de incompatibilidade de tipos `TS2322` ao passar o autocomplete para o drawer sem uso de `any` ou supressão de compilação.
 
 ## [2.26.0] - 2026-08-11
 
