@@ -1,25 +1,26 @@
 ---
 id: EPIC-31
-title: Correção do Plano de Safra, Seleção de Versões, Liberação de Seletores e Persistência de Status de Cenários — Concluído
+title: Refatoração de Densidade P0 e Decomposição Modular da Arquitetura — Concluído
 status: ACCEPTED
 branch: main
-last_updated: 2026-08-11
-current_task: Nenhuma — Versão 2.26.0 Concluída com Sucesso (100% Homologado, 7/7 Master Checklist PASS & 0 Erros)
+last_updated: 2026-09-30
+current_task: Nenhuma — Versão 2.27.0 Concluída com Sucesso (100% Homologado, 7/7 Master Checklist PASS & 0 Violações de Densidade)
 ---
 
-# SESSION — Versão 2.26.0: Resiliência do Plano de Safra, Seleção de Versões & Persistência de Status
+# SESSION — Versão 2.27.0: Refatoração de Densidade P0 e Decomposição Modular
 
 ## 📍 Estado Atual
 - **Branch ativa:** `main`
-- **Fase:** Versão 2.26.0 Totalmente Concluída, Auditada e Validada (7/7 Master Checklist PASS & 0 erros de compilação)
+- **Fase:** Versão 2.27.0 Totalmente Concluída, Auditada e Validada (7/7 Master Checklist PASS & 0 arquivos de aplicação > 300 linhas)
 - **Próxima tarefa:** Nenhuma
 
-## 🏁 Últimas Entregas Concluídas
-- **TASK-3101**: **Persistência Imediata de Status (`App.tsx` & `services_scenarios.py`)**: Sincronização instantânea no banco de dados via `PATCH /api/scenarios/:id/status` ao aprovar ou finalizar cenários, permitindo que a atualização do status seja salva e mantida após recarregamentos.
-- **TASK-3102**: **Liberação dos Seletores de Safra e Mês (`CalculatorTopBar.tsx`)**: Remoção da trava `disabled={isLocked}` dos menus de Safra e Mês de Referência mesmo em cenários aprovados, liberando a criação de novas versões/cenários para outros períodos.
-- **TASK-3103**: **Seleção Completa de Versões no Plano de Safra (`services_harvest_plan.py`, `router_harvest_plan.py`, `HarvestPlanTable.tsx`)**: Suporte a parâmetros string `year_harvest` (`2026/2027`) e exibição de todas as versões e status de cenários no cabeçalho da consolidação.
-- **TASK-3104**: **Resiliência e Fallbacks do Plano de Safra (`services_harvest_plan_calc.py`)**: Inclusão de fallbacks automáticos para incluir variáveis ativas no plano de safra e recuperar anos safra a partir dos cenários cadastrados caso as tabelas estejam vazias.
-- **TASK-3105**: **Padronização do Cliente HTTP & Self-Learning (`useScenarioIO.ts`, `client.ts`, `bme-calc-operations/SKILL.md`)**: Substituição de chamadas `axios` nativas por `apiClient` com timeout de 30s e criação da skill de operações BME Calc.
+## 🏁 Entregas do Épico 31 Concluídas
+- **TASK-3101**: **Decomposição do VariableModal (`VariableModal.tsx`, `VariableModalIdentitySection.tsx`, `VariableModalHarvestPlanSection.tsx`)**: Redução de 414 para 284 linhas físicas e eliminação de tipos `any`.
+- **TASK-3103**: **Decomposição do Serviço de Variáveis (`services_variables.py` & `services_variables_helpers.py`)**: Redução de 377 para 253 linhas físicas e criação do módulo auxiliar para ciclo de vida de equações e taxonomia fabril.
+- **TASK-3104**: **Decomposição de Configurações (`SystemSettingsModal.tsx`, `SystemSettingsYearsTab.tsx`, `SystemSettingsMonthsTab.tsx`, `SystemSettingsCycleTab.tsx`, `SystemSettingsSolverTab.tsx`)**: Redução de 335 para 117 linhas físicas e migração para `apiClient`.
+- **TASK-3105**: **Decomposição do Hook de Fluxograma (`useFlowchartState.ts`, `flowchartTopology.ts`, `useFlowchartScenarioSelector.ts`)**: Redução de 341 para 249 linhas físicas e eliminação de 75 linhas duplicadas de topologia.
+- **TASK-3106**: **Tipagem Estrita de Autocomplete (`VariableDrawerFormulaSection.tsx`)**: Sincronização de `EquationAutocompleteState` com `ReturnType<typeof useEquationAutocomplete>`, eliminando o erro de compilação `TS2322`.
+- **TASK-3102**: **Auditoria Final de Arquitetura**: 100% dos arquivos de aplicação em estrita conformidade com o limite de 300 linhas físicas do `GEMINI.md` (P0).
 
 ## ⚠️ Blockers / Open Issues
 - Nenhum.
