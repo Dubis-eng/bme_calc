@@ -13,13 +13,9 @@ import {
 import { useAtomValue, useSetAtom } from 'jotai';
 import apiClient from '../api/client';
 import { toast } from '../components/ui/Toast';
-
-import { getProcessFlowForSector } from '../lib/processFlow';
-import { generateDynamicSectorFlow } from '../lib/generateDynamicSectorFlow';
 import { getMergedVariablesAtom, selectedFieldIdAtom } from '../state/atoms';
-import { ScenarioMetadata } from '../types';
-
-const NODE_KIND_TO_TYPE: Record<string, string> = { io: 'ioNode', hub: 'hubNode', process: 'processNode' };
+import { mapCustomEdges, createDefaultFlowElements } from './flowchartTopology';
+import { useFlowchartScenarioSelector } from './useFlowchartScenarioSelector';
 
 export function useFlowchartState(sector: string) {
   const mergedVariables = useAtomValue(getMergedVariablesAtom);
@@ -33,46 +29,19 @@ export function useFlowchartState(sector: string) {
   const [isViewingDefault, setIsViewingDefault] = useState<boolean>(false);
   const [savedCustomLayout, setSavedCustomLayout] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
-  // Independent Scenario Selector state
-  const [availableScenarios, setAvailableScenarios] = useState<ScenarioMetadata[]>([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
-  const [availableYears, setAvailableYears] = useState<number[]>([2025, 2026, 2027]);
+  const scenarioSelector = useFlowchartScenarioSelector();
 
   // Modal State for attaching variables / renaming
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
-  useEffect(() => {
-    apiClient.get('/api/scenarios').then((res) => {
-      if (Array.isArray(res.data)) {
-        setAvailableScenarios(res.data);
-        if (res.data.length > 0 && !selectedScenarioId) {
-          setSelectedScenarioId(res.data[0].id);
-        }
-      }
-    }).catch(() => {});
-
-    apiClient.get('/api/harvest-plan/years').then((res) => {
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        setAvailableYears(res.data);
-      }
-    }).catch(() => {});
-  }, [selectedScenarioId]);
-
   const loadFlowchart = useCallback(async (sectorKey: string) => {
     setIsViewingDefault(false);
     try {
       const res = await apiClient.get(`/api/flowcharts/${encodeURIComponent(sectorKey)}`);
-      if (res.data && res.data.nodes && res.data.nodes.length > 0) {
+      if (res.data?.nodes && res.data.nodes.length > 0) {
         setNodes(res.data.nodes);
-        const mappedEdges = (res.data.edges || []).map((e: Edge) => ({
-          ...e,
-          type: 'smoothstep',
-          animated: true,
-          style: { strokeWidth: 2, stroke: '#0d9488' },
-          markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#14b8a6' },
-        }));
+        const mappedEdges = mapCustomEdges(res.data.edges || []);
         setEdges(mappedEdges);
         setSavedCustomLayout({ nodes: res.data.nodes, edges: mappedEdges });
         setHasCustomLayout(true);
@@ -82,27 +51,7 @@ export function useFlowchartState(sector: string) {
       // Fallback to auto topology
     }
 
-    const generated = generateDynamicSectorFlow(mergedVariables, sectorKey);
-    const flow = generated.nodes.length > 0 ? generated : getProcessFlowForSector(sectorKey);
-
-    const defaultNodes: Node[] = flow.nodes.map((n) => ({
-      id: n.id,
-      type: NODE_KIND_TO_TYPE[n.kind] || 'processNode',
-      position: n.position,
-      data: { title: n.title, subtitle: n.subtitle, fieldIds: n.fieldIds },
-      draggable: true,
-    }));
-
-    const defaultEdges: Edge[] = flow.edges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      type: 'smoothstep',
-      animated: true,
-      style: { strokeWidth: 2, stroke: '#0d9488' },
-      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#14b8a6' },
-    }));
-
+    const { nodes: defaultNodes, edges: defaultEdges } = createDefaultFlowElements(mergedVariables, sectorKey);
     setNodes(defaultNodes);
     setEdges(defaultEdges);
     setSavedCustomLayout(null);
@@ -226,27 +175,7 @@ export function useFlowchartState(sector: string) {
   const handleToggleDefaultView = useCallback(() => {
     if (!isViewingDefault) {
       setSavedCustomLayout({ nodes, edges });
-      const generated = generateDynamicSectorFlow(mergedVariables, sector);
-      const flow = generated.nodes.length > 0 ? generated : getProcessFlowForSector(sector);
-
-      const defaultNodes: Node[] = flow.nodes.map((n) => ({
-        id: n.id,
-        type: NODE_KIND_TO_TYPE[n.kind] || 'processNode',
-        position: n.position,
-        data: { title: n.title, subtitle: n.subtitle, fieldIds: n.fieldIds },
-        draggable: true,
-      }));
-
-      const defaultEdges: Edge[] = flow.edges.map((e) => ({
-        id: e.id,
-        source: e.source,
-        target: e.target,
-        type: 'smoothstep',
-        animated: true,
-        style: { strokeWidth: 2, stroke: '#0d9488' },
-        markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#14b8a6' },
-      }));
-
+      const { nodes: defaultNodes, edges: defaultEdges } = createDefaultFlowElements(mergedVariables, sector);
       setNodes(defaultNodes);
       setEdges(defaultEdges);
       setIsViewingDefault(true);
@@ -267,27 +196,7 @@ export function useFlowchartState(sector: string) {
     } catch {
       // ignore
     }
-    const generated = generateDynamicSectorFlow(mergedVariables, sector);
-    const flow = generated.nodes.length > 0 ? generated : getProcessFlowForSector(sector);
-
-    const defaultNodes: Node[] = flow.nodes.map((n) => ({
-      id: n.id,
-      type: NODE_KIND_TO_TYPE[n.kind] || 'processNode',
-      position: n.position,
-      data: { title: n.title, subtitle: n.subtitle, fieldIds: n.fieldIds },
-      draggable: true,
-    }));
-
-    const defaultEdges: Edge[] = flow.edges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      type: 'smoothstep',
-      animated: true,
-      style: { strokeWidth: 2, stroke: '#0d9488' },
-      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#14b8a6' },
-    }));
-
+    const { nodes: defaultNodes, edges: defaultEdges } = createDefaultFlowElements(mergedVariables, sector);
     setNodes(defaultNodes);
     setEdges(defaultEdges);
     setSavedCustomLayout(null);
@@ -330,11 +239,11 @@ export function useFlowchartState(sector: string) {
     editingNodeTitle,
     editingFieldIds,
     handleSaveNodeDetails,
-    availableScenarios,
-    selectedScenarioId,
-    setSelectedScenarioId,
-    selectedYear,
-    setSelectedYear,
-    availableYears,
+    availableScenarios: scenarioSelector.availableScenarios,
+    selectedScenarioId: scenarioSelector.selectedScenarioId,
+    setSelectedScenarioId: scenarioSelector.setSelectedScenarioId,
+    selectedYear: scenarioSelector.selectedYear,
+    setSelectedYear: scenarioSelector.setSelectedYear,
+    availableYears: scenarioSelector.availableYears,
   };
 }

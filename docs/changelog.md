@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Decomposição Modular de SystemSettingsModal (TASK-3104)**:
   - Criação dos subcomponentes de abas `SystemSettingsYearsTab.tsx` (99 linhas), `SystemSettingsMonthsTab.tsx` (109 linhas), `SystemSettingsCycleTab.tsx` (63 linhas) e `SystemSettingsSolverTab.tsx` (51 linhas).
   - Refatoração de `SystemSettingsModal.tsx` de 335 para 117 linhas físicas, padronizando chamadas via `apiClient` e adotando container responsivo com arquitetura defensiva de modais (`max-h-[90vh] flex flex-col`).
+- **Decomposição Modular de useFlowchartState (TASK-3105)**:
+  - Criação de `flowchartTopology.ts` (48 linhas) centralizando geração de topologia de fluxo e normalização de arestas, eliminando ~75 linhas de código duplicado.
+  - Criação do hook `useFlowchartScenarioSelector.ts` (36 linhas) isolando a seleção e carregamento de cenários e safras.
+  - Redução de `useFlowchartState.ts` de 341 para 249 linhas físicas, mantendo compatibilidade total com `ProcessFlowCanvas.tsx`.
 
 ## [2.26.0] - 2026-08-11
 

@@ -35,6 +35,12 @@
       "status": "COMPLETED"
     },
     {
+      "id": "TASK-3105",
+      "description": "Frontend: Modularizar useFlowchartState.ts (341 linhas) extraindo flowchartTopology.ts e useFlowchartScenarioSelector.ts para cumprir o limite constitucional de 300 linhas físicas de GEMINI.md.",
+      "scope": "frontend/src/hooks/useFlowchartState.ts, frontend/src/hooks/flowchartTopology.ts, frontend/src/hooks/useFlowchartScenarioSelector.ts",
+      "status": "COMPLETED"
+    },
+    {
       "id": "TASK-3102",
       "description": "Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade.",
       "scope": "Todo o repositório",
