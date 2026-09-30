@@ -20,7 +20,7 @@ This file tracks automatic warnings and legacy failures to be resolved later.
 - [x] **Architecture Audit**: File exceeds 300 lines (File: `backend/src/services/services_variables.py`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/App.tsx`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/sectors/SectorControlPointTable.tsx`)
-- [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/settings/SystemSettingsModal.tsx`)
+- [x] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/settings/SystemSettingsModal.tsx`)
 - [x] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/variables/VariableDrawer.tsx`)
 - [x] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/components/variables/VariableModal.tsx`)
 - [ ] **Architecture Audit**: File exceeds 300 lines (File: `frontend/src/hooks/useFlowchartState.ts`)

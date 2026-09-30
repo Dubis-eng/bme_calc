@@ -29,6 +29,12 @@
       "status": "COMPLETED"
     },
     {
+      "id": "TASK-3104",
+      "description": "Frontend: Modularizar SystemSettingsModal.tsx (335 linhas) extraindo abas de Safras, Meses, Ciclo e Solver para cumprir o limite constitucional de 300 linhas físicas de GEMINI.md.",
+      "scope": "frontend/src/components/settings/SystemSettingsModal.tsx, SystemSettingsYearsTab.tsx, SystemSettingsMonthsTab.tsx, SystemSettingsCycleTab.tsx, SystemSettingsSolverTab.tsx",
+      "status": "COMPLETED"
+    },
+    {
       "id": "TASK-3102",
       "description": "Auditoria & Verificação: Validar conformidade de densidade, tipagem estrita e execução do checklist de qualidade.",
       "scope": "Todo o repositório",

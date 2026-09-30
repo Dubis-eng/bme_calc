@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Decomposição Modular de services_variables.py (TASK-3103)**:
   - Criação do submódulo auxiliar `services_variables_helpers.py` (125 linhas) isolando a manipulação de equações AST, ciclo de vida de equações, auto-resolução de pontos de controle/etapas e agrupamentos do Plano de Safra.
   - Refatoração de `services_variables.py` de 377 para 253 linhas físicas, unificando a formatação do payload de resposta e mantendo 100% de retrocompatibilidade com a reexportação de `_update_variable_equation`.
+- **Decomposição Modular de SystemSettingsModal (TASK-3104)**:
+  - Criação dos subcomponentes de abas `SystemSettingsYearsTab.tsx` (99 linhas), `SystemSettingsMonthsTab.tsx` (109 linhas), `SystemSettingsCycleTab.tsx` (63 linhas) e `SystemSettingsSolverTab.tsx` (51 linhas).
+  - Refatoração de `SystemSettingsModal.tsx` de 335 para 117 linhas físicas, padronizando chamadas via `apiClient` e adotando container responsivo com arquitetura defensiva de modais (`max-h-[90vh] flex flex-col`).
 
 ## [2.26.0] - 2026-08-11
 
